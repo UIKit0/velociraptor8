@@ -12,6 +12,7 @@
 #include <assert.h>
 #include <ctype.h>
 
+#include <stdexcept>
 #include <string>
 #include <vector>
 #include <map>
@@ -1789,12 +1790,15 @@ void Editor::AddCharUTF(const char *s, unsigned int len, bool treatAsDBCS) {
 	{
 		UndoGroup ug(pdoc, (sel.Count() > 1) || !sel.Empty() || inOverstrike);
 
+		// Vector elements point into selection in order to change selection.
 		std::vector<SelectionRange *> selPtrs;
 		for (size_t r = 0; r < sel.Count(); r++) {
 			selPtrs.push_back(&sel.Range(r));
 		}
+		// Order selections by position in document.
 		std::sort(selPtrs.begin(), selPtrs.end(), cmpSelPtrs);
 
+		// Loop in reverse to avoid disturbing positions of selections yet to be processed.
 		for (std::vector<SelectionRange *>::reverse_iterator rit = selPtrs.rbegin();
 			rit != selPtrs.rend(); ++rit) {
 			SelectionRange *currentSel = *rit;
@@ -2105,6 +2109,7 @@ void Editor::Clear() {
 		ClearSelection();
 	}
 	sel.RemoveDuplicates();
+	ShowCaretAtCurrentPosition();		// Avoid blinking
 }
 
 void Editor::SelectAll() {
@@ -3654,18 +3659,23 @@ long Editor::FindText(
 	int lengthFound = istrlen(ft->lpstrText);
 	if (!pdoc->HasCaseFolder())
 		pdoc->SetCaseFolder(CaseFolderForEncoding());
-	int pos = pdoc->FindText(ft->chrg.cpMin, ft->chrg.cpMax, ft->lpstrText,
-	        (wParam & SCFIND_MATCHCASE) != 0,
-	        (wParam & SCFIND_WHOLEWORD) != 0,
-	        (wParam & SCFIND_WORDSTART) != 0,
-	        (wParam & SCFIND_REGEXP) != 0,
-	        static_cast<int>(wParam),
-	        &lengthFound);
-	if (pos != -1) {
-		ft->chrgText.cpMin = pos;
-		ft->chrgText.cpMax = pos + lengthFound;
+	try {
+		int pos = pdoc->FindText(ft->chrg.cpMin, ft->chrg.cpMax, ft->lpstrText,
+			(wParam & SCFIND_MATCHCASE) != 0,
+			(wParam & SCFIND_WHOLEWORD) != 0,
+			(wParam & SCFIND_WORDSTART) != 0,
+			(wParam & SCFIND_REGEXP) != 0,
+			static_cast<int>(wParam),
+			&lengthFound);
+		if (pos != -1) {
+			ft->chrgText.cpMin = pos;
+			ft->chrgText.cpMax = pos + lengthFound;
+		}
+		return pos;
+	} catch (RegexError &) {
+		errorStatus = SC_STATUS_WARN_REGEX;
+		return -1;
 	}
-	return pos;
 }
 
 /**
@@ -3699,22 +3709,27 @@ long Editor::SearchText(
 	int lengthFound = istrlen(txt);
 	if (!pdoc->HasCaseFolder())
 		pdoc->SetCaseFolder(CaseFolderForEncoding());
-	if (iMessage == SCI_SEARCHNEXT) {
-		pos = pdoc->FindText(searchAnchor, pdoc->Length(), txt,
-		        (wParam & SCFIND_MATCHCASE) != 0,
-		        (wParam & SCFIND_WHOLEWORD) != 0,
-		        (wParam & SCFIND_WORDSTART) != 0,
-		        (wParam & SCFIND_REGEXP) != 0,
-		        static_cast<int>(wParam),
-		        &lengthFound);
-	} else {
-		pos = pdoc->FindText(searchAnchor, 0, txt,
-		        (wParam & SCFIND_MATCHCASE) != 0,
-		        (wParam & SCFIND_WHOLEWORD) != 0,
-		        (wParam & SCFIND_WORDSTART) != 0,
-		        (wParam & SCFIND_REGEXP) != 0,
-		        static_cast<int>(wParam),
-		        &lengthFound);
+	try {
+		if (iMessage == SCI_SEARCHNEXT) {
+			pos = pdoc->FindText(searchAnchor, pdoc->Length(), txt,
+					(wParam & SCFIND_MATCHCASE) != 0,
+					(wParam & SCFIND_WHOLEWORD) != 0,
+					(wParam & SCFIND_WORDSTART) != 0,
+					(wParam & SCFIND_REGEXP) != 0,
+					static_cast<int>(wParam),
+					&lengthFound);
+		} else {
+			pos = pdoc->FindText(searchAnchor, 0, txt,
+					(wParam & SCFIND_MATCHCASE) != 0,
+					(wParam & SCFIND_WHOLEWORD) != 0,
+					(wParam & SCFIND_WORDSTART) != 0,
+					(wParam & SCFIND_REGEXP) != 0,
+					static_cast<int>(wParam),
+					&lengthFound);
+		}
+	} catch (RegexError &) {
+		errorStatus = SC_STATUS_WARN_REGEX;
+		return -1;
 	}
 	if (pos != -1) {
 		SetSelection(pos, pos + lengthFound);
@@ -3749,18 +3764,23 @@ long Editor::SearchInTarget(const char *text, int length) {
 
 	if (!pdoc->HasCaseFolder())
 		pdoc->SetCaseFolder(CaseFolderForEncoding());
-	int pos = pdoc->FindText(targetStart, targetEnd, text,
-	        (searchFlags & SCFIND_MATCHCASE) != 0,
-	        (searchFlags & SCFIND_WHOLEWORD) != 0,
-	        (searchFlags & SCFIND_WORDSTART) != 0,
-	        (searchFlags & SCFIND_REGEXP) != 0,
-	        searchFlags,
-	        &lengthFound);
-	if (pos != -1) {
-		targetStart = pos;
-		targetEnd = pos + lengthFound;
+	try {
+		int pos = pdoc->FindText(targetStart, targetEnd, text,
+				(searchFlags & SCFIND_MATCHCASE) != 0,
+				(searchFlags & SCFIND_WHOLEWORD) != 0,
+				(searchFlags & SCFIND_WORDSTART) != 0,
+				(searchFlags & SCFIND_REGEXP) != 0,
+				searchFlags,
+				&lengthFound);
+		if (pos != -1) {
+			targetStart = pos;
+			targetEnd = pos + lengthFound;
+		}
+		return pos;
+	} catch (RegexError &) {
+		errorStatus = SC_STATUS_WARN_REGEX;
+		return -1;
 	}
-	return pos;
 }
 
 void Editor::GoToLine(int lineNo) {
