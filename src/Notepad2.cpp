@@ -267,15 +267,14 @@ int   iSortOptions = 0;
 int   iAlignMode   = 0;
 
 BOOL      fIsElevated = FALSE;
-WCHAR     wchWndClass[16] = WC_NOTEPAD2;
+
+static WCHAR     fullWndClass[16] = WC_NOTEPAD2;
 
 HINSTANCE g_hInstance;
 HANDLE    g_hScintilla;
 UINT16    g_uWinVer;
 WCHAR     g_wchAppUserModelID[32] = L"";
 WCHAR     g_wchWorkingDirectory[MAX_PATH] = L"";
-
-
 
 #ifdef BOOKMARK_EDITION
     //Graphics for bookmark indicator
@@ -339,12 +338,6 @@ WCHAR     g_wchWorkingDirectory[MAX_PATH] = L"";
     "           "};
 #endif
 
-
-
-//=============================================================================
-//
-// Flags
-//
 int flagNoReuseWindow      = 0;
 int flagReuseWindow        = 0;
 int flagMultiFileArg       = 0;
@@ -374,13 +367,7 @@ int flagUseSystemMRU       = 0;
 int flagRelaunchElevated   = 0;
 int flagDisplayHelp        = 0;
 
-
-
-//==============================================================================
-//
 //  Folding Functions
-//
-//
 typedef enum {
   EXPAND =  1,
   SNIFF  =  0,
@@ -559,14 +546,20 @@ void __stdcall FoldAltArrow( int key, int mode )
   }
 }
 
+#if 0
+#include <string>
+std::string foo(std::string s) {
+    s.clear();
+    return s;
+}
+#endif
+
 int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdShow)
 {
-
   MSG msg;
   HWND hwnd;
   HACCEL hAccMain;
   HACCEL hAccFindReplace;
-  INITCOMMONCONTROLSEX icex;
   //HMODULE hSciLexer;
   WCHAR wchWorkingDirectory[MAX_PATH];
 
@@ -577,10 +570,10 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInst,LPSTR lpCmdLine,int n
   g_uWinVer = MAKEWORD(HIBYTE(g_uWinVer),LOBYTE(g_uWinVer));
 
   // Don't keep working directory locked
-  GetCurrentDirectory(COUNTOF(g_wchWorkingDirectory),g_wchWorkingDirectory);
-  GetModuleFileName(NULL,wchWorkingDirectory,COUNTOF(wchWorkingDirectory));
-  PathRemoveFileSpec(wchWorkingDirectory);
-  SetCurrentDirectory(wchWorkingDirectory);
+  GetCurrentDirectoryW(COUNTOF(g_wchWorkingDirectory),g_wchWorkingDirectory);
+  GetModuleFileNameW(NULL,wchWorkingDirectory,COUNTOF(wchWorkingDirectory));
+  PathRemoveFileSpecW(wchWorkingDirectory);
+  SetCurrentDirectoryW(wchWorkingDirectory);
 
   SetErrorMode(SEM_FAILCRITICALERRORS|SEM_NOOPENFILEERRORBOX);
 
@@ -599,7 +592,7 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInst,LPSTR lpCmdLine,int n
         NULL);
     MessageBox(NULL,(LPCWSTR)lpMsgBuf,L"Notepad2-mod",MB_OK|MB_ICONEXCLAMATION);
     LocalFree(lpMsgBuf);
-    return(0);
+    return 0;
   }
 
   fIsElevated = IsElevated();
@@ -616,25 +609,26 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInst,LPSTR lpCmdLine,int n
 
   if (flagDisplayHelp) {
     DisplayCmdLineHelp();
-    return(0);
+    return 0;
   }
 
   if (fIsElevated)
-    StrCat(wchWndClass,L"U");
+      StrCat(fullWndClass, L"U");
   if (flagPasteBoard)
-    StrCat(wchWndClass,L"B");
+      StrCat(fullWndClass, L"B");
 
   if (RelaunchElevated())
-    return(0);
+    return 0;
 
   if (RelaunchMultiInst())
-    return(0);
+    return 0;
 
   if (ActivatePrevInst())
-    return(0);
+    return 0;
 
   (void)OleInitialize(NULL);
 
+  INITCOMMONCONTROLSEX icex;
   icex.dwSize = sizeof(INITCOMMONCONTROLSEX);
   icex.dwICC  = ICC_WIN95_CLASSES|ICC_COOL_CLASSES|ICC_BAR_CLASSES|ICC_USEREX_CLASSES;
   InitCommonControlsEx(&icex);
@@ -670,7 +664,7 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInst,LPSTR lpCmdLine,int n
 
   // Save Settings is done elsewhere
   Scintilla_ReleaseResources();
-  UnregisterClass(wchWndClass,hInstance);
+  UnregisterClass(fullWndClass, hInstance);
 
   if (hModUxTheme)
     FreeLibrary(hModUxTheme);
@@ -693,7 +687,7 @@ BOOL InitApplication(HINSTANCE hInstance)
   wc.hCursor       = LoadCursor(NULL,IDC_ARROW);
   wc.hbrBackground = (HBRUSH)(COLOR_3DFACE+1);
   wc.lpszMenuName  = MAKEINTRESOURCE(IDR_MAINWND);
-  wc.lpszClassName = wchWndClass;
+  wc.lpszClassName = fullWndClass;
 
   return RegisterClass(&wc);
 
@@ -701,7 +695,6 @@ BOOL InitApplication(HINSTANCE hInstance)
 
 HWND InitInstance(HINSTANCE hInstance,LPSTR pszCmdLine,int nCmdShow)
 {
-
   RECT rc = { wi.x, wi.y, wi.x+wi.cx, wi.y+wi.cy };
   RECT rc2;
   MONITORINFO mi;
@@ -791,7 +784,7 @@ HWND InitInstance(HINSTANCE hInstance,LPSTR pszCmdLine,int nCmdShow)
 
   hwndMain = CreateWindowEx(
                0,
-               wchWndClass,
+               fullWndClass,
                L"Notepad2",
                WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN,
                wi.x,
@@ -981,14 +974,6 @@ HWND InitInstance(HINSTANCE hInstance,LPSTR pszCmdLine,int nCmdShow)
 
 }
 
-
-//=============================================================================
-//
-//  MainWndProc()
-//
-//  Messages are distributed to the MsgXXX-handlers
-//
-//
 LRESULT CALLBACK MainWndProc(HWND hwnd,UINT umsg,WPARAM wParam,LPARAM lParam)
 {
   static BOOL bShutdownOK;
@@ -1352,7 +1337,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd,UINT umsg,WPARAM wParam,LPARAM lParam)
             MinimizeWndToTray(hwnd);
             ShowNotifyIcon(hwnd,TRUE);
             SetNotifyIconTitle(hwnd);
-            return(0);
+            return 0;
           }
           else
             return DefWindowProc(hwnd,umsg,wParam,lParam);
@@ -1491,26 +1476,17 @@ LRESULT CALLBACK MainWndProc(HWND hwnd,UINT umsg,WPARAM wParam,LPARAM lParam)
         if (!IsWindowVisible(hwnd))
           ShowNotifyIcon(hwnd,TRUE);
           SetNotifyIconTitle(hwnd);
-        return(0);
+        return 0;
       }
 
       return DefWindowProc(hwnd,umsg,wParam,lParam);
-
   }
-
-  return(0);
-
+  return 0;
 }
 
-
-//=============================================================================
-//
-//  MsgCreate() - Handles WM_CREATE
-//
-//
+// Handles WM_CREATE
 LRESULT MsgCreate(HWND hwnd,WPARAM wParam,LPARAM lParam)
 {
-
   HINSTANCE hInstance = ((LPCREATESTRUCT)lParam)->hInstance;
 
   // Setup edit control
@@ -1688,16 +1664,11 @@ LRESULT MsgCreate(HWND hwnd,WPARAM wParam,LPARAM lParam)
       hwndStatus == NULL || hwndToolbar == NULL || hwndReBar == NULL)
     return(-1);
 
-  return(0);
+  return 0;
 
 }
 
-
-//=============================================================================
-//
-//  CreateBars() - Create Toolbar and Statusbar
-//
-//
+// Create Toolbar and Statusbar
 void CreateBars(HWND hwnd,HINSTANCE hInstance)
 {
   RECT rc;
@@ -1871,11 +1842,7 @@ void CreateBars(HWND hwnd,HINSTANCE hInstance)
 }
 
 
-//=============================================================================
-//
-//  MsgThemeChanged() - Handle WM_THEMECHANGED
-//
-//
+// Handle WM_THEMECHANGED
 void MsgThemeChanged(HWND hwnd,WPARAM wParam,LPARAM lParam)
 {
   RECT rc, rc2;
@@ -1929,14 +1896,9 @@ void MsgThemeChanged(HWND hwnd,WPARAM wParam,LPARAM lParam)
 }
 
 
-//=============================================================================
-//
-//  MsgSize() - Handles WM_SIZE
-//
-//
+//  Handles WM_SIZE
 void MsgSize(HWND hwnd,WPARAM wParam,LPARAM lParam)
 {
-
   RECT rc;
   int x,y,cx,cy;
   HDWP hdwp;
@@ -2004,12 +1966,7 @@ void MsgSize(HWND hwnd,WPARAM wParam,LPARAM lParam)
 
 }
 
-
-//=============================================================================
-//
-//  MsgInitMenu() - Handles WM_INITMENU
-//
-//
+// Handles WM_INITMENU
 void MsgInitMenu(HWND hwnd,WPARAM wParam,LPARAM lParam)
 {
 
@@ -2256,15 +2213,9 @@ void MsgInitMenu(HWND hwnd,WPARAM wParam,LPARAM lParam)
 
 }
 
-
-//=============================================================================
-//
-//  MsgCommand() - Handles WM_COMMAND
-//
-//
+// Handles WM_COMMAND
 LRESULT MsgCommand(HWND hwnd,WPARAM wParam,LPARAM lParam)
 {
-
   switch(LOWORD(wParam))
   {
 
@@ -2291,7 +2242,7 @@ LRESULT MsgCommand(HWND hwnd,WPARAM wParam,LPARAM lParam)
           int iXOffset    = (int)SendMessage(hwndEdit,SCI_GETXOFFSET,0,0);
 
           if ((bModified || iEncoding != iOriginalEncoding) && MsgBox(MBOKCANCEL,IDS_ASK_REVERT) != IDOK)
-            return(0);
+            return 0;
 
           lstrcpy(tchCurFile2,szCurFile);
 
@@ -2743,7 +2694,7 @@ LRESULT MsgCommand(HWND hwnd,WPARAM wParam,LPARAM lParam)
             iNewEncoding = CPI_UNICODEBE;
 
           if ((bModified || iEncoding != iOriginalEncoding) && MsgBox(MBOKCANCEL,IDS_ASK_RECODE) != IDOK)
-            return(0);
+            return 0;
 
           if (RecodeDlg(hwnd,&iNewEncoding)) {
 
@@ -5033,19 +4984,12 @@ LRESULT MsgCommand(HWND hwnd,WPARAM wParam,LPARAM lParam)
 
   }
 
-  return(0);
+  return 0;
 
 }
 
-
-//=============================================================================
-//
-//  MsgNotify() - Handles WM_NOTIFY
-//
-//
 LRESULT MsgNotify(HWND hwnd,WPARAM wParam,LPARAM lParam)
 {
-
   LPNMHDR pnmh = (LPNMHDR)lParam;
   struct SCNotification* scn = (struct SCNotification*)lParam;
 
@@ -5333,7 +5277,7 @@ LRESULT MsgNotify(HWND hwnd,WPARAM wParam,LPARAM lParam)
             for (i = 0; i < c; i++)
               SendMessage(hwndToolbar,TB_DELETEBUTTON,0,0);
             SendMessage(hwndToolbar,TB_ADDBUTTONS,NUMINITIALTOOLS,(LPARAM)tbbMainWnd);
-            return(0);
+            return 0;
           }
 
       }
@@ -5431,16 +5375,10 @@ LRESULT MsgNotify(HWND hwnd,WPARAM wParam,LPARAM lParam)
   }
 
 
-  return(0);
+  return 0;
 
 }
 
-
-//=============================================================================
-//
-//  LoadSettings()
-//
-//
 void LoadSettings()
 {
   WCHAR *pIniSection = (WCHAR*)LocalAlloc(LPTR,sizeof(WCHAR)*32*1024);
@@ -5748,17 +5686,9 @@ void LoadSettings()
       iDefaultCharSet = ANSI_CHARSET;
   }
 
-  // Scintilla Styles
   Style_Load();
-
 }
 
-
-//=============================================================================
-//
-//  SaveSettings()
-//
-//
 void SaveSettings(BOOL bSaveSettingsNow)
 {
   WCHAR *pIniSection = NULL;
@@ -5904,15 +5834,8 @@ void SaveSettings(BOOL bSaveSettingsNow)
 
 }
 
-
-//=============================================================================
-//
-//  ParseCommandLine()
-//
-//
 void ParseCommandLine()
 {
-
   LPWSTR lp1,lp2,lp3;
   BOOL bContinue = TRUE;
   BOOL bIsFileArg = FALSE;
@@ -6348,12 +6271,6 @@ void LoadFlags()
   LocalFree(pIniSection);
 }
 
-
-//=============================================================================
-//
-//  FindIniFile()
-//
-//
 int CheckIniFile(LPWSTR lpszFile,LPCWSTR lpszModule)
 {
   WCHAR tchFileExpanded[MAX_PATH];
@@ -6388,7 +6305,7 @@ int CheckIniFile(LPWSTR lpszFile,LPCWSTR lpszModule)
     return(1);
   }
 
-  return(0);
+  return 0;
 }
 
 int CheckIniFileRedirect(LPWSTR lpszFile,LPCWSTR lpszModule)
@@ -6413,7 +6330,7 @@ int CheckIniFileRedirect(LPWSTR lpszFile,LPCWSTR lpszModule)
       }
     }
   }
-  return(0);
+  return 0;
 }
 
 int FindIniFile() {
@@ -6425,7 +6342,7 @@ int FindIniFile() {
 
   if (lstrlen(szIniFile)) {
     if (lstrcmpi(szIniFile,L"*?") == 0)
-      return(0);
+      return 0;
     else {
       if (!CheckIniFile(szIniFile,tchModule)) {
         ExpandEnvironmentStringsEx(szIniFile,COUNTOF(szIniFile));
@@ -6464,13 +6381,12 @@ int FindIniFile() {
   return(1);
 }
 
-
 int TestIniFile() {
 
   if (lstrcmpi(szIniFile,L"*?") == 0) {
     lstrcpy(szIniFile2,L"");
     lstrcpy(szIniFile,L"");
-    return(0);
+    return 0;
   }
 
   if (PathIsDirectory(szIniFile) || *CharPrev(szIniFile,StrEnd(szIniFile)) == L'\\') {
@@ -6490,18 +6406,16 @@ int TestIniFile() {
   if (!PathFileExists(szIniFile) || PathIsDirectory(szIniFile)) {
     lstrcpy(szIniFile2,szIniFile);
     lstrcpy(szIniFile,L"");
-    return(0);
+    return 0;
   }
   else
     return(1);
 }
 
-
 int CreateIniFile() {
 
   return(CreateIniFileEx(szIniFile));
 }
-
 
 int CreateIniFileEx(LPCWSTR lpszIniFile) {
 
@@ -6529,19 +6443,13 @@ int CreateIniFileEx(LPCWSTR lpszIniFile) {
       return(1);
     }
     else
-      return(0);
+      return 0;
   }
 
   else
-    return(0);
+    return 0;
 }
 
-
-//=============================================================================
-//
-//  UpdateToolbar()
-//
-//
 #define EnableTool(id,b) SendMessage(hwndToolbar,TB_ENABLEBUTTON,id, \
                            MAKELONG(((b) ? 1 : 0), 0))
 
@@ -6580,15 +6488,8 @@ void UpdateToolbar()
 
 }
 
-
-//=============================================================================
-//
-//  UpdateStatusbar()
-//
-//
 void UpdateStatusbar()
 {
-
   int iPos;
   int iLn;
   int iLines;
@@ -6704,15 +6605,8 @@ void UpdateStatusbar()
   StatusSetText(hwndStatus,STATUS_LEXER,tchLexerName);
 
   //InvalidateRect(hwndStatus,NULL,TRUE);
-
 }
 
-
-//=============================================================================
-//
-//  UpdateLineNumberWidth()
-//
-//
 void UpdateLineNumberWidth()
 {
   char tchLines[32];
@@ -6736,12 +6630,6 @@ void UpdateLineNumberWidth()
     SendMessage(hwndEdit,SCI_SETMARGINWIDTHN,0,0);
 }
 
-
-//=============================================================================
-//
-//  FileIO()
-//
-//
 BOOL FileIO(BOOL fLoad,LPCWSTR psz,BOOL bNoEncDetect,int *ienc,int *ieol,
             BOOL *pbUnicodeErr,BOOL *pbFileTooBig,
             BOOL *pbCancelDataLoss,BOOL bSaveCopy)
@@ -6775,12 +6663,6 @@ BOOL FileIO(BOOL fLoad,LPCWSTR psz,BOOL bNoEncDetect,int *ienc,int *ieol,
   return(fSuccess);
 }
 
-
-//=============================================================================
-//
-//  FileLoad()
-//
-//
 BOOL FileLoad(BOOL bDontSave,BOOL bNew,BOOL bReload,BOOL bNoEncDetect,LPCWSTR lpszFile)
 {
   WCHAR tch[MAX_PATH] = L"";
@@ -6942,12 +6824,6 @@ BOOL FileLoad(BOOL bDontSave,BOOL bNew,BOOL bReload,BOOL bNoEncDetect,LPCWSTR lp
   return(fSuccess);
 }
 
-
-//=============================================================================
-//
-//  FileSave()
-//
-//
 BOOL FileSave(BOOL bSaveAlways,BOOL bAsk,BOOL bSaveAs,BOOL bSaveCopy)
 {
   WCHAR tchFile[MAX_PATH];
@@ -7080,12 +6956,6 @@ BOOL FileSave(BOOL bSaveAlways,BOOL bAsk,BOOL bSaveAs,BOOL bSaveCopy)
   return(fSuccess);
 }
 
-
-//=============================================================================
-//
-//  OpenFileDlg()
-//
-//
 BOOL OpenFileDlg(HWND hwnd,LPWSTR lpstrFile,int cchFile,LPCWSTR lpstrInitialDir)
 {
   OPENFILENAME ofn;
@@ -7136,12 +7006,6 @@ BOOL OpenFileDlg(HWND hwnd,LPWSTR lpstrFile,int cchFile,LPCWSTR lpstrInitialDir)
     return FALSE;
 }
 
-
-//=============================================================================
-//
-//  SaveFileDlg()
-//
-//
 BOOL SaveFileDlg(HWND hwnd,LPWSTR lpstrFile,int cchFile,LPCWSTR lpstrInitialDir)
 {
   OPENFILENAME ofn;
@@ -7192,23 +7056,14 @@ BOOL SaveFileDlg(HWND hwnd,LPWSTR lpstrFile,int cchFile,LPCWSTR lpstrInitialDir)
     return FALSE;
 }
 
-
-/******************************************************************************
-*
-* ActivatePrevInst()
-*
-* Tries to find and activate an already open Notepad2 Window
-*
-*
-******************************************************************************/
 BOOL CALLBACK EnumWndProc(HWND hwnd,LPARAM lParam)
 {
   BOOL bContinue = TRUE;
-  WCHAR szClassName[64];
+  WCHAR className[64];
 
-  if (GetClassName(hwnd,szClassName,COUNTOF(szClassName)))
+  if (GetClassNameW(hwnd, className, COUNTOF(className)))
 
-    if (lstrcmpi(szClassName,wchWndClass) == 0) {
+      if (lstrcmpiW(className, fullWndClass) == 0) {
 
       DWORD dwReuseLock = GetDlgItemInt(hwnd,IDC_REUSELOCK,NULL,FALSE);
       if (GetTickCount() - dwReuseLock >= REUSEWINDOWLOCKTIMEOUT) {
@@ -7219,17 +7074,17 @@ BOOL CALLBACK EnumWndProc(HWND hwnd,LPARAM lParam)
           bContinue = FALSE;
       }
     }
-  return(bContinue);
+  return bContinue;
 }
 
 BOOL CALLBACK EnumWndProc2(HWND hwnd,LPARAM lParam)
 {
   BOOL bContinue = TRUE;
-  WCHAR szClassName[64];
+  WCHAR className[64];
 
-  if (GetClassName(hwnd,szClassName,COUNTOF(szClassName)))
+  if (GetClassNameW(hwnd, className, COUNTOF(className)))
 
-    if (lstrcmpi(szClassName,wchWndClass) == 0) {
+      if (lstrcmpiW(className, fullWndClass) == 0) {
 
       DWORD dwReuseLock = GetDlgItemInt(hwnd,IDC_REUSELOCK,NULL,FALSE);
       if (GetTickCount() - dwReuseLock >= REUSEWINDOWLOCKTIMEOUT) {
@@ -7246,9 +7101,10 @@ BOOL CALLBACK EnumWndProc2(HWND hwnd,LPARAM lParam)
           bContinue = TRUE;
       }
     }
-  return(bContinue);
+  return bContinue;
 }
 
+// Tries to find and activate an already open Notepad2 Window
 BOOL ActivatePrevInst()
 {
   HWND hwnd = NULL;
@@ -7362,7 +7218,6 @@ BOOL ActivatePrevInst()
   // Found a window
   if (hwnd != NULL)
   {
-    // Enabled
     if (IsWindowEnabled(hwnd))
     {
       // Make sure the previous window won't pop up a change notification message
@@ -7463,12 +7318,6 @@ BOOL ActivatePrevInst()
     return FALSE;
 }
 
-
-//=============================================================================
-//
-//  RelaunchMultiInst()
-//
-//
 BOOL RelaunchMultiInst() {
 
   if (flagMultiFileArg == 2 && cFileList > 1) {
@@ -7521,12 +7370,6 @@ BOOL RelaunchMultiInst() {
   }
 }
 
-
-//=============================================================================
-//
-//  RelaunchElevated()
-//
-//
 BOOL RelaunchElevated() {
 
   if (!IsVista() || fIsElevated || !flagRelaunchElevated || flagDisplayHelp)
@@ -7569,14 +7412,7 @@ BOOL RelaunchElevated() {
   }
 }
 
-
-//=============================================================================
-//
-//  SnapToDefaultPos()
-//
 //  Aligns Notepad2 to the default window position on the current screen
-//
-//
 void SnapToDefaultPos(HWND hwnd)
 {
   WINDOWPLACEMENT wndpl;
@@ -7619,12 +7455,6 @@ void SnapToDefaultPos(HWND hwnd)
   SetWindowPlacement(hwnd,&wndpl);
 }
 
-
-//=============================================================================
-//
-//  ShowNotifyIcon()
-//
-//
 void ShowNotifyIcon(HWND hwnd,BOOL bAdd)
 {
 
@@ -7651,15 +7481,8 @@ void ShowNotifyIcon(HWND hwnd,BOOL bAdd)
 
 }
 
-
-//=============================================================================
-//
-//  SetNotifyIconTitle()
-//
-//
 void SetNotifyIconTitle(HWND hwnd)
 {
-
   NOTIFYICONDATA nid;
   SHFILEINFO shfi;
   WCHAR tchTitle[128];
@@ -7693,15 +7516,8 @@ void SetNotifyIconTitle(HWND hwnd)
 
 }
 
-
-//=============================================================================
-//
-//  InstallFileWatching()
-//
-//
 void InstallFileWatching(LPCWSTR lpszFile)
 {
-
   WCHAR tchDirectory[MAX_PATH];
   HANDLE hFind;
 
@@ -7720,7 +7536,6 @@ void InstallFileWatching(LPCWSTR lpszFile)
     }
     return;
   }
-
   // Install
   else
   {
@@ -7759,12 +7574,6 @@ void InstallFileWatching(LPCWSTR lpszFile)
   }
 }
 
-
-//=============================================================================
-//
-//  WatchTimerProc()
-//
-//
 void CALLBACK WatchTimerProc(HWND hwnd,UINT uMsg,UINT_PTR idEvent,DWORD dwTime)
 {
   if (bRunningWatch)
@@ -7821,12 +7630,6 @@ void CALLBACK WatchTimerProc(HWND hwnd,UINT uMsg,UINT_PTR idEvent,DWORD dwTime)
   }
 }
 
-
-//=============================================================================
-//
-//  PasteBoardTimer()
-//
-//
 void CALLBACK PasteBoardTimer(HWND hwnd,UINT uMsg,UINT_PTR idEvent,DWORD dwTime)
 {
   if (dwLastCopyTime > 0 && GetTickCount() - dwLastCopyTime > 200) {
@@ -7849,7 +7652,3 @@ void CALLBACK PasteBoardTimer(HWND hwnd,UINT uMsg,UINT_PTR idEvent,DWORD dwTime)
     dwLastCopyTime = 0;
   }
 }
-
-
-
-///  End of Notepad2.c  \\\

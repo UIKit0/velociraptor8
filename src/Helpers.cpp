@@ -1335,7 +1335,7 @@ DWORD GetLongPathNameEx(LPWSTR lpszPath,DWORD cchBuffer)
       CharUpperBuff(lpszPath,1);
     return(dwRet);
   }
-  return(0);
+  return 0;
 }
 
 
@@ -1379,7 +1379,7 @@ int FormatNumberStr(LPWSTR lpNumberStr)
   int  i = 0;
 
   if (!lstrlen(lpNumberStr))
-    return(0);
+    return 0;
 
   if (!GetLocaleInfo(LOCALE_USER_DEFAULT,
                      LOCALE_STHOUSAND,
@@ -1551,7 +1551,7 @@ BOOL MRU_Delete(LPMRULIST pmru,int iIndex) {
 
   int i;
   if (iIndex < 0 || iIndex > pmru->iSize-1)
-    return(0);
+    return 0;
   if (pmru->pszItems[iIndex])
     LocalFree(pmru->pszItems[iIndex]);
   for (i = iIndex; i < pmru->iSize-1; i++) {

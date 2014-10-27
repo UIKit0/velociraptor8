@@ -376,7 +376,7 @@ DWORD WINAPI DirList_IconThread(LPVOID lpParam)
   if (!lpdl->lpsf) {
     SetEvent(lpdl->hTerminatedThread);
     ExitThread(0);
-    return(0);
+    return 0;
   }
 
   hwnd = lpdl->hwnd;
@@ -460,7 +460,7 @@ DWORD WINAPI DirList_IconThread(LPVOID lpParam)
 
   SetEvent(lpdl->hTerminatedThread);
   ExitThread(0);
-  return(0);
+  return 0;
 
 }
 

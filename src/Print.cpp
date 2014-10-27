@@ -524,7 +524,7 @@ UINT_PTR CALLBACK PageSetupHook(HWND hwnd, UINT uiMsg, WPARAM wParam, LPARAM lPa
     default:
       break;
   }
-  return(0);
+  return 0;
 }
 
 

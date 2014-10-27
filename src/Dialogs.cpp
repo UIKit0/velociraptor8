@@ -62,7 +62,7 @@ int MsgBox(int iType,UINT uIdMsg,...)
   HWND hwnd;
 
   if (!GetString(uIdMsg,szBuf,COUNTOF(szBuf)))
-    return(0);
+    return 0;
 
   wvsprintfW(szText,szBuf,(va_list)((PUINT_PTR)&uIdMsg + 1));
 
@@ -138,7 +138,7 @@ int CALLBACK BFFCallBack(HWND hwnd,UINT umsg,LPARAM lParam,LPARAM lpData)
   if (umsg == BFFM_INITIALIZED)
     SendMessage(hwnd,BFFM_SETSELECTION,TRUE,lpData);
 
-  return(0);
+  return 0;
 
   lParam;
 }
@@ -977,7 +977,7 @@ DWORD WINAPI FileMRUIconThread(LPVOID lpParam) {
 
   SetEvent(lpit->hTerminatedThread);
   ExitThread(0);
-  return(0);
+  return 0;
 }
 
 INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd,UINT umsg,WPARAM wParam,LPARAM lParam)
