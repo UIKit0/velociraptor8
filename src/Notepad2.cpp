@@ -1141,7 +1141,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd,UINT umsg,WPARAM wParam,LPARAM lParam)
     // update Scintilla colors
     case WM_SYSCOLORCHANGE:
       {
-        extern PEDITLEXER pLexCurrent;
+        extern EDITLEXER* pLexCurrent;
         Style_SetLexer(hwndEdit,pLexCurrent);
         return DefWindowProc(hwnd,umsg,wParam,lParam);
       }

@@ -41,7 +41,7 @@ typedef struct _keywordlist
 } KEYWORDLIST, *PKEYWORDLIST;
 
 
-typedef struct _editlexer
+struct EDITLEXER
 {
   int iLexer;
   int rid;
@@ -49,9 +49,8 @@ typedef struct _editlexer
   WCHAR* pszDefExt;
   WCHAR  szExtensions[128];
   PKEYWORDLIST pKeyWords;
-  EDITSTYLE    Styles[];
-
-} EDITLEXER, *PEDITLEXER;
+  EDITSTYLE    Styles[0];
+};
 
 
 // Number of Lexers in pLexArray
@@ -62,7 +61,7 @@ void   Style_Load();
 void   Style_Save();
 BOOL   Style_Import(HWND);
 BOOL   Style_Export(HWND);
-void   Style_SetLexer(HWND,PEDITLEXER);
+void   Style_SetLexer(HWND, EDITLEXER*);
 void   Style_SetLongLineColors(HWND);
 void   Style_SetCurrentLineBackground(HWND);
 void   Style_SetLexerFromFile(HWND,LPCWSTR);
@@ -89,8 +88,8 @@ BOOL   Style_SelectColor(HWND,BOOL,LPWSTR,int);
 void   Style_SetStyles(HWND,int,LPCWSTR);
 void   Style_SetFontQuality(HWND,LPCWSTR);
 void   Style_GetCurrentLexerName(LPWSTR,int);
-int    Style_GetLexerIconId(PEDITLEXER);
-HTREEITEM Style_AddLexerToTreeView(HWND,PEDITLEXER);
+int    Style_GetLexerIconId(EDITLEXER*);
+HTREEITEM Style_AddLexerToTreeView(HWND, EDITLEXER*);
 INT_PTR CALLBACK Styles_ConfigDlgProc(HWND,UINT,WPARAM,LPARAM);
 void   Style_ConfigDlg(HWND);
 INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND,UINT,WPARAM,LPARAM);

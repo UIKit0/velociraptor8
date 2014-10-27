@@ -2431,7 +2431,7 @@ EDITLEXER lexVHDL = { SCLEX_VHDL, 63370, L"VHDL", L"vhdl; vhd", L"", &KeyWords_V
 // This array holds all the lexers...
 // Don't forget to change the number of the lexer for HTML and XML
 // in Notepad2.c ParseCommandLine() if you change this array!
-PEDITLEXER pLexArray[NUMLEXERS] =
+EDITLEXER* pLexArray[NUMLEXERS] =
 {
   &lexDefault,
   &lexANSI,
@@ -2472,9 +2472,8 @@ PEDITLEXER pLexArray[NUMLEXERS] =
   &lexVHDL
 };
 
-
 // Currently used lexer
-PEDITLEXER pLexCurrent = &lexDefault;
+EDITLEXER* pLexCurrent = &lexDefault;
 COLORREF crCustom[16];
 BOOL bUse2ndDefaultStyle;
 BOOL fStylesModified = FALSE;
@@ -2489,11 +2488,6 @@ extern int  iDefaultCodePage;
 extern int  iDefaultCharSet;
 extern BOOL bHiliteCurrentLine;
 
-
-//=============================================================================
-//
-//  Style_Load()
-//
 void Style_Load()
 {
   int i,iLexer;
@@ -2570,11 +2564,6 @@ void Style_Load()
   LocalFree(pIniSection);
 }
 
-
-//=============================================================================
-//
-//  Style_Save()
-//
 void Style_Save()
 {
   int i,iLexer;
@@ -2627,11 +2616,6 @@ void Style_Save()
   LocalFree(pIniSection);
 }
 
-
-//=============================================================================
-//
-//  Style_Import()
-//
 BOOL Style_Import(HWND hwnd)
 {
   WCHAR szFile[MAX_PATH * 2] = L"";
@@ -2679,10 +2663,6 @@ BOOL Style_Import(HWND hwnd)
   return(FALSE);
 }
 
-//=============================================================================
-//
-//  Style_Export()
-//
 BOOL Style_Export(HWND hwnd)
 {
   WCHAR szFile[MAX_PATH * 2] = L"";
@@ -2730,12 +2710,7 @@ BOOL Style_Export(HWND hwnd)
   return(FALSE);
 }
 
-
-//=============================================================================
-//
-//  Style_SetLexer()
-//
-void Style_SetLexer(HWND hwnd,PEDITLEXER pLexNew)
+void Style_SetLexer(HWND hwnd, EDITLEXER* pLexNew)
 {
   int i;
   //WCHAR *p;
@@ -3129,11 +3104,6 @@ void Style_SetLexer(HWND hwnd,PEDITLEXER pLexNew)
   pLexCurrent = pLexNew;
 }
 
-
-//=============================================================================
-//
-//  Style_SetLongLineColors()
-//
 void Style_SetLongLineColors(HWND hwnd)
 {
   int rgb;
@@ -3155,11 +3125,6 @@ void Style_SetLongLineColors(HWND hwnd)
   }
 }
 
-
-//=============================================================================
-//
-//  Style_SetCurrentLineBackground()
-//
 void Style_SetCurrentLineBackground(HWND hwnd)
 {
   int rgb, iValue;
@@ -3186,12 +3151,7 @@ void Style_SetCurrentLineBackground(HWND hwnd)
     SendMessage(hwnd,SCI_SETCARETLINEVISIBLE,FALSE,0);
 }
 
-
-//=============================================================================
-//
-//  Style_SniffShebang()
-//
-PEDITLEXER __fastcall Style_SniffShebang(char *pchText)
+EDITLEXER* __fastcall Style_SniffShebang(char *pchText)
 {
   if (StrCmpNA(pchText,"#!",2) == 0) {
     char *pch = pchText + 2;
@@ -3228,12 +3188,7 @@ PEDITLEXER __fastcall Style_SniffShebang(char *pchText)
   return(NULL);
 }
 
-
-//=============================================================================
-//
-//  Style_MatchLexer()
-//
-PEDITLEXER __fastcall Style_MatchLexer(LPCWSTR lpszMatch,BOOL bCheckNames)
+EDITLEXER* __fastcall Style_MatchLexer(LPCWSTR lpszMatch, BOOL bCheckNames)
 {
   int i;
   WCHAR  tch[256+16];
@@ -3273,11 +3228,6 @@ PEDITLEXER __fastcall Style_MatchLexer(LPCWSTR lpszMatch,BOOL bCheckNames)
   return(NULL);
 }
 
-
-//=============================================================================
-//
-//  Style_SetLexerFromFile()
-//
 extern int fNoHTMLGuess;
 extern int fNoCGIGuess;
 extern FILEVARS fvCurFile;
@@ -3286,13 +3236,13 @@ void Style_SetLexerFromFile(HWND hwnd,LPCWSTR lpszFile)
 {
   LPWSTR lpszExt = PathFindExtension(lpszFile);
   BOOL  bFound = FALSE;
-  PEDITLEXER pLexNew = pLexArray[iDefaultLexer];
-  PEDITLEXER pLexSniffed;
+  EDITLEXER* pLexNew = pLexArray[iDefaultLexer];
+  EDITLEXER* pLexSniffed;
 
   if ((fvCurFile.mask & FV_MODE) && fvCurFile.tchMode[0]) {
 
     WCHAR wchMode[32];
-    PEDITLEXER pLexMode;
+    EDITLEXER* pLexMode;
     UINT cp = (UINT)SendMessage(hwnd,SCI_GETCODEPAGE,0,0);
     MultiByteToWideChar(cp,0,fvCurFile.tchMode,-1,wchMode,COUNTOF(wchMode));
 
@@ -3395,14 +3345,9 @@ void Style_SetLexerFromFile(HWND hwnd,LPCWSTR lpszFile)
   Style_SetLexer(hwnd,pLexNew);
 }
 
-
-//=============================================================================
-//
-//  Style_SetLexerFromName()
-//
 void Style_SetLexerFromName(HWND hwnd,LPCWSTR lpszFile,LPCWSTR lpszName)
 {
-  PEDITLEXER pLexNew;
+    EDITLEXER* pLexNew;
   if (pLexNew = Style_MatchLexer(lpszName,FALSE))
     Style_SetLexer(hwnd,pLexNew);
   else if (pLexNew = Style_MatchLexer(lpszName,TRUE))
@@ -3411,41 +3356,21 @@ void Style_SetLexerFromName(HWND hwnd,LPCWSTR lpszFile,LPCWSTR lpszName)
     Style_SetLexerFromFile(hwnd,lpszFile);
 }
 
-
-//=============================================================================
-//
-//  Style_SetDefaultLexer()
-//
 void Style_SetDefaultLexer(HWND hwnd)
 {
   Style_SetLexer(hwnd,pLexArray[0]);
 }
 
-
-//=============================================================================
-//
-//  Style_SetHTMLLexer()
-//
 void Style_SetHTMLLexer(HWND hwnd)
 {
   Style_SetLexer(hwnd,Style_MatchLexer(L"Web Source Code",TRUE));
 }
 
-
-//=============================================================================
-//
-//  Style_SetXMLLexer()
-//
 void Style_SetXMLLexer(HWND hwnd)
 {
   Style_SetLexer(hwnd,Style_MatchLexer(L"XML Document",TRUE));
 }
 
-
-//=============================================================================
-//
-//  Style_SetLexerFromID()
-//
 void Style_SetLexerFromID(HWND hwnd,int id)
 {
   if (id >= 0 && id < NUMLEXERS) {
@@ -3453,22 +3378,12 @@ void Style_SetLexerFromID(HWND hwnd,int id)
   }
 }
 
-
-//=============================================================================
-//
-//  Style_ToggleUse2ndDefault()
-//
 void Style_ToggleUse2ndDefault(HWND hwnd)
 {
   bUse2ndDefaultStyle = (bUse2ndDefaultStyle) ? 0 : 1;
   Style_SetLexer(hwnd,pLexCurrent);
 }
 
-
-//=============================================================================
-//
-//  Style_SetDefaultFont()
-//
 void Style_SetDefaultFont(HWND hwnd)
 {
   int iIdx = (bUse2ndDefaultStyle) ? 12 : 0;
@@ -3481,21 +3396,11 @@ void Style_SetDefaultFont(HWND hwnd)
   }
 }
 
-
-//=============================================================================
-//
-//  Style_GetUse2ndDefault()
-//
 BOOL Style_GetUse2ndDefault(HWND hwnd)
 {
   return (bUse2ndDefaultStyle);
 }
 
-
-//=============================================================================
-//
-//  Style_SetIndentGuides()
-//
 extern int flagSimpleIndentGuides;
 
 void Style_SetIndentGuides(HWND hwnd,BOOL bShow)
@@ -3514,11 +3419,6 @@ void Style_SetIndentGuides(HWND hwnd,BOOL bShow)
   SendMessage(hwnd,SCI_SETINDENTATIONGUIDES,iIndentView,0);
 }
 
-
-//=============================================================================
-//
-//  Style_GetFileOpenDlgFilter()
-//
 extern WCHAR tchFileDlgFilters[5*1024];
 
 BOOL Style_GetOpenDlgFilterStr(LPWSTR lpszFilter,int cchFilter)
@@ -3533,11 +3433,6 @@ BOOL Style_GetOpenDlgFilterStr(LPWSTR lpszFilter,int cchFilter)
   return TRUE;
 }
 
-
-//=============================================================================
-//
-//  Style_StrGetFont()
-//
 BOOL Style_StrGetFont(LPCWSTR lpszStyle,LPWSTR lpszFont,int cchFont)
 {
   WCHAR tch[256];
@@ -3567,11 +3462,6 @@ BOOL Style_StrGetFont(LPCWSTR lpszStyle,LPWSTR lpszFont,int cchFont)
   return FALSE;
 }
 
-
-//=============================================================================
-//
-//  Style_StrGetFontQuality()
-//
 BOOL Style_StrGetFontQuality(LPCWSTR lpszStyle,LPWSTR lpszQuality,int cchQuality)
 {
   WCHAR tch[256];
@@ -3594,11 +3484,6 @@ BOOL Style_StrGetFontQuality(LPCWSTR lpszStyle,LPWSTR lpszQuality,int cchQuality
   return FALSE;
 }
 
-
-//=============================================================================
-//
-//  Style_StrGetCharSet()
-//
 BOOL Style_StrGetCharSet(LPCWSTR lpszStyle,int *i)
 {
   WCHAR tch[256];
@@ -3622,11 +3507,6 @@ BOOL Style_StrGetCharSet(LPCWSTR lpszStyle,int *i)
   return FALSE;
 }
 
-
-//=============================================================================
-//
-//  Style_StrGetSize()
-//
 BOOL Style_StrGetSize(LPCWSTR lpszStyle,int *i)
 {
   WCHAR tch[256];
@@ -3664,11 +3544,6 @@ BOOL Style_StrGetSize(LPCWSTR lpszStyle,int *i)
   return FALSE;
 }
 
-
-//=============================================================================
-//
-//  Style_StrGetSizeStr()
-//
 BOOL Style_StrGetSizeStr(LPCWSTR lpszStyle,LPWSTR lpszSize,int cchSize)
 {
   WCHAR tch[256];
@@ -3686,11 +3561,6 @@ BOOL Style_StrGetSizeStr(LPCWSTR lpszStyle,LPWSTR lpszSize,int cchSize)
   return FALSE;
 }
 
-
-//=============================================================================
-//
-//  Style_StrGetColor()
-//
 BOOL Style_StrGetColor(BOOL bFore,LPCWSTR lpszStyle,int *rgb)
 {
   WCHAR tch[256];
@@ -3717,11 +3587,6 @@ BOOL Style_StrGetColor(BOOL bFore,LPCWSTR lpszStyle,int *rgb)
   return FALSE;
 }
 
-
-//=============================================================================
-//
-//  Style_StrGetCase()
-//
 BOOL Style_StrGetCase(LPCWSTR lpszStyle,int *i)
 {
   WCHAR tch[256];
@@ -3745,11 +3610,6 @@ BOOL Style_StrGetCase(LPCWSTR lpszStyle,int *i)
   return FALSE;
 }
 
-
-//=============================================================================
-//
-//  Style_StrGetAlpha()
-//
 BOOL Style_StrGetAlpha(LPCWSTR lpszStyle,int *i)
 {
   WCHAR tch[256];
@@ -3773,11 +3633,6 @@ BOOL Style_StrGetAlpha(LPCWSTR lpszStyle,int *i)
   return FALSE;
 }
 
-
-//=============================================================================
-//
-//  Style_SelectFont()
-//
 BOOL Style_SelectFont(HWND hwnd,LPWSTR lpszStyle,int cchStyle,BOOL bDefaultStyle)
 {
   CHOOSEFONT cf;
@@ -3878,11 +3733,6 @@ BOOL Style_SelectFont(HWND hwnd,LPWSTR lpszStyle,int cchStyle,BOOL bDefaultStyle
   return TRUE;
 }
 
-
-//=============================================================================
-//
-//  Style_SelectColor()
-//
 BOOL Style_SelectColor(HWND hwnd,BOOL bFore,LPWSTR lpszStyle,int cchStyle)
 {
   CHOOSECOLOR cc;
@@ -4016,11 +3866,6 @@ BOOL Style_SelectColor(HWND hwnd,BOOL bFore,LPWSTR lpszStyle,int cchStyle)
   return TRUE;
 }
 
-
-//=============================================================================
-//
-//  Style_SetStyles()
-//
 void Style_SetStyles(HWND hwnd,int iStyle,LPCWSTR lpszStyle)
 {
 
@@ -4081,11 +3926,6 @@ void Style_SetStyles(HWND hwnd,int iStyle,LPCWSTR lpszStyle)
 
 }
 
-
-//=============================================================================
-//
-//  Style_SetFontQuality()
-//
 void Style_SetFontQuality(HWND hwnd,LPCWSTR lpszStyle) {
 
   WPARAM wQuality = SC_EFF_QUALITY_DEFAULT;
@@ -4119,23 +3959,13 @@ void Style_SetFontQuality(HWND hwnd,LPCWSTR lpszStyle) {
   SendMessage(hwnd,SCI_SETFONTQUALITY,wQuality,0);
 }
 
-
-//=============================================================================
-//
-//  Style_GetCurrentLexerName()
-//
 void Style_GetCurrentLexerName(LPWSTR lpszName,int cchName)
 {
   if (!GetString(pLexCurrent->rid,lpszName,cchName))
     lstrcpyn(lpszName,pLexCurrent->pszName,cchName);
 }
 
-
-//=============================================================================
-//
-//  Style_GetLexerIconId()
-//
-int Style_GetLexerIconId(PEDITLEXER plex)
+int Style_GetLexerIconId(EDITLEXER* plex)
 {
   WCHAR *p;
   WCHAR *pszExtensions;
@@ -4166,12 +3996,7 @@ int Style_GetLexerIconId(PEDITLEXER plex)
   return (shfi.iIcon);
 }
 
-
-//=============================================================================
-//
-//  Style_AddLexerToTreeView()
-//
-HTREEITEM Style_AddLexerToTreeView(HWND hwnd,PEDITLEXER plex)
+HTREEITEM Style_AddLexerToTreeView(HWND hwnd, EDITLEXER* plex)
 {
   int i = 0;
   WCHAR tch[128];
@@ -4214,12 +4039,7 @@ HTREEITEM Style_AddLexerToTreeView(HWND hwnd,PEDITLEXER plex)
   return hTreeNode;
 }
 
-
-//=============================================================================
-//
-//  Style_AddLexerToListView()
-//
-void Style_AddLexerToListView(HWND hwnd,PEDITLEXER plex)
+void Style_AddLexerToListView(HWND hwnd, EDITLEXER* plex)
 {
   WCHAR tch[128];
   LVITEM lvi;
@@ -4237,17 +4057,12 @@ void Style_AddLexerToListView(HWND hwnd,PEDITLEXER plex)
   ListView_InsertItem(hwnd,&lvi);
 }
 
-
-//=============================================================================
-//
-//  Style_ConfigDlgProc()
-//
 INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd,UINT umsg,WPARAM wParam,LPARAM lParam)
 {
 
   static HWND hwndTV;
   static BOOL fDragging;
-  static PEDITLEXER pCurrentLexer;
+  static EDITLEXER* pCurrentLexer;
   static PEDITSTYLE pCurrentStyle;
   static HFONT hFontTitle;
   static HBRUSH hbrFore;
@@ -4346,7 +4161,7 @@ INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd,UINT umsg,WPARAM wParam,LPARAM lP
                 if (StrChr(wch,L'|')) *StrChr(wch,L'|') = 0;
 
                 pCurrentStyle = 0;
-                if (pCurrentLexer = (PEDITLEXER)lpnmtv->itemNew.lParam)
+                if (pCurrentLexer = (EDITLEXER*) lpnmtv->itemNew.lParam)
                 {
                   SetDlgItemText(hwnd,IDC_STYLELABEL,wch);
                   EnableWindow(GetDlgItem(hwnd,IDC_STYLEEDIT),TRUE);
@@ -4770,14 +4585,8 @@ INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd,UINT umsg,WPARAM wParam,LPARAM lP
 
 }
 
-
-//=============================================================================
-//
-//  Style_ConfigDlg()
-//
 void Style_ConfigDlg(HWND hwnd)
 {
-
   WCHAR *StyleBackup[1024];
   int c,cItems,i,iLexer;
 
@@ -4825,14 +4634,8 @@ void Style_ConfigDlg(HWND hwnd)
   Style_SetLexer(hwnd,pLexCurrent);
 }
 
-
-//=============================================================================
-//
-//  Style_SelectLexerDlgProc()
-//
 INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd,UINT umsg,WPARAM wParam,LPARAM lParam)
 {
-
   static int cxClient;
   static int cyClient;
   static int mmiPtMaxY;
@@ -4910,7 +4713,7 @@ INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd,UINT umsg,WPARAM wParam,LPAR
         for (i = 0; i < lvItems; i++) {
           lvi.iItem = i;
           ListView_GetItem(hwndLV,&lvi);;
-          if (lstrcmp(((PEDITLEXER)lvi.lParam)->pszName,pLexCurrent->pszName) == 0) {
+          if (lstrcmp(((EDITLEXER*) lvi.lParam)->pszName, pLexCurrent->pszName) == 0) {
             ListView_SetItemState(hwndLV,i,LVIS_FOCUSED|LVIS_SELECTED,LVIS_FOCUSED|LVIS_SELECTED);
             ListView_EnsureVisible(hwndLV,i,FALSE);
             if (iDefaultLexer == i) {
@@ -5040,7 +4843,7 @@ INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd,UINT umsg,WPARAM wParam,LPAR
             lvi.mask = LVIF_PARAM;
             lvi.iItem = ListView_GetNextItem(hwndLV,-1,LVNI_ALL | LVNI_SELECTED);
             if (ListView_GetItem(hwndLV,&lvi)) {
-              pLexCurrent = (PEDITLEXER)lvi.lParam;
+                pLexCurrent = (EDITLEXER*) lvi.lParam;
               iDefaultLexer = iInternalDefault;
               bAutoSelect = (IsDlgButtonChecked(hwnd,IDC_AUTOSELECT) == BST_CHECKED) ? 1 : 0;
               EndDialog(hwnd,IDOK);
@@ -5063,11 +4866,6 @@ INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd,UINT umsg,WPARAM wParam,LPAR
 
 }
 
-
-//=============================================================================
-//
-//  Style_SelectLexerDlg()
-//
 void Style_SelectLexerDlg(HWND hwnd)
 {
   if (IDOK == ThemedDialogBoxParam(g_hInstance,
@@ -5076,6 +4874,3 @@ void Style_SelectLexerDlg(HWND hwnd)
 
     Style_SetLexer(hwnd,pLexCurrent);
 }
-
-
-// End of Styles.c
