@@ -33,10 +33,7 @@
 #include "helpers.h"
 #include "resource.h"
 
-//=============================================================================
-//
 //  Manipulation of (cached) ini file sections
-//
 int IniSectionGetString(LPCWSTR lpCachedIniSection, LPCWSTR lpName,
                         LPCWSTR lpDefault, LPWSTR lpReturnedString,
                         int cchReturnedString) {
@@ -103,10 +100,6 @@ BOOL IniSectionSetString(LPWSTR lpCachedIniSection, LPCWSTR lpName,
     return FALSE;
 }
 
-//=============================================================================
-//
-//  PrivateIsAppThemed()
-//
 extern HMODULE hModUxTheme;
 BOOL PrivateIsAppThemed() {
     FARPROC pfnIsAppThemed;
@@ -169,25 +162,6 @@ BOOL IsElevated() {
     }
     return bIsElevated;
 }
-
-//=============================================================================
-//
-//  SetExplorerTheme()
-//
-// BOOL SetExplorerTheme(HWND hwnd)
-//{
-//  FARPROC pfnSetWindowTheme;
-//
-//  if (IsVista()) {
-//    if (hModUxTheme) {
-//      pfnSetWindowTheme = GetProcAddress(hModUxTheme,"SetWindowTheme");
-//
-//      if (pfnSetWindowTheme)
-//        return (S_OK == pfnSetWindowTheme(hwnd,L"Explorer",NULL));
-//    }
-//  }
-//  return FALSE;
-//}
 
 //  Merge alpha channel into color channel
 BOOL BitmapMergeAlpha(HBITMAP hbmp, COLORREF crDest) {
@@ -981,15 +955,7 @@ BOOL PathIsLnkToDirectory(LPCWSTR pszPath, LPWSTR pszResPath, int cchResPath) {
         return FALSE;
 }
 
-///////////////////////////////////////////////////////////////////////////////
-//
-//
-//  Name: PathCreateDeskLnk()
-//
 //  Purpose: Modified to create a desktop link to Notepad2
-//
-//  Manipulates:
-//
 BOOL PathCreateDeskLnk(LPCWSTR pszDocument) {
 
     WCHAR tchExeFile[MAX_PATH];
@@ -1051,15 +1017,7 @@ BOOL PathCreateDeskLnk(LPCWSTR pszDocument) {
     return (bSucceeded);
 }
 
-///////////////////////////////////////////////////////////////////////////////
-//
-//
-//  Name: PathCreateFavLnk()
-//
 //  Purpose: Modified to create a Notepad2 favorites link
-//
-//  Manipulates:
-//
 BOOL PathCreateFavLnk(LPCWSTR pszName, LPCWSTR pszTarget, LPCWSTR pszDir) {
 
     WCHAR tchLnkFileName[MAX_PATH];
@@ -1101,10 +1059,6 @@ BOOL PathCreateFavLnk(LPCWSTR pszName, LPCWSTR pszTarget, LPCWSTR pszDir) {
     return bSucceeded;
 }
 
-//=============================================================================
-//
-//  StrLTrim()
-//
 BOOL StrLTrim(LPWSTR pszSource, LPCWSTR pszTrimChars) {
     LPWSTR psz;
 
@@ -1120,10 +1074,6 @@ BOOL StrLTrim(LPWSTR pszSource, LPCWSTR pszTrimChars) {
     return TRUE;
 }
 
-//=============================================================================
-//
-//  TrimString()
-//
 BOOL TrimString(LPWSTR lpString) {
 
     LPWSTR psz;
@@ -1148,10 +1098,6 @@ BOOL TrimString(LPWSTR lpString) {
     return TRUE;
 }
 
-//=============================================================================
-//
-//  ExtractFirstArgument()
-//
 BOOL ExtractFirstArgument(LPCWSTR lpArgs, LPWSTR lpArg1, LPWSTR lpArg2) {
 
     LPWSTR psz;
@@ -1190,10 +1136,6 @@ BOOL ExtractFirstArgument(LPCWSTR lpArgs, LPWSTR lpArg1, LPWSTR lpArg2) {
     return TRUE;
 }
 
-//=============================================================================
-//
-//  PrepareFilterStr()
-//
 void PrepareFilterStr(LPWSTR lpFilter) {
     LPWSTR psz = StrEnd(lpFilter);
     while (psz != lpFilter) {
@@ -1202,20 +1144,14 @@ void PrepareFilterStr(LPWSTR lpFilter) {
     }
 }
 
-//=============================================================================
-//
-//  StrTab2Space() - in place conversion
-//
+//  in place conversion
 void StrTab2Space(LPWSTR lpsz) {
     WCHAR *c = lpsz;
     while (c = StrChr(lpsz, L'\t'))
         *c = L' ';
 }
 
-//=============================================================================
-//
-//  PathFixBackslashes() - in place conversion
-//
+//  in place conversion
 void PathFixBackslashes(LPWSTR lpsz) {
     WCHAR *c = lpsz;
     while (c = StrChr(c, L'/')) {
@@ -1226,12 +1162,7 @@ void PathFixBackslashes(LPWSTR lpsz) {
     }
 }
 
-//=============================================================================
-//
-//  ExpandEnvironmentStringsEx()
-//
 //  Adjusted for Windows 95
-//
 void ExpandEnvironmentStringsEx(LPWSTR lpSrc, DWORD dwSrc) {
     WCHAR szBuf[312];
 
@@ -1239,11 +1170,6 @@ void ExpandEnvironmentStringsEx(LPWSTR lpSrc, DWORD dwSrc) {
         lstrcpyn(lpSrc, szBuf, dwSrc);
 }
 
-//=============================================================================
-//
-//  PathCanonicalizeEx()
-//
-//
 void PathCanonicalizeEx(LPWSTR lpSrc) {
     WCHAR szDst[MAX_PATH];
 
@@ -1251,11 +1177,6 @@ void PathCanonicalizeEx(LPWSTR lpSrc) {
         lstrcpy(lpSrc, szDst);
 }
 
-//=============================================================================
-//
-//  GetLongPathNameEx()
-//
-//
 DWORD GetLongPathNameEx(LPWSTR lpszPath, DWORD cchBuffer) {
     DWORD dwRet = GetLongPathName(lpszPath, lpszPath, cchBuffer);
     if (dwRet) {
@@ -1266,13 +1187,8 @@ DWORD GetLongPathNameEx(LPWSTR lpszPath, DWORD cchBuffer) {
     return 0;
 }
 
-//=============================================================================
-//
-//  SHGetFileInfo2()
-//
 //  Return a default name when the file has been removed, and always append
 //  a filename extension
-//
 DWORD_PTR SHGetFileInfo2(LPCWSTR pszPath, DWORD dwFileAttributes,
                          SHFILEINFO *psfi, UINT cbFileInfo, UINT uFlags) {
 
@@ -1295,10 +1211,6 @@ DWORD_PTR SHGetFileInfo2(LPCWSTR pszPath, DWORD dwFileAttributes,
     }
 }
 
-//=============================================================================
-//
-//  FormatNumberStr()
-//
 int FormatNumberStr(LPWSTR lpNumberStr) {
     WCHAR *c;
     WCHAR szSep[8];
@@ -1324,10 +1236,6 @@ int FormatNumberStr(LPWSTR lpNumberStr) {
     return (lstrlen(lpNumberStr));
 }
 
-//=============================================================================
-//
-//  SetDlgItemIntEx()
-//
 BOOL SetDlgItemIntEx(HWND hwnd, int nIdItem, UINT uValue) {
     WCHAR szBuf[64];
 
@@ -1337,10 +1245,7 @@ BOOL SetDlgItemIntEx(HWND hwnd, int nIdItem, UINT uValue) {
     return (SetDlgItemText(hwnd, nIdItem, szBuf));
 }
 
-//=============================================================================
-//
 //  A2W: Convert Dialog Item Text form Unicode to UTF-8 and vice versa
-//
 UINT GetDlgItemTextA2W(UINT uCP, HWND hDlg, int nIDDlgItem, LPSTR lpString,
                        int nMaxCount) {
     WCHAR wsz[1024] = L"";
@@ -1362,10 +1267,6 @@ LRESULT ComboBox_AddStringA2W(UINT uCP, HWND hwnd, LPCSTR lpString) {
     return SendMessageW(hwnd, CB_ADDSTRING, 0, (LPARAM)wsz);
 }
 
-//=============================================================================
-//
-//  CodePageFromCharSet()
-//
 UINT CodePageFromCharSet(UINT uCharSet) {
     CHARSETINFO ci;
     if (TranslateCharsetInfo((DWORD *)(UINT_PTR)uCharSet, &ci, TCI_SRCCHARSET))
@@ -1374,10 +1275,6 @@ UINT CodePageFromCharSet(UINT uCharSet) {
         return (GetACP());
 }
 
-//=============================================================================
-//
-//  MRU functions
-//
 LPMRULIST MRU_Create(LPCWSTR pszRegKey, int iFlags, int iSize) {
 
     LPMRULIST pmru = (LPMRULIST)LocalAlloc(LPTR, sizeof(MRULIST));
@@ -1833,13 +1730,6 @@ HWND CreateThemedDialogParam(HINSTANCE hInstance, LPCTSTR lpTemplate,
     return (hwnd);
 }
 
-/******************************************************************************
-*
-*  UnSlash functions
-*  Mostly taken from SciTE, (c) Neil Hodgson, http://www.scintilla.org
-*
-/
-
 /**
  * Is the character an octal digit?
  */
@@ -1864,6 +1754,7 @@ static int GetHexDigit(char ch) {
 /**
  * Convert C style \a, \b, \f, \n, \r, \t, \v, \xhh and \uhhhh into their
  * indicated characters.
+ *  Mostly taken from SciTE, (c) Neil Hodgson, http://www.scintilla.org
  */
 unsigned int UnSlash(char *s, UINT cpEdit) {
     char *sStart = s;

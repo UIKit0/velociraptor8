@@ -436,16 +436,13 @@ BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle, LPCWSTR pszPageFormat) {
     return TRUE;
 }
 
-//=============================================================================
-//
-//  EditPrintSetup() - Code from SciTE
+//  Code from SciTE
 //
 //  Custom controls: 30 Zoom
 //                   31 Spin
 //                   32 Header
 //                   33 Footer
 //                   34 Colors
-//
 UINT_PTR CALLBACK
 PageSetupHook(HWND hwnd, UINT uiMsg, WPARAM wParam, LPARAM lParam) {
     switch (uiMsg) {
@@ -567,7 +564,7 @@ void EditPrintSetup(HWND hwnd) {
     LocalFree(pDlgTemplate);
 }
 
-//  EditPrintInit() - Setup default page margin if no values from registry
+//  Setup default page margin if no values from registry
 void EditPrintInit() {
     if (pagesetupMargin.left == -1 || pagesetupMargin.top == -1 ||
         pagesetupMargin.right == -1 || pagesetupMargin.bottom == -1) {

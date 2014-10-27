@@ -4840,10 +4840,6 @@ void EditSortLines(HWND hwnd, int iSortFlags) {
     }
 }
 
-//=============================================================================
-//
-//  EditJumpTo()
-//
 void EditJumpTo(HWND hwnd, int iNewLine, int iNewCol) {
     int iMaxLine = (int)SendMessage(hwnd, SCI_GETLINECOUNT, 0, 0);
 
@@ -7291,10 +7287,6 @@ int FileVars_GetEncoding(LPFILEVARS lpfv) {
         return (-1);
 }
 
-//=============================================================================
-//
-//  SciInitThemes()
-//
 // WNDPROC pfnSciWndProc = NULL;
 //
 // FARPROC pfnOpenThemeData = NULL;
@@ -7330,12 +7322,7 @@ int FileVars_GetEncoding(LPFILEVARS lpfv) {
 //    bThemesPresent = TRUE;
 //  }
 //}
-//
-//
-////=============================================================================
-////
-////  SciThemedWndProc()
-////
+
 // LRESULT CALLBACK SciThemedWndProc(HWND hwnd,UINT umsg,WPARAM wParam,LPARAM
 // lParam)
 //{

@@ -39,11 +39,7 @@
 #include "SciCall.h"
 #include "resource.h"
 
-/******************************************************************************
-*
-* Local and global Variables for Notepad2.c
-*
-*/
+// Local and global Variables for Notepad2.c
 HWND hwndStatus;
 HWND hwndToolbar;
 HWND hwndReBar;
@@ -476,14 +472,6 @@ void __stdcall FoldAltArrow(int key, int mode) {
         }
     }
 }
-
-#if 0
-#include <string>
-std::string foo(std::string s) {
-    s.clear();
-    return s;
-}
-#endif
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine,
                    int nCmdShow) {
@@ -1383,7 +1371,7 @@ MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
     return 0;
 }
 
-// Handles WM_CREATE
+// WM_CREATE
 LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
     HINSTANCE hInstance = ((LPCREATESTRUCT)lParam)->hInstance;
 
@@ -1758,7 +1746,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
     cyReBarFrame = bIsAppThemed ? 0 : 2;
 }
 
-// Handle WM_THEMECHANGED
+// WM_THEMECHANGED
 void MsgThemeChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
     RECT rc, rc2;
     HINSTANCE hInstance =
@@ -1816,7 +1804,7 @@ void MsgThemeChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
     UpdateStatusbar();
 }
 
-//  Handles WM_SIZE
+// WM_SIZE
 void MsgSize(HWND hwnd, WPARAM wParam, LPARAM lParam) {
     RECT rc;
     int x, y, cx, cy;
@@ -1886,7 +1874,7 @@ void MsgSize(HWND hwnd, WPARAM wParam, LPARAM lParam) {
     // UpdateStatusbar();
 }
 
-// Handles WM_INITMENU
+// WM_INITMENU
 void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
     int i, i2;
@@ -2164,7 +2152,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
     EnableCmd(hmenu, IDM_VIEW_SAVESETTINGSNOW, i);
 }
 
-// Handles WM_COMMAND
+// WM_COMMAND
 LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
     switch (LOWORD(wParam)) {
 
@@ -4879,6 +4867,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
     return 0;
 }
 
+// WM_NOTIFY
 LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
     LPNMHDR pnmh = (LPNMHDR)lParam;
     struct SCNotification *scn = (struct SCNotification *)lParam;
