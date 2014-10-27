@@ -162,10 +162,6 @@ HRESULT PrivateSetCurrentProcessExplicitAppUserModelID(PCWSTR AppID)
 }
 
 
-//=============================================================================
-//
-//  IsElevated()
-//
 BOOL IsElevated() {
 
   BOOL bIsElevated = FALSE;
@@ -211,11 +207,7 @@ BOOL IsElevated() {
 //}
 
 
-//=============================================================================
-//
-//  BitmapMergeAlpha()
 //  Merge alpha channel into color channel
-//
 BOOL BitmapMergeAlpha(HBITMAP hbmp,COLORREF crDest)
 {
   BITMAP bmp;
@@ -243,11 +235,7 @@ BOOL BitmapMergeAlpha(HBITMAP hbmp,COLORREF crDest)
 }
 
 
-//=============================================================================
-//
-//  BitmapAlphaBlend()
 //  Perform alpha blending to color channel only
-//
 BOOL BitmapAlphaBlend(HBITMAP hbmp,COLORREF crDest,BYTE alpha)
 {
   BITMAP bmp;
@@ -273,11 +261,7 @@ BOOL BitmapAlphaBlend(HBITMAP hbmp,COLORREF crDest,BYTE alpha)
 }
 
 
-//=============================================================================
-//
-//  BitmapGrayScale()
 //  Gray scale color channel only
-//
 BOOL BitmapGrayScale(HBITMAP hbmp)
 {
   BITMAP bmp;
@@ -302,11 +286,7 @@ BOOL BitmapGrayScale(HBITMAP hbmp)
 }
 
 
-//=============================================================================
-//
-//  VerifyContrast()
 //  Check if two colors can be distinguished
-//
 BOOL VerifyContrast(COLORREF cr1,COLORREF cr2)
 {
   BYTE r1 = GetRValue(cr1);
@@ -322,11 +302,7 @@ BOOL VerifyContrast(COLORREF cr1,COLORREF cr2)
 }
 
 
-//=============================================================================
-//
-//  IsFontAvailable()
 //  Test if a certain font is installed on the system
-//
 int CALLBACK EnumFontsProc(CONST LOGFONT *plf,CONST TEXTMETRIC *ptm,DWORD FontType,LPARAM lParam)
 {
   *((PBOOL)lParam) = TRUE;
@@ -345,10 +321,6 @@ BOOL IsFontAvailable(LPCWSTR lpszFontName)
 }
 
 
-//=============================================================================
-//
-//  SetWindowTitle()
-//
 BOOL bFreezeAppTitle = FALSE;
 
 BOOL SetWindowTitle(HWND hwnd,UINT uIDAppName,BOOL bIsElevated,UINT uIDUntitled,
@@ -437,10 +409,6 @@ BOOL SetWindowTitle(HWND hwnd,UINT uIDAppName,BOOL bIsElevated,UINT uIDUntitled,
 }
 
 
-//=============================================================================
-//
-//  SetWindowTransparentMode()
-//
 void SetWindowTransparentMode(HWND hwnd,BOOL bTransparentMode)
 {
   FARPROC fp;
@@ -468,10 +436,6 @@ void SetWindowTransparentMode(HWND hwnd,BOOL bTransparentMode)
 }
 
 
-//=============================================================================
-//
-//  CenterDlgInParent()
-//
 void CenterDlgInParent(HWND hDlg)
 {
 
@@ -513,10 +477,6 @@ void CenterDlgInParent(HWND hDlg)
 }
 
 
-//=============================================================================
-//
-//  GetDlgPos()
-//
 void GetDlgPos(HWND hDlg,LPINT xDlg,LPINT yDlg)
 {
 
@@ -536,10 +496,6 @@ void GetDlgPos(HWND hDlg,LPINT xDlg,LPINT yDlg)
 }
 
 
-//=============================================================================
-//
-//  SetDlgPos()
-//
 void SetDlgPos(HWND hDlg,int xDlg,int yDlg)
 {
 
@@ -575,10 +531,6 @@ void SetDlgPos(HWND hDlg,int xDlg,int yDlg)
 }
 
 
-//=============================================================================
-//
-//  Resize Dialog Helpers()
-//
 typedef struct _resizedlg {
   int cxClient;
   int cyClient;
@@ -672,10 +624,6 @@ HDWP DeferCtlPos(HDWP hdwp,HWND hwndDlg,int nCtlId,int dx,int dy,UINT uFlags)
 }
 
 
-//=============================================================================
-//
-//  MakeBitmapButton()
-//
 void MakeBitmapButton(HWND hwnd,int nCtlId,HINSTANCE hInstance,UINT uBmpId)
 {
   HWND hwndCtl = GetDlgItem(hwnd,nCtlId);
@@ -692,10 +640,6 @@ void MakeBitmapButton(HWND hwnd,int nCtlId,HINSTANCE hInstance,UINT uBmpId)
 }
 
 
-//=============================================================================
-//
-//  MakeColorPickButton()
-//
 void MakeColorPickButton(HWND hwnd,int nCtlId,HINSTANCE hInstance,COLORREF crColor)
 {
   HWND hwndCtl = GetDlgItem(hwnd,nCtlId);
@@ -745,10 +689,6 @@ void MakeColorPickButton(HWND hwnd,int nCtlId,HINSTANCE hInstance,COLORREF crCol
 }
 
 
-//=============================================================================
-//
-//  DeleteBitmapButton()
-//
 void DeleteBitmapButton(HWND hwnd,int nCtlId)
 {
   HWND hwndCtl = GetDlgItem(hwnd,nCtlId);
@@ -758,23 +698,13 @@ void DeleteBitmapButton(HWND hwnd,int nCtlId)
 }
 
 
-//=============================================================================
-//
-//  StatusSetText()
-//
 BOOL StatusSetText(HWND hwnd,UINT nPart,LPCWSTR lpszText)
 {
-
   UINT uFlags = (nPart == 255) ? nPart|SBT_NOBORDERS : nPart;
   return (BOOL)SendMessage(hwnd,SB_SETTEXT,uFlags,(LPARAM)lpszText);
-
 }
 
 
-//=============================================================================
-//
-//  SendWMSize()
-//
 LRESULT SendWMSize(HWND hwnd)
 {
   RECT rc; GetClientRect(hwnd,&rc);
@@ -783,10 +713,6 @@ LRESULT SendWMSize(HWND hwnd)
 }
 
 
-//=============================================================================
-//
-//  StatusSetTextID()
-//
 BOOL StatusSetTextID(HWND hwnd,UINT nPart,UINT uID)
 {
 
@@ -807,10 +733,6 @@ BOOL StatusSetTextID(HWND hwnd,UINT nPart,UINT uID)
 }
 
 
-//=============================================================================
-//
-//  StatusCalcPaneWidth()
-//
 int StatusCalcPaneWidth(HWND hwnd,LPCWSTR lpsz)
 {
   SIZE  size;
@@ -829,10 +751,6 @@ int StatusCalcPaneWidth(HWND hwnd,LPCWSTR lpsz)
 }
 
 
-//=============================================================================
-//
-//  Toolbar_Get/SetButtons()
-//
 int Toolbar_GetButtons(HWND hwnd,int cmdBase,LPWSTR lpszButtons,int cchButtons)
 {
   WCHAR tchButtons[512];
@@ -891,13 +809,8 @@ int Toolbar_SetButtons(HWND hwnd,int cmdBase,LPCWSTR lpszButtons,LPCTBBUTTON ptb
 }
 
 
-//=============================================================================
-//
-//  IsCmdEnabled()
-//
 BOOL IsCmdEnabled(HWND hwnd,UINT uId)
 {
-
   HMENU hmenu;
   UINT ustate;
 
@@ -909,20 +822,13 @@ BOOL IsCmdEnabled(HWND hwnd,UINT uId)
 
   if (ustate == 0xFFFFFFFF)
     return TRUE;
-
   else
     return (!(ustate & (MF_GRAYED|MF_DISABLED)));
-
 }
 
 
-//=============================================================================
-//
-//  FormatString()
-//
 int FormatString(LPWSTR lpOutput,int nOutput,UINT uIdFormat,...)
 {
-
   WCHAR *p = LocalAlloc(LPTR,sizeof(WCHAR)*nOutput);
 
   if (GetString(uIdFormat,p,nOutput))
@@ -931,14 +837,9 @@ int FormatString(LPWSTR lpOutput,int nOutput,UINT uIdFormat,...)
   LocalFree(p);
 
   return lstrlen(lpOutput);
-
 }
 
 
-//=============================================================================
-//
-//  PathRelativeToApp()
-//
 void PathRelativeToApp(
   LPWSTR lpszSrc,LPWSTR lpszDest,int cchDest,BOOL bSrcIsFile,
   BOOL bUnexpandEnv,BOOL bUnexpandMyDocs) {
@@ -985,10 +886,6 @@ void PathRelativeToApp(
 }
 
 
-//=============================================================================
-//
-//  PathAbsoluteFromApp()
-//
 void PathAbsoluteFromApp(LPWSTR lpszSrc,LPWSTR lpszDest,int cchDest,BOOL bExpandEnv) {
 
   WCHAR wchPath[MAX_PATH];
@@ -1023,16 +920,8 @@ void PathAbsoluteFromApp(LPWSTR lpszSrc,LPWSTR lpszDest,int cchDest,BOOL bExpand
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-//
-//
-//  Name: PathIsLnkFile()
-//
 //  Purpose: Determine wheter pszPath is a Windows Shell Link File by
 //           comparing the filename extension with L".lnk"
-//
-//  Manipulates:
-//
 BOOL PathIsLnkFile(LPCWSTR pszPath)
 {
 
