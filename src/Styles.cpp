@@ -2498,7 +2498,7 @@ void Style_Load()
 {
   int i,iLexer;
   WCHAR tch[32];
-  WCHAR *pIniSection = LocalAlloc(LPTR,sizeof(WCHAR)*32*1024);
+  WCHAR *pIniSection = (WCHAR*)LocalAlloc(LPTR, sizeof(WCHAR) * 32 * 1024);
   int   cchIniSection = (int)LocalSize(pIniSection)/sizeof(WCHAR);
 
   // Custom colors
@@ -2579,7 +2579,7 @@ void Style_Save()
 {
   int i,iLexer;
   WCHAR tch[32];
-  WCHAR *pIniSection = LocalAlloc(LPTR,sizeof(WCHAR)*32*1024);
+  WCHAR *pIniSection = (WCHAR*) LocalAlloc(LPTR, sizeof(WCHAR) * 32 * 1024);
   int   cchIniSection = (int)LocalSize(pIniSection)/sizeof(WCHAR);
 
   // Custom colors
@@ -2654,7 +2654,7 @@ BOOL Style_Import(HWND hwnd)
   if (GetOpenFileName(&ofn)) {
 
     int i,iLexer;
-    WCHAR *pIniSection = LocalAlloc(LPTR,sizeof(WCHAR)*32*1024);
+    WCHAR *pIniSection = (WCHAR*) LocalAlloc(LPTR, sizeof(WCHAR) * 32 * 1024);
     int   cchIniSection = (int)LocalSize(pIniSection)/sizeof(WCHAR);
 
     for (iLexer = 0; iLexer < NUMLEXERS; iLexer++) {
@@ -2706,7 +2706,7 @@ BOOL Style_Export(HWND hwnd)
   if (GetSaveFileName(&ofn)) {
 
     int i,iLexer;
-    WCHAR *pIniSection = LocalAlloc(LPTR,sizeof(WCHAR)*32*1024);
+    WCHAR *pIniSection = (WCHAR*) LocalAlloc(LPTR, sizeof(WCHAR) * 32 * 1024);
     int   cchIniSection = (int)LocalSize(pIniSection)/sizeof(WCHAR);
 
     for (iLexer = 0; iLexer < NUMLEXERS; iLexer++) {
@@ -4148,7 +4148,7 @@ int Style_GetLexerIconId(PEDITLEXER plex)
   else
     pszExtensions = plex->pszDefExt;
 
-  pszFile = GlobalAlloc(GPTR,sizeof(WCHAR)*(lstrlen(pszExtensions) + CSTRLEN(L"*.txt") + 16));
+  pszFile = (WCHAR*) GlobalAlloc(GPTR, sizeof(WCHAR)*(lstrlen(pszExtensions) + CSTRLEN(L"*.txt") + 16));
   lstrcpy(pszFile,L"*.");
   lstrcat(pszFile,pszExtensions);
   if (p = StrChr(pszFile,L';'))
@@ -4298,7 +4298,7 @@ INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd,UINT umsg,WPARAM wParam,LPARAM lP
         if (hFontTitle)
           DeleteObject(hFontTitle);
         if (NULL == (hFontTitle = (HFONT)SendDlgItemMessage(hwnd,IDC_TITLE,WM_GETFONT,0,0)))
-          hFontTitle = GetStockObject(DEFAULT_GUI_FONT);
+          hFontTitle = (HFONT)GetStockObject(DEFAULT_GUI_FONT);
         GetObject(hFontTitle,sizeof(LOGFONT),&lf);
         lf.lfHeight += lf.lfHeight / 5;
         lf.lfWeight = FW_BOLD;

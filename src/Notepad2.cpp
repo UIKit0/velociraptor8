@@ -1209,7 +1209,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd,UINT umsg,WPARAM wParam,LPARAM lParam)
         SetDlgItemInt(hwnd,IDC_REUSELOCK,GetTickCount(),FALSE);
 
         if (pcds->dwData == DATA_NOTEPAD2_PARAMS) {
-          LPNP2PARAMS params = LocalAlloc(LPTR,pcds->cbData);
+            LPNP2PARAMS params = (LPNP2PARAMS)LocalAlloc(LPTR, pcds->cbData);
           CopyMemory(params,pcds->lpData,pcds->cbData);
 
           if (params->flagLexerSpecified)
@@ -1773,13 +1773,13 @@ void CreateBars(HWND hwnd,HINSTANCE hInstance)
   {
     if (!SearchPath(NULL,tchToolbarBitmap,NULL,COUNTOF(szTmp),szTmp,NULL))
       lstrcpy(szTmp,tchToolbarBitmap);
-    hbmp = LoadImage(NULL,szTmp,IMAGE_BITMAP,0,0,LR_CREATEDIBSECTION|LR_LOADFROMFILE);
+    hbmp = (HBITMAP)LoadImageW(NULL,szTmp,IMAGE_BITMAP,0,0,LR_CREATEDIBSECTION|LR_LOADFROMFILE);
   }
   if (hbmp)
     bExternalBitmap = TRUE;
   else {
-    hbmp = LoadImage(hInstance,MAKEINTRESOURCE(IDR_MAINWND),IMAGE_BITMAP,0,0,LR_CREATEDIBSECTION);
-    hbmpCopy = CopyImage(hbmp,IMAGE_BITMAP,0,0,LR_CREATEDIBSECTION);
+      hbmp = (HBITMAP)LoadImageW(hInstance, MAKEINTRESOURCE(IDR_MAINWND), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
+      hbmpCopy = (HBITMAP)CopyImage(hbmp, IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
   }
   GetObject(hbmp,sizeof(BITMAP),&bmp);
   if (!IsXP())
@@ -1795,7 +1795,7 @@ void CreateBars(HWND hwnd,HINSTANCE hInstance)
   {
     if (!SearchPath(NULL,tchToolbarBitmapHot,NULL,COUNTOF(szTmp),szTmp,NULL))
       lstrcpy(szTmp,tchToolbarBitmapHot);
-    if (hbmp = LoadImage(NULL,szTmp,IMAGE_BITMAP,0,0,LR_CREATEDIBSECTION|LR_LOADFROMFILE))
+    if (hbmp = (HBITMAP) LoadImageW(NULL, szTmp, IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION | LR_LOADFROMFILE))
     {
       GetObject(hbmp,sizeof(BITMAP),&bmp);
       himl = ImageList_Create(bmp.bmWidth/NUMTOOLBITMAPS,bmp.bmHeight,ILC_COLOR32|ILC_MASK,0,0);
@@ -1811,7 +1811,7 @@ void CreateBars(HWND hwnd,HINSTANCE hInstance)
   {
     if (!SearchPath(NULL,tchToolbarBitmapDisabled,NULL,COUNTOF(szTmp),szTmp,NULL))
       lstrcpy(szTmp,tchToolbarBitmapDisabled);
-    if (hbmp = LoadImage(NULL,szTmp,IMAGE_BITMAP,0,0,LR_CREATEDIBSECTION|LR_LOADFROMFILE))
+    if (hbmp = (HBITMAP) LoadImageW(NULL, szTmp, IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION | LR_LOADFROMFILE))
     {
       GetObject(hbmp,sizeof(BITMAP),&bmp);
       himl = ImageList_Create(bmp.bmWidth/NUMTOOLBITMAPS,bmp.bmHeight,ILC_COLOR32|ILC_MASK,0,0);
@@ -1840,7 +1840,7 @@ void CreateBars(HWND hwnd,HINSTANCE hInstance)
     DeleteObject(hbmpCopy);
 
   // Load toolbar labels
-  pIniSection = LocalAlloc(LPTR,sizeof(WCHAR)*32*1024);
+  pIniSection = (WCHAR*)LocalAlloc(LPTR,sizeof(WCHAR)*32*1024);
   cchIniSection = (int)LocalSize(pIniSection)/sizeof(WCHAR);
   LoadIniSection(L"Toolbar Labels",pIniSection,cchIniSection);
   n = 1;
@@ -4612,11 +4612,11 @@ LRESULT MsgCommand(HWND hwnd,WPARAM wParam,LPARAM lParam)
               UINT uCP = (SendMessage(hwndEdit,SCI_GETCODEPAGE,0,0) == SC_CP_UTF8) ? CP_UTF8 : CP_ACP;
               MultiByteToWideChar(uCP,0,mszSelection,-1,wszSelection,COUNTOF(wszSelection));
 
-              lpszCommand = GlobalAlloc(GPTR,sizeof(WCHAR)*(512+COUNTOF(szCmdTemplate)+MAX_PATH+32));
+              lpszCommand = (WCHAR*)GlobalAlloc(GPTR,sizeof(WCHAR)*(512+COUNTOF(szCmdTemplate)+MAX_PATH+32));
               wsprintf(lpszCommand,szCmdTemplate,wszSelection);
               ExpandEnvironmentStringsEx(lpszCommand,(DWORD)GlobalSize(lpszCommand)/sizeof(WCHAR));
 
-              lpszArgs = GlobalAlloc(GPTR,GlobalSize(lpszCommand));
+              lpszArgs = (WCHAR*)GlobalAlloc(GPTR,GlobalSize(lpszCommand));
               ExtractFirstArgument(lpszCommand,lpszCommand,lpszArgs);
 
               if (lstrlen(szCurFile)) {
@@ -4814,7 +4814,7 @@ LRESULT MsgCommand(HWND hwnd,WPARAM wParam,LPARAM lParam)
           WCHAR *pData;
           EmptyClipboard();
           hData = GlobalAlloc(GMEM_MOVEABLE|GMEM_ZEROINIT,sizeof(WCHAR) * (lstrlen(pszCopy) + 1));
-          pData = GlobalLock(hData);
+          pData = (WCHAR*)GlobalLock(hData);
           StrCpyN(pData,pszCopy,(int)GlobalSize(hData) / sizeof(WCHAR));
           GlobalUnlock(hData);
           SetClipboardData(CF_UNICODETEXT,hData);
@@ -4846,7 +4846,7 @@ LRESULT MsgCommand(HWND hwnd,WPARAM wParam,LPARAM lParam)
           WCHAR *pData;
           EmptyClipboard();
           hData = GlobalAlloc(GMEM_MOVEABLE|GMEM_ZEROINIT,sizeof(WCHAR) * (lstrlen(wszWinPos) + 1));
-          pData = GlobalLock(hData);
+          pData = (WCHAR*)GlobalLock(hData);
           StrCpyN(pData,wszWinPos,(int)GlobalSize(hData) / sizeof(WCHAR));
           GlobalUnlock(hData);
           SetClipboardData(CF_UNICODETEXT,hData);
@@ -5203,7 +5203,7 @@ LRESULT MsgNotify(HWND hwnd,WPARAM wParam,LPARAM lParam)
               if (iCurLine > 0/* && iLineLength <= 2*/)
               {
                 int iPrevLineLength = (int)SendMessage(hwndEdit,SCI_LINELENGTH,iCurLine-1,0);
-                if (pLineBuf = GlobalAlloc(GPTR,iPrevLineLength+1))
+                if (pLineBuf = (char*)GlobalAlloc(GPTR,iPrevLineLength+1))
                 {
                   SendMessage(hwndEdit,SCI_GETLINE,iCurLine-1,(LPARAM)pLineBuf);
                   *(pLineBuf+iPrevLineLength) = '\0';
@@ -5478,7 +5478,7 @@ LRESULT MsgNotify(HWND hwnd,WPARAM wParam,LPARAM lParam)
 //
 void LoadSettings()
 {
-  WCHAR *pIniSection = LocalAlloc(LPTR,sizeof(WCHAR)*32*1024);
+  WCHAR *pIniSection = (WCHAR*)LocalAlloc(LPTR,sizeof(WCHAR)*32*1024);
   int   cchIniSection = (int)LocalSize(pIniSection)/sizeof(WCHAR);
 
   LoadIniSection(L"Settings",pIniSection,cchIniSection);
@@ -5811,7 +5811,7 @@ void SaveSettings(BOOL bSaveSettingsNow)
     return;
   }
 
-  pIniSection = LocalAlloc(LPTR,sizeof(WCHAR)*32*1024);
+  pIniSection = (WCHAR*)LocalAlloc(LPTR,sizeof(WCHAR)*32*1024);
   cchIniSection = (int)LocalSize(pIniSection)/sizeof(WCHAR);
 
   IniSectionSetInt(pIniSection,L"SaveSettings",bSaveSettings);
@@ -5961,9 +5961,9 @@ void ParseCommandLine()
   // Good old console can also send args separated by Tabs
   StrTab2Space(lpCmdLine);
 
-  lp1 = LocalAlloc(LPTR,sizeof(WCHAR)*(lstrlen(lpCmdLine) + 1));
-  lp2 = LocalAlloc(LPTR,sizeof(WCHAR)*(lstrlen(lpCmdLine) + 1));
-  lp3 = LocalAlloc(LPTR,sizeof(WCHAR)*(lstrlen(lpCmdLine) + 1));
+  lp1 = (WCHAR*)LocalAlloc(LPTR,sizeof(WCHAR)*(lstrlen(lpCmdLine) + 1));
+  lp2 = (WCHAR*) LocalAlloc(LPTR, sizeof(WCHAR)*(lstrlen(lpCmdLine) + 1));
+  lp3 = (WCHAR*) LocalAlloc(LPTR, sizeof(WCHAR)*(lstrlen(lpCmdLine) + 1));
 
   // Start with 2nd argument
   ExtractFirstArgument(lpCmdLine,lp1,lp3);
@@ -6280,14 +6280,14 @@ void ParseCommandLine()
     // pathname
     else
     {
-      LPWSTR lpFileBuf = LocalAlloc(LPTR,sizeof(WCHAR)*(lstrlen(lpCmdLine) + 1));
+        LPWSTR lpFileBuf = (WCHAR*) LocalAlloc(LPTR, sizeof(WCHAR)*(lstrlen(lpCmdLine) + 1));
 
       cchiFileList = lstrlen(lpCmdLine) - lstrlen(lp3);
 
       if (lpFileArg)
         GlobalFree(lpFileArg);
 
-      lpFileArg = GlobalAlloc(GPTR,sizeof(WCHAR)*(MAX_PATH+2)); // changed for ActivatePrevInst() needs
+      lpFileArg = (WCHAR*) GlobalAlloc(GPTR, sizeof(WCHAR)*(MAX_PATH + 2)); // changed for ActivatePrevInst() needs
       StrCpyN(lpFileArg,lp3,MAX_PATH);
 
       PathFixBackslashes(lpFileArg);
@@ -6325,15 +6325,9 @@ void ParseCommandLine()
 
 }
 
-
-//=============================================================================
-//
-//  LoadFlags()
-//
-//
 void LoadFlags()
 {
-  WCHAR *pIniSection = LocalAlloc(LPTR,sizeof(WCHAR)*32*1024);
+    WCHAR *pIniSection = (WCHAR*) LocalAlloc(LPTR, sizeof(WCHAR) * 32 * 1024);
   int   cchIniSection = (int)LocalSize(pIniSection)/sizeof(WCHAR);
 
   LoadIniSection(L"Settings2",pIniSection,cchIniSection);
@@ -7353,7 +7347,7 @@ BOOL ActivatePrevInst()
         if (lpSchemeArg)
           cb += (lstrlen(lpSchemeArg) + 1) * sizeof(WCHAR);
 
-        params = GlobalAlloc(GPTR,cb);
+        params = (LPNP2PARAMS)GlobalAlloc(GPTR,cb);
         params->flagFileSpecified = FALSE;
         params->flagChangeNotify = 0;
         params->flagQuietCreate = FALSE;
@@ -7453,7 +7447,7 @@ BOOL ActivatePrevInst()
         if (cchTitleExcerpt)
           cb += (cchTitleExcerpt + 1) * sizeof(WCHAR);
 
-        params = GlobalAlloc(GPTR,cb);
+        params = (NP2PARAMS*)GlobalAlloc(GPTR,cb);
         params->flagFileSpecified = TRUE;
         lstrcpy(&params->wchData,lpFileArg);
         params->flagChangeNotify = flagChangeNotify;
@@ -7519,8 +7513,8 @@ BOOL RelaunchMultiInst() {
     PROCESS_INFORMATION pi;
 
     LPWSTR lpCmdLineNew = StrDup(GetCommandLine());
-    LPWSTR lp1 = LocalAlloc(LPTR,sizeof(WCHAR)*(lstrlen(lpCmdLineNew) + 1));
-    LPWSTR lp2 = LocalAlloc(LPTR,sizeof(WCHAR)*(lstrlen(lpCmdLineNew) + 1));
+    LPWSTR lp1 = (WCHAR*)LocalAlloc(LPTR,sizeof(WCHAR)*(lstrlen(lpCmdLineNew) + 1));
+    LPWSTR lp2 = (WCHAR*)LocalAlloc(LPTR, sizeof(WCHAR)*(lstrlen(lpCmdLineNew) + 1));
 
     StrTab2Space(lpCmdLineNew);
     lstrcpy(lpCmdLineNew + cchiFileList,L"");
@@ -7583,8 +7577,8 @@ BOOL RelaunchElevated() {
     GetStartupInfo(&si);
 
     lpCmdLine = GetCommandLine();
-    lpArg1 = LocalAlloc(LPTR,sizeof(WCHAR)*(lstrlen(lpCmdLine) + 1));
-    lpArg2 = LocalAlloc(LPTR,sizeof(WCHAR)*(lstrlen(lpCmdLine) + 1));
+    lpArg1 = (WCHAR*)LocalAlloc(LPTR,sizeof(WCHAR)*(lstrlen(lpCmdLine) + 1));
+    lpArg2 = (WCHAR*) LocalAlloc(LPTR, sizeof(WCHAR)*(lstrlen(lpCmdLine) + 1));
     ExtractFirstArgument(lpCmdLine,lpArg1,lpArg2);
 
     if (lstrlen(lpArg1)) {
@@ -7672,7 +7666,7 @@ void ShowNotifyIcon(HWND hwnd,BOOL bAdd)
   NOTIFYICONDATA nid;
 
   if (!hIcon)
-    hIcon = LoadImage(g_hInstance,MAKEINTRESOURCE(IDR_MAINWND),
+    hIcon = (HICON)LoadImageW(g_hInstance,MAKEINTRESOURCE(IDR_MAINWND),
                       IMAGE_ICON,16,16,LR_DEFAULTCOLOR);
 
   ZeroMemory(&nid,sizeof(NOTIFYICONDATA));

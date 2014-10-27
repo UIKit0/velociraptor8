@@ -17,9 +17,11 @@
 *
 *
 ******************************************************************************/
+
 #if !defined(_WIN32_WINNT)
 #define _WIN32_WINNT 0x501
 #endif
+
 #include <windows.h>
 #include <commctrl.h>
 #include <shlobj.h>
@@ -67,22 +69,22 @@ int MsgBox(int iType,UINT uIdMsg,...)
   if (!GetString(uIdMsg,szBuf,COUNTOF(szBuf)))
     return(0);
 
-  wvsprintf(szText,szBuf,(LPVOID)((PUINT_PTR)&uIdMsg + 1));
+  wvsprintfW(szText,szBuf,(va_list)((PUINT_PTR)&uIdMsg + 1));
 
   if (uIdMsg == IDS_ERR_LOADFILE || uIdMsg == IDS_ERR_SAVEFILE ||
       uIdMsg == IDS_CREATEINI_FAIL || uIdMsg == IDS_WRITEINI_FAIL ||
       uIdMsg == IDS_EXPORT_FAIL) {
-    LPVOID lpMsgBuf;
+      WCHAR *lpMsgBuf = NULL;
     WCHAR wcht;
-    FormatMessage(
+    FormatMessageW(
       FORMAT_MESSAGE_ALLOCATE_BUFFER|FORMAT_MESSAGE_FROM_SYSTEM|FORMAT_MESSAGE_IGNORE_INSERTS,
       NULL,
       dwLastIOError,
       MAKELANGID(LANG_NEUTRAL,SUBLANG_DEFAULT),
-      (LPTSTR)&lpMsgBuf,
+      lpMsgBuf,
       0,
       NULL);
-    StrTrim(lpMsgBuf,L" \a\b\f\n\r\t\v");
+    StrTrimW(lpMsgBuf,L" \a\b\f\n\r\t\v");
     StrCatBuff(szText,L"\n",COUNTOF(szText));
     StrCatBuff(szText,lpMsgBuf,COUNTOF(szText));
     LocalFree(lpMsgBuf);
@@ -226,7 +228,7 @@ INT_PTR CALLBACK AboutDlgProc(HWND hwnd,UINT umsg,WPARAM wParam,LPARAM lParam)
           DeleteObject(hFontTitle);
 
         if (NULL == (hFontTitle = (HFONT)SendDlgItemMessage(hwnd,IDC_VERSION,WM_GETFONT,0,0)))
-          hFontTitle = GetStockObject(DEFAULT_GUI_FONT);
+          hFontTitle = (HFONT)GetStockObject(DEFAULT_GUI_FONT);
         GetObject(hFontTitle,sizeof(LOGFONT),&lf);
         lf.lfWeight = FW_BOLD;
         hFontTitle = CreateFontIndirect(&lf);
@@ -1064,7 +1066,7 @@ INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd,UINT umsg,WPARAM wParam,LPARAM lParam)
         SHFILEINFO shfi = { 0 };
         LVCOLUMN lvc = { LVCF_FMT|LVCF_TEXT, LVCFMT_LEFT, 0, L"", -1, 0, 0, 0 };
 
-        LPICONTHREADINFO lpit = (LPVOID)GlobalAlloc(GPTR,sizeof(ICONTHREADINFO));
+        LPICONTHREADINFO lpit = (LPICONTHREADINFO) GlobalAlloc(GPTR, sizeof(ICONTHREADINFO));
         SetProp(hwnd,L"it",(HANDLE)lpit);
         lpit->hwnd = GetDlgItem(hwnd,IDC_FILEMRU);
         lpit->hExitThread = CreateEvent(NULL,TRUE,FALSE,NULL);
@@ -1099,7 +1101,7 @@ INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd,UINT umsg,WPARAM wParam,LPARAM lParam)
 
     case WM_DESTROY:
       {
-        LPICONTHREADINFO lpit = (LPVOID)GetProp(hwnd,L"it");
+        LPICONTHREADINFO lpit = (LPICONTHREADINFO) GetProp(hwnd, L"it");
         SetEvent(lpit->hExitThread);
         while (WaitForSingleObject(lpit->hTerminatedThread,0) != WAIT_OBJECT_0) {
           MSG msg;
@@ -1245,7 +1247,7 @@ INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd,UINT umsg,WPARAM wParam,LPARAM lParam)
             SHFILEINFO shfi = { 0 };
 
             DWORD dwtid;
-            LPICONTHREADINFO lpit = (LPVOID)GetProp(hwnd,L"it");
+            LPICONTHREADINFO lpit = (LPICONTHREADINFO) GetProp(hwnd, L"it");
 
             SetEvent(lpit->hExitThread);
             while (WaitForSingleObject(lpit->hTerminatedThread,0) != WAIT_OBJECT_0) {
@@ -1884,7 +1886,7 @@ INT_PTR CALLBACK SelectDefEncodingDlgProc(HWND hwnd,UINT umsg,WPARAM wParam,LPAR
 
         pdd = (PENCODEDLG)lParam;
 
-        hbmp = LoadImage(g_hInstance,MAKEINTRESOURCE(IDB_ENCODING),IMAGE_BITMAP,0,0,LR_CREATEDIBSECTION);
+        hbmp = (HBITMAP)LoadImageW(g_hInstance,MAKEINTRESOURCE(IDB_ENCODING),IMAGE_BITMAP,0,0,LR_CREATEDIBSECTION);
         himl = ImageList_Create(16,16,ILC_COLOR32|ILC_MASK,0,0);
         ImageList_AddMasked(himl,hbmp,CLR_DEFAULT);
         DeleteObject(hbmp);
@@ -1992,7 +1994,7 @@ INT_PTR CALLBACK SelectEncodingDlgProc(HWND hwnd,UINT umsg,WPARAM wParam,LPARAM 
 
         hwndLV = GetDlgItem(hwnd,IDC_ENCODINGLIST);
 
-        hbmp = LoadImage(g_hInstance,MAKEINTRESOURCE(IDB_ENCODING),IMAGE_BITMAP,0,0,LR_CREATEDIBSECTION);
+        hbmp = (HBITMAP)LoadImageW(g_hInstance,MAKEINTRESOURCE(IDB_ENCODING),IMAGE_BITMAP,0,0,LR_CREATEDIBSECTION);
         himl = ImageList_Create(16,16,ILC_COLOR32|ILC_MASK,0,0);
         ImageList_AddMasked(himl,hbmp,CLR_DEFAULT);
         DeleteObject(hbmp);
@@ -2320,8 +2322,8 @@ INT_PTR InfoBox(int iType,LPCWSTR lpstrSetting,int uidMessage,...)
   if (!GetString(uidMessage,wchFormat,COUNTOF(wchFormat)))
     return(-1);
 
-  ib.lpstrMessage = LocalAlloc(LPTR,1024 * sizeof(WCHAR));
-  wvsprintf(ib.lpstrMessage,wchFormat,(LPVOID)((PUINT_PTR)&uidMessage + 1));
+  ib.lpstrMessage = (WCHAR *)LocalAlloc(LPTR,1024 * sizeof(WCHAR));
+  wvsprintf(ib.lpstrMessage,wchFormat,(va_list)((PUINT_PTR)&uidMessage + 1));
   ib.lpstrSetting = (LPWSTR)lpstrSetting;
   ib.bDisableCheckBox = (lstrlen(szIniFile) == 0 || lstrlen(lpstrSetting) == 0 || iMode == 2) ? TRUE : FALSE;
 

@@ -19,12 +19,6 @@
 ******************************************************************************/
 
 
-
-// extern "C" declarations of Scintilla functions
-BOOL Scintilla_RegisterClasses(void*);
-BOOL Scintilla_ReleaseResources();
-
-
 typedef struct _editfindreplace
 {
   char szFind[512];

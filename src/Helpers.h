@@ -18,11 +18,8 @@
 *
 ******************************************************************************/
 
-
-
 extern HINSTANCE g_hInstance;
 extern UINT16 g_uWinVer;
-
 
 #define COUNTOF(ar) (sizeof(ar)/sizeof(ar[0]))
 #define CSTRLEN(s)  (COUNTOF(s)-1)
@@ -103,12 +100,12 @@ void DeleteBitmapButton(HWND,int);
 
 
 #define StatusSetSimple(hwnd,b) SendMessage(hwnd,SB_SIMPLE,(WPARAM)b,0)
-BOOL StatusSetText(HWND,UINT,LPCWSTR);
+BOOL StatusSetText(HWND,UINT,const WCHAR*);
 BOOL StatusSetTextID(HWND,UINT,UINT);
-int  StatusCalcPaneWidth(HWND,LPCWSTR);
+int  StatusCalcPaneWidth(HWND,const WCHAR*);
 
-int Toolbar_GetButtons(HWND,int,LPWSTR,int);
-int Toolbar_SetButtons(HWND,int,LPCWSTR,void*,int);
+int Toolbar_GetButtons(HWND,int,WCHAR *,int);
+int Toolbar_SetButtons(HWND, int, const WCHAR*, const TBBUTTON *, int);
 
 LRESULT SendWMSize(HWND);
 
@@ -120,8 +117,13 @@ LRESULT SendWMSize(HWND);
 
 BOOL IsCmdEnabled(HWND, UINT);
 
+#define GetString(id, buf, cchBufMax) LoadStringW(g_hInstance, id, buf, cchBufMax)
 
-#define GetString(id,pb,cb) LoadString(g_hInstance,id,pb,cb)
+/*
+inline int GetString(UINT id, WCHAR *buf, int cchBufMax) {
+    return LoadStringW(g_hInstance, id, buf, cchBufMax);
+}
+*/
 
 #define StrEnd(pStart) (pStart + lstrlen(pStart))
 
@@ -232,6 +234,3 @@ BOOL GetDoAnimateMinimize(VOID);
 VOID MinimizeWndToTray(HWND hWnd);
 VOID RestoreWndFromTray(HWND hWnd);
 
-
-
-///   End of Helpers.h   \\\

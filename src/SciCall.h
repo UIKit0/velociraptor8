@@ -25,15 +25,11 @@ __forceinline void InitScintillaHandle(HWND hwnd) {
   g_hScintilla = (HANDLE)SendMessage(hwnd, SCI_GETDIRECTPOINTER, 0, 0);
 }
 
+class ScintillaWin;
 
-//=============================================================================
-//
-//  SciCall()
-//
-//
-LRESULT WINAPI Scintilla_DirectFunction(HANDLE, UINT, WPARAM, LPARAM);
-#define SciCall(m, w, l) Scintilla_DirectFunction(g_hScintilla, m, w, l)
-
+//LRESULT WINAPI Scintilla_DirectFunction(HANDLE, UINT, WPARAM, LPARAM);
+extern "C" sptr_t __stdcall Scintilla_DirectFunction(ScintillaWin *, UINT, uptr_t, sptr_t);
+#define SciCall(m, w, l) Scintilla_DirectFunction((ScintillaWin*)g_hScintilla,m, w, l)
 
 //=============================================================================
 //

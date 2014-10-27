@@ -336,13 +336,13 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Dialogs.c" />
-    <ClCompile Include="Dlapi.c" />
-    <ClCompile Include="Edit.c" />
-    <ClCompile Include="Helpers.c" />
-    <ClCompile Include="Notepad2.c" />
+    <ClCompile Include="Dialogs.cpp" />
+    <ClCompile Include="Dlapi.cpp" />
+    <ClCompile Include="Edit.cpp" />
+    <ClCompile Include="Helpers.cpp" />
+    <ClCompile Include="Notepad2.cpp" />
     <ClCompile Include="Print.cpp" />
-    <ClCompile Include="Styles.c" />
+    <ClCompile Include="Styles.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Dialogs.h" />

@@ -21,11 +21,6 @@
 #ifndef _DLAPI_H_
 #define _DLAPI_H_
 
-#ifdef __cplusplus
-extern "C" { // C-Declarations
-#endif //__cplusplus
-
-
 
 //==== DirList ================================================================
 
@@ -182,15 +177,4 @@ BOOL IL_GetDisplayName(LPSHELLFOLDER,
                        LPCITEMIDLIST,
                        DWORD,LPWSTR,int);
 
-
-
-
-#ifdef __cplusplus
-}
-#endif //__cplusplus
-
-
-#endif // _DLAPI_H_
-
-
-///   End of Dlapi.h   \\\
+#endif

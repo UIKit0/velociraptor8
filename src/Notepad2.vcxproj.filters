@@ -15,25 +15,25 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Dialogs.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Dlapi.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Edit.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Helpers.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Notepad2.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Print.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Styles.c">
+    <ClCompile Include="Dialogs.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Notepad2.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Helpers.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Dlapi.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Edit.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Styles.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

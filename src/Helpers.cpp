@@ -136,14 +136,11 @@ BOOL PrivateIsAppThemed()
   return bIsAppThemed;
 }
 
+typedef HRESULT (WINAPI *SetCurrentProcessExplicitAppUserModelIDProc)(PCWSTR AppID);
 
-//=============================================================================
-//
-//  PrivateSetCurrentProcessExplicitAppUserModelID()
-//
 HRESULT PrivateSetCurrentProcessExplicitAppUserModelID(PCWSTR AppID)
 {
-  FARPROC pfnSetCurrentProcessExplicitAppUserModelID;
+    SetCurrentProcessExplicitAppUserModelIDProc pfnSetCurrentProcessExplicitAppUserModelID;
 
   if (lstrlen(AppID) == 0)
     return(S_OK);
@@ -152,13 +149,12 @@ HRESULT PrivateSetCurrentProcessExplicitAppUserModelID(PCWSTR AppID)
     return(S_OK);
 
   pfnSetCurrentProcessExplicitAppUserModelID =
-    GetProcAddress(GetModuleHandleA("shell32.dll"),"SetCurrentProcessExplicitAppUserModelID");
+      (SetCurrentProcessExplicitAppUserModelIDProc)GetProcAddress(GetModuleHandleA("shell32.dll"), "SetCurrentProcessExplicitAppUserModelID");
 
   if (pfnSetCurrentProcessExplicitAppUserModelID)
-    return((HRESULT)pfnSetCurrentProcessExplicitAppUserModelID(AppID));
-
+      return pfnSetCurrentProcessExplicitAppUserModelID(AppID);
   else
-    return(S_OK);
+    return S_OK;
 }
 
 
@@ -177,7 +173,7 @@ BOOL IsElevated() {
     } /*TOKEN_ELEVATION*/te;
     DWORD dwReturnLength = 0;
 
-    if (GetTokenInformation(hToken,/*TokenElevation*/20,&te,sizeof(te),&dwReturnLength)) {
+    if (GetTokenInformation(hToken,TokenElevation,&te,sizeof(te),&dwReturnLength)) {
         if (dwReturnLength == sizeof(te))
           bIsElevated = te.TokenIsElevated;
     }
@@ -216,7 +212,7 @@ BOOL BitmapMergeAlpha(HBITMAP hbmp,COLORREF crDest)
     if (bmp.bmBitsPixel == 32) {
 
       int x,y;
-      RGBQUAD *prgba = bmp.bmBits;
+      RGBQUAD *prgba = (RGBQUAD*)bmp.bmBits;
 
       for (y = 0; y < bmp.bmHeight; y++) {
         for (x = 0; x < bmp.bmWidth; x++) {
@@ -244,7 +240,7 @@ BOOL BitmapAlphaBlend(HBITMAP hbmp,COLORREF crDest,BYTE alpha)
     if (bmp.bmBitsPixel == 32) {
 
       int x,y;
-      RGBQUAD *prgba = bmp.bmBits;
+      RGBQUAD *prgba = (RGBQUAD*)bmp.bmBits;
 
       for (y = 0; y < bmp.bmHeight; y++) {
         for (x = 0; x < bmp.bmWidth; x++) {
@@ -270,7 +266,7 @@ BOOL BitmapGrayScale(HBITMAP hbmp)
     if (bmp.bmBitsPixel == 32) {
 
       int x,y;
-      RGBQUAD *prgba = bmp.bmBits;
+      RGBQUAD *prgba = (RGBQUAD*) bmp.bmBits;
 
       for (y = 0; y < bmp.bmHeight; y++) {
         for (x = 0; x < bmp.bmWidth; x++) {
@@ -411,12 +407,10 @@ BOOL SetWindowTitle(HWND hwnd,UINT uIDAppName,BOOL bIsElevated,UINT uIDUntitled,
 
 void SetWindowTransparentMode(HWND hwnd,BOOL bTransparentMode)
 {
-  FARPROC fp;
   int  iAlphaPercent;
   BYTE bAlpha;
 
   if (bTransparentMode) {
-    if (fp = GetProcAddress(GetModuleHandle(L"User32"),"SetLayeredWindowAttributes")) {
       SetWindowLongPtr(hwnd,GWL_EXSTYLE,
         GetWindowLongPtr(hwnd,GWL_EXSTYLE) | WS_EX_LAYERED);
 
@@ -426,13 +420,10 @@ void SetWindowTransparentMode(HWND hwnd,BOOL bTransparentMode)
         iAlphaPercent = 75;
       bAlpha = iAlphaPercent * 255 / 100;
 
-      fp(hwnd,0,bAlpha,LWA_ALPHA);
-    }
+      SetLayeredWindowAttributes(hwnd, 0, bAlpha, LWA_ALPHA);
+  } else {
+      SetWindowLongPtr(hwnd, GWL_EXSTYLE, GetWindowLongPtr(hwnd, GWL_EXSTYLE) & ~WS_EX_LAYERED);
   }
-
-  else
-    SetWindowLongPtr(hwnd,GWL_EXSTYLE,
-      GetWindowLongPtr(hwnd,GWL_EXSTYLE) & ~WS_EX_LAYERED);
 }
 
 
@@ -545,7 +536,7 @@ void ResizeDlg_Init(HWND hwnd,int cxFrame,int cyFrame,int nIdGrip)
   RECT rc;
   WCHAR wch[64];
   int cGrip;
-  RESIZEDLG *pm = LocalAlloc(LPTR,sizeof(RESIZEDLG));
+  RESIZEDLG *pm = (RESIZEDLG*)LocalAlloc(LPTR, sizeof(RESIZEDLG));
 
   GetClientRect(hwnd,&rc);
   pm->cxClient = rc.right - rc.left;
@@ -582,7 +573,7 @@ void ResizeDlg_Init(HWND hwnd,int cxFrame,int cyFrame,int nIdGrip)
 void ResizeDlg_Destroy(HWND hwnd,int *cxFrame,int *cyFrame)
 {
   RECT rc;
-  PRESIZEDLG pm = GetProp(hwnd,L"ResizeDlg");
+  PRESIZEDLG pm = (RESIZEDLG*)GetProp(hwnd, L"ResizeDlg");
 
   GetWindowRect(hwnd,&rc);
   *cxFrame = rc.right-rc.left;
@@ -594,7 +585,7 @@ void ResizeDlg_Destroy(HWND hwnd,int *cxFrame,int *cyFrame)
 
 void ResizeDlg_Size(HWND hwnd,LPARAM lParam,int *cx,int *cy)
 {
-  PRESIZEDLG pm = GetProp(hwnd,L"ResizeDlg");
+    PRESIZEDLG pm = (RESIZEDLG*) GetProp(hwnd, L"ResizeDlg");
 
   *cx = LOWORD(lParam) - pm->cxClient;
   *cy = HIWORD(lParam) - pm->cyClient;
@@ -604,7 +595,7 @@ void ResizeDlg_Size(HWND hwnd,LPARAM lParam,int *cx,int *cy)
 
 void ResizeDlg_GetMinMaxInfo(HWND hwnd,LPARAM lParam)
 {
-  PRESIZEDLG pm = GetProp(hwnd,L"ResizeDlg");
+    PRESIZEDLG pm = (RESIZEDLG*) GetProp(hwnd, L"ResizeDlg");
 
   LPMINMAXINFO lpmmi = (LPMINMAXINFO)lParam;
   lpmmi->ptMinTrackSize.x = pm->mmiPtMinX;
@@ -629,7 +620,7 @@ void MakeBitmapButton(HWND hwnd,int nCtlId,HINSTANCE hInstance,UINT uBmpId)
   HWND hwndCtl = GetDlgItem(hwnd,nCtlId);
   BITMAP bmp;
   BUTTON_IMAGELIST bi;
-  HBITMAP hBmp = LoadImage(hInstance,MAKEINTRESOURCE(uBmpId),IMAGE_BITMAP,0,0,LR_CREATEDIBSECTION);
+  HBITMAP hBmp = (HBITMAP)LoadImageW(hInstance,MAKEINTRESOURCE(uBmpId),IMAGE_BITMAP,0,0,LR_CREATEDIBSECTION);
   GetObject(hBmp,sizeof(BITMAP),&bmp);
   bi.himl = ImageList_Create(bmp.bmWidth,bmp.bmHeight,ILC_COLOR32|ILC_MASK,1,0);
   ImageList_AddMasked(bi.himl,hBmp,CLR_DEFAULT);
@@ -738,7 +729,7 @@ int StatusCalcPaneWidth(HWND hwnd,LPCWSTR lpsz)
   SIZE  size;
   HDC   hdc   = GetDC(hwnd);
   HFONT hfont = (HFONT)SendMessage(hwnd,WM_GETFONT,0,0);
-  HFONT hfold = SelectObject(hdc,hfont);
+  HFONT hfold = (HFONT)SelectObject(hdc,hfont);
   int   mmode = SetMapMode(hdc,MM_TEXT);
 
   GetTextExtentPoint32(hdc,lpsz,lstrlen(lpsz),&size);
@@ -772,7 +763,7 @@ int Toolbar_GetButtons(HWND hwnd,int cmdBase,LPWSTR lpszButtons,int cchButtons)
   return(c);
 }
 
-int Toolbar_SetButtons(HWND hwnd,int cmdBase,LPCWSTR lpszButtons,LPCTBBUTTON ptbb,int ctbb)
+int Toolbar_SetButtons(HWND hwnd, int cmdBase, const WCHAR* lpszButtons, const TBBUTTON * ptbb, int ctbb)
 {
   WCHAR tchButtons[512];
   WCHAR *p;
@@ -826,19 +817,17 @@ BOOL IsCmdEnabled(HWND hwnd,UINT uId)
     return (!(ustate & (MF_GRAYED|MF_DISABLED)));
 }
 
-
 int FormatString(LPWSTR lpOutput,int nOutput,UINT uIdFormat,...)
 {
-  WCHAR *p = LocalAlloc(LPTR,sizeof(WCHAR)*nOutput);
+  WCHAR *p = (WCHAR*)LocalAlloc(LPTR,sizeof(WCHAR)*nOutput);
 
   if (GetString(uIdFormat,p,nOutput))
-    wvsprintf(lpOutput,p,(LPVOID)((PUINT_PTR)&uIdFormat+1));
+    wvsprintf(lpOutput,p,(va_list)((PUINT_PTR)&uIdFormat+1));
 
   LocalFree(p);
 
   return lstrlen(lpOutput);
 }
-
 
 void PathRelativeToApp(
   LPWSTR lpszSrc,LPWSTR lpszDest,int cchDest,BOOL bSrcIsFile,
@@ -957,17 +946,7 @@ BOOL PathIsLnkFile(LPCWSTR pszPath)
 
 }
 
-
-///////////////////////////////////////////////////////////////////////////////
-//
-//
-//  Name: PathGetLnkPath()
-//
 //  Purpose: Try to get the path to which a lnk-file is linked
-//
-//
-//  Manipulates: pszResPath
-//
 BOOL PathGetLnkPath(LPCWSTR pszLnkFile,LPWSTR pszResPath,int cchResPath)
 {
 
@@ -975,28 +954,28 @@ BOOL PathGetLnkPath(LPCWSTR pszLnkFile,LPWSTR pszResPath,int cchResPath)
   WIN32_FIND_DATA  fd;
   BOOL             bSucceeded = FALSE;
 
-  if (SUCCEEDED(CoCreateInstance(&CLSID_ShellLink,NULL,
+  if (SUCCEEDED(CoCreateInstance(CLSID_ShellLink,NULL,
                                  CLSCTX_INPROC_SERVER,
-                                 &IID_IShellLink,&psl)))
+                                 IID_IShellLinkW,(LPVOID*)&psl)))
   {
     IPersistFile *ppf;
 
-    if (SUCCEEDED(psl->lpVtbl->QueryInterface(psl,&IID_IPersistFile,&ppf)))
+    if (SUCCEEDED(psl->QueryInterface(IID_IPersistFile,(void**)&ppf)))
     {
-      WORD wsz[MAX_PATH];
+      WCHAR wsz[MAX_PATH];
 
       /*MultiByteToWideChar(CP_ACP,MB_PRECOMPOSED,
                           pszLnkFile,-1,wsz,MAX_PATH);*/
       lstrcpy(wsz,pszLnkFile);
 
-      if (SUCCEEDED(ppf->lpVtbl->Load(ppf,wsz,STGM_READ)))
+      if (SUCCEEDED(ppf->Load(wsz,STGM_READ)))
       {
-        if (NOERROR == psl->lpVtbl->GetPath(psl,pszResPath,cchResPath,&fd,0))
+        if (NOERROR == psl->GetPath(pszResPath,cchResPath,&fd,0))
           bSucceeded = TRUE;
       }
-      ppf->lpVtbl->Release(ppf);
+      ppf->Release();
     }
-    psl->lpVtbl->Release(psl);
+    psl->Release();
   }
 
   // This additional check seems reasonable
@@ -1012,17 +991,8 @@ BOOL PathGetLnkPath(LPCWSTR pszLnkFile,LPWSTR pszResPath,int cchResPath)
 
 }
 
-
-///////////////////////////////////////////////////////////////////////////////
-//
-//
-//  Name: PathIsLnkToDirectory()
-//
 //  Purpose: Determine wheter pszPath is a Windows Shell Link File which
 //           refers to a directory
-//
-//  Manipulates: pszResPath
-//
 BOOL PathIsLnkToDirectory(LPCWSTR pszPath,LPWSTR pszResPath,int cchResPath)
 {
 
@@ -1096,30 +1066,30 @@ BOOL PathCreateDeskLnk(LPCWSTR pszDocument)
   if (!SHGetNewLinkInfo(pszDocument,tchLinkDir,tchLnkFileName,&fMustCopy,SHGNLI_PREFIXNAME))
     return(FALSE);
 
-  if (SUCCEEDED(CoCreateInstance(&CLSID_ShellLink,NULL,
+  if (SUCCEEDED(CoCreateInstance(CLSID_ShellLink,NULL,
                                  CLSCTX_INPROC_SERVER,
-                                 &IID_IShellLink,&psl)))
+                                 IID_IShellLink,(void**)&psl)))
   {
     IPersistFile *ppf;
 
-    if (SUCCEEDED(psl->lpVtbl->QueryInterface(psl,&IID_IPersistFile,&ppf)))
+    if (SUCCEEDED(psl->QueryInterface(IID_IPersistFile,(void**)&ppf)))
     {
-      WORD wsz[MAX_PATH];
+      WCHAR wsz[MAX_PATH];
 
       /*MultiByteToWideChar(CP_ACP,MB_PRECOMPOSED,
                           tchLnkFileName,-1,wsz,MAX_PATH);*/
       lstrcpy(wsz,tchLnkFileName);
 
-      psl->lpVtbl->SetPath(psl,tchExeFile);
-      psl->lpVtbl->SetArguments(psl,tchArguments);
-      psl->lpVtbl->SetDescription(psl,tchDescription);
+      psl->SetPath(tchExeFile);
+      psl->SetArguments(tchArguments);
+      psl->SetDescription(tchDescription);
 
-      if (SUCCEEDED(ppf->lpVtbl->Save(ppf,wsz,TRUE)))
+      if (SUCCEEDED(ppf->Save(wsz,TRUE)))
         bSucceeded = TRUE;
 
-      ppf->lpVtbl->Release(ppf);
+      ppf->Release();
     }
-    psl->lpVtbl->Release(psl);
+    psl->Release();
   }
 
   return(bSucceeded);
@@ -1141,7 +1111,7 @@ BOOL PathCreateFavLnk(LPCWSTR pszName,LPCWSTR pszTarget,LPCWSTR pszDir)
 
   WCHAR tchLnkFileName[MAX_PATH];
 
-  IShellLink *psl;
+  IShellLinkW *psl;
   BOOL bSucceeded = FALSE;
 
   if (!pszName || lstrlen(pszName) == 0)
@@ -1154,32 +1124,31 @@ BOOL PathCreateFavLnk(LPCWSTR pszName,LPCWSTR pszTarget,LPCWSTR pszDir)
   if (PathFileExists(tchLnkFileName))
     return FALSE;
 
-  if (SUCCEEDED(CoCreateInstance(&CLSID_ShellLink,NULL,
+  if (SUCCEEDED(CoCreateInstance(CLSID_ShellLink,NULL,
                                  CLSCTX_INPROC_SERVER,
-                                 &IID_IShellLink,&psl)))
+                                 IID_IShellLinkW,(void**)&psl)))
   {
     IPersistFile *ppf;
 
-    if (SUCCEEDED(psl->lpVtbl->QueryInterface(psl,&IID_IPersistFile,&ppf)))
+    if (SUCCEEDED(psl->QueryInterface(IID_IPersistFile,(void**)&ppf)))
     {
-      WORD wsz[MAX_PATH];
+      WCHAR wsz[MAX_PATH];
 
       /*MultiByteToWideChar(CP_ACP,MB_PRECOMPOSED,
                           tchLnkFileName,-1,wsz,MAX_PATH);*/
       lstrcpy(wsz,tchLnkFileName);
 
-      psl->lpVtbl->SetPath(psl,pszTarget);
+      psl->SetPath(pszTarget);
 
-      if (SUCCEEDED(ppf->lpVtbl->Save(ppf,wsz,TRUE)))
+      if (SUCCEEDED(ppf->Save(wsz,TRUE)))
         bSucceeded = TRUE;
 
-      ppf->lpVtbl->Release(ppf);
+      ppf->Release();
     }
-    psl->lpVtbl->Release(psl);
+    psl->Release();
   }
 
-  return(bSucceeded);
-
+  return bSucceeded;
 }
 
 
@@ -1497,12 +1466,12 @@ UINT CodePageFromCharSet(UINT uCharSet)
 //
 LPMRULIST MRU_Create(LPCWSTR pszRegKey,int iFlags,int iSize) {
 
-  LPMRULIST pmru = LocalAlloc(LPTR,sizeof(MRULIST));
+    LPMRULIST pmru = (LPMRULIST)LocalAlloc(LPTR, sizeof(MRULIST));
   ZeroMemory(pmru,sizeof(MRULIST));
   lstrcpyn(pmru->szRegKey,pszRegKey,COUNTOF(pmru->szRegKey));
   pmru->iFlags = iFlags;
   pmru->iSize = min(iSize,MRU_MAXITEMS);
-  return(pmru);
+  return pmru;
 }
 
 BOOL MRU_Destroy(LPMRULIST pmru) {
@@ -1649,7 +1618,7 @@ BOOL MRU_Load(LPMRULIST pmru) {
   int i,n = 0;
   WCHAR tchName[32];
   WCHAR tchItem[1024];
-  WCHAR *pIniSection = LocalAlloc(LPTR,sizeof(WCHAR)*32*1024);
+  WCHAR *pIniSection = (WCHAR*)LocalAlloc(LPTR,sizeof(WCHAR)*32*1024);
 
   MRU_Empty(pmru);
   LoadIniSection(pmru->szRegKey,pIniSection,(int)LocalSize(pIniSection)/sizeof(WCHAR));
@@ -1675,7 +1644,7 @@ BOOL MRU_Save(LPMRULIST pmru) {
 
   int i;
   WCHAR tchName[32];
-  WCHAR *pIniSection = LocalAlloc(LPTR,sizeof(WCHAR)*32*1024);
+  WCHAR *pIniSection = (WCHAR*)LocalAlloc(LPTR,sizeof(WCHAR)*32*1024);
 
   //IniDeleteSection(pmru->szRegKey);
 
@@ -1738,9 +1707,14 @@ BOOL MRU_MergeSave(LPMRULIST pmru,BOOL bAddFiles,BOOL bRelativePath,BOOL bUnexpa
 
 */
 
+typedef HTHEME(WINAPI *OpenThemeDataProc)(HWND hwnd, LPCWSTR pszClassList);
+typedef HRESULT(WINAPI *CloseThemeDataProc)(HTHEME hTheme);
+
 BOOL GetThemedDialogFont(LPWSTR lpFaceName,WORD* wSize)
 {
-  HDC hDC;
+    // TODO(kjk): port this
+#if 0
+    HDC hDC;
   int iLogPixelsY;
   HMODULE hModUxTheme;
   HTHEME hTheme;
@@ -1783,6 +1757,9 @@ BOOL GetThemedDialogFont(LPWSTR lpFaceName,WORD* wSize)
   }*/
 
   return(bSucceed);
+#else
+    return FALSE;
+#endif
 }
 
 __inline BOOL DialogTemplate_IsDialogEx(const DLGTEMPLATE* pTemplate) {
@@ -1855,7 +1832,7 @@ DLGTEMPLATE* LoadThemedDialogTemplate(LPCTSTR lpDialogTemplateID,HINSTANCE hInst
   dwTemplateSize = (UINT)SizeofResource(hInstance,hRsrc);
 
   if ((dwTemplateSize == 0) ||
-      (pTemplate = LocalAlloc(LPTR,dwTemplateSize+LF_FACESIZE*2)) == NULL) {
+      (pTemplate = (DLGTEMPLATE*)LocalAlloc(LPTR, dwTemplateSize + LF_FACESIZE * 2)) == NULL) {
     UnlockResource(hRsrcMem);
     FreeResource(hRsrcMem);
     return(NULL);
