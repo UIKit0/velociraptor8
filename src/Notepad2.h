@@ -26,8 +26,7 @@
 
 //==== Data Type for WM_COPYDATA ==============================================
 #define DATA_NOTEPAD2_PARAMS 0xFB10
-typedef struct np2params {
-
+struct NP2PARAMS {
   int   flagFileSpecified;
   int   flagChangeNotify;
   int   flagLexerSpecified;
@@ -41,9 +40,7 @@ typedef struct np2params {
   int   flagSetEOLMode;
   int   flagTitleExcerpt;
   WCHAR wchData;
-
-} NP2PARAMS, *LPNP2PARAMS;
-
+};
 
 //==== Toolbar Style ==========================================================
 #define WS_TOOLBAR (WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | \

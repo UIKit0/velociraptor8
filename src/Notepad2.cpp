@@ -1209,7 +1209,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd,UINT umsg,WPARAM wParam,LPARAM lParam)
         SetDlgItemInt(hwnd,IDC_REUSELOCK,GetTickCount(),FALSE);
 
         if (pcds->dwData == DATA_NOTEPAD2_PARAMS) {
-            LPNP2PARAMS params = (LPNP2PARAMS)LocalAlloc(LPTR, pcds->cbData);
+            NP2PARAMS* params = (NP2PARAMS*) LocalAlloc(LPTR, pcds->cbData);
           CopyMemory(params,pcds->lpData,pcds->cbData);
 
           if (params->flagLexerSpecified)
@@ -7328,7 +7328,7 @@ BOOL ActivatePrevInst()
       // Enabled
       if (IsWindowEnabled(hwnd))
       {
-        LPNP2PARAMS params;
+          NP2PARAMS* params;
         DWORD cb = sizeof(NP2PARAMS);
 
         // Make sure the previous window won't pop up a change notification message
@@ -7347,7 +7347,7 @@ BOOL ActivatePrevInst()
         if (lpSchemeArg)
           cb += (lstrlen(lpSchemeArg) + 1) * sizeof(WCHAR);
 
-        params = (LPNP2PARAMS)GlobalAlloc(GPTR,cb);
+        params = (NP2PARAMS*) GlobalAlloc(GPTR, cb);
         params->flagFileSpecified = FALSE;
         params->flagChangeNotify = 0;
         params->flagQuietCreate = FALSE;
@@ -7418,7 +7418,7 @@ BOOL ActivatePrevInst()
         // Search working directory from second instance, first!
         // lpFileArg is at least MAX_PATH+2 bytes
         WCHAR tchTmp[MAX_PATH];
-        LPNP2PARAMS params;
+        NP2PARAMS* params;
         DWORD cb = sizeof(NP2PARAMS);
         int cchTitleExcerpt;
 

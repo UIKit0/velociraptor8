@@ -58,11 +58,29 @@ public:
     ~AutoStr() {
         free(s);
     }
-    char *Get() {
+    char *Get() const {
         return s;
     }
     operator char*() const {
         return s;
+    }
+};
+
+template <typename T>
+class AutoStruct {
+    T *val;
+public:
+    AutoStruct() {
+        val = AllocMust<T>();
+    }
+    ~AutoStruct() {
+        free(val);
+    }
+    T *Get() const {
+        return val;
+    }
+    operator T*() const {
+        return val;
     }
 };
 

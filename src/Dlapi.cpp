@@ -31,9 +31,8 @@
 
 //==== DLDATA Structure =======================================================
 
-typedef struct tagDLDATA // dl
+struct DLDATA
 {
-
   HWND hwnd;                 // HWND of ListView Control
   UINT cbidl;                // Size of pidl
   LPITEMIDLIST  pidl;        // Directory Id
@@ -44,7 +43,7 @@ typedef struct tagDLDATA // dl
   BOOL bNoFadeHidden;        // Flag passed from GetDispInfo()
   HANDLE hExitThread;        // Flag is set when Icon Thread should terminate
   HANDLE hTerminatedThread;  // Flag is set when Icon Thread has terminated
-} DLDATA, *LPDLDATA;
+};
 
 //==== Property Name ==========================================================
 static const WCHAR *pDirListProp = L"DirListData";
@@ -57,8 +56,7 @@ BOOL DirList_Init(HWND hwnd,LPCWSTR pszHeader)
   SHFILEINFO shfi = { 0 };
   LV_COLUMN  lvc;
 
-  // Allocate DirListData Property
-  LPDLDATA lpdl = (LPDLDATA) GlobalAlloc(GPTR, sizeof(DLDATA));
+  DLDATA* lpdl = (DLDATA*) GlobalAlloc(GPTR, sizeof(DLDATA));
   if (!lpdl) {
       return FALSE;
   }
@@ -108,7 +106,7 @@ BOOL DirList_Init(HWND hwnd,LPCWSTR pszHeader)
 //  Free memory used by dl structure
 BOOL DirList_Destroy(HWND hwnd)
 {
-    LPDLDATA lpdl = (LPDLDATA) GetProp(hwnd, pDirListProp);
+    DLDATA* lpdl = (DLDATA*) GetProp(hwnd, pDirListProp);
 
   // Release multithreading objects
   DirList_TerminateIconThread(hwnd);
@@ -134,7 +132,7 @@ BOOL DirList_StartIconThread(HWND hwnd)
 {
 
   DWORD dwtid;
-  LPDLDATA lpdl = (LPDLDATA) GetProp(hwnd, pDirListProp);
+  DLDATA* lpdl = (DLDATA*) GetProp(hwnd, pDirListProp);
 
   DirList_TerminateIconThread(hwnd);
 
@@ -150,8 +148,7 @@ BOOL DirList_StartIconThread(HWND hwnd)
 //  Terminate Icon Thread and reset multithreading control structures
 BOOL DirList_TerminateIconThread(HWND hwnd)
 {
-
-    LPDLDATA lpdl = (LPDLDATA) GetProp(hwnd, pDirListProp);
+    DLDATA* lpdl = (DLDATA*) GetProp(hwnd, pDirListProp);
 
   SetEvent(lpdl->hExitThread);
 
@@ -197,7 +194,7 @@ int DirList_Fill(HWND hwnd,LPCWSTR lpszDir,DWORD grfFlags,LPCWSTR lpszFileSpec,
   DL_FILTER dlf;
   SHFILEINFO shfi = { 0 };
 
-  LPDLDATA lpdl = (LPDLDATA) GetProp(hwnd, pDirListProp);
+  DLDATA* lpdl = (DLDATA*) GetProp(hwnd, pDirListProp);
 
   // Initialize default icons
   SHGetFileInfo(L"Icon",FILE_ATTRIBUTE_DIRECTORY,&shfi,sizeof(SHFILEINFO),
@@ -362,10 +359,8 @@ int DirList_Fill(HWND hwnd,LPCWSTR lpszDir,DWORD grfFlags,LPCWSTR lpszFileSpec,
 //  Thread to extract file icons in the background
 DWORD WINAPI DirList_IconThread(LPVOID lpParam)
 {
-
   HWND hwnd;
 
-  LPDLDATA lpdl;
   LV_ITEM lvi;
   LPLV_ITEMDATA lplvid;
 
@@ -374,7 +369,7 @@ DWORD WINAPI DirList_IconThread(LPVOID lpParam)
   int iItem = 0;
   int iMaxItem;
 
-  lpdl = (LPDLDATA)lpParam;
+  DLDATA* lpdl = (DLDATA*) lpParam;
   ResetEvent(lpdl->hTerminatedThread);
 
   // Exit immediately if DirList_Fill() hasn't been called
@@ -785,20 +780,18 @@ BOOL DirList_PropertyDlg(HWND hwnd,int iItem)
 BOOL DirList_GetLongPathName(HWND hwnd,LPWSTR lpszLongPath)
 {
   WCHAR tch[MAX_PATH];
-  LPDLDATA lpdl = (LPDLDATA) GetProp(hwnd, pDirListProp);
-  if (SHGetPathFromIDList(lpdl->pidl,tch))
+  DLDATA* lpdl = (DLDATA*) GetProp(hwnd, pDirListProp);
+  if (SHGetPathFromIDListW(lpdl->pidl, tch))
   {
-    lstrcpy(lpszLongPath,tch);
-    return(TRUE);
+    lstrcpyW(lpszLongPath,tch);
+    return TRUE;
   }
-  else
-    return(FALSE);
+  return FALSE;
 }
 
 //  Select specified item in the list
 BOOL DirList_SelectItem(HWND hwnd,LPCWSTR lpszDisplayName,LPCWSTR lpszFullPath)
 {
-
   #define LVIS_FLAGS LVIS_SELECTED|LVIS_FOCUSED
 
   WCHAR szShortPath[MAX_PATH];
