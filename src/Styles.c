@@ -4141,7 +4141,7 @@ int Style_GetLexerIconId(PEDITLEXER plex)
   WCHAR *pszExtensions;
   WCHAR *pszFile;
 
-  SHFILEINFO shfi;
+  SHFILEINFO shfi = { 0 };
 
   if (lstrlen(plex->szExtensions))
     pszExtensions = plex->szExtensions;
@@ -4259,7 +4259,7 @@ INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd,UINT umsg,WPARAM wParam,LPARAM lP
     case WM_INITDIALOG:
       {
         int i;
-        SHFILEINFO shfi;
+        SHFILEINFO shfi = { 0 };
         LOGFONT lf;
         HTREEITEM currentLex;
         int found = 0;
@@ -4849,7 +4849,7 @@ INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd,UINT umsg,WPARAM wParam,LPAR
         int i;
         int lvItems;
         LVITEM lvi;
-        SHFILEINFO shfi;
+        SHFILEINFO shfi = { 0 };
         LVCOLUMN lvc = { LVCF_FMT|LVCF_TEXT, LVCFMT_LEFT, 0, L"", -1, 0, 0, 0 };
 
         RECT rc;

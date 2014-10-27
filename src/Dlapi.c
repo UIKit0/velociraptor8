@@ -65,11 +65,14 @@ BOOL DirList_Init(HWND hwnd,LPCWSTR pszHeader)
 {
 
   HIMAGELIST hil;
-  SHFILEINFO shfi;
+  SHFILEINFO shfi = { 0 };
   LV_COLUMN  lvc;
 
   // Allocate DirListData Property
   LPDLDATA lpdl = (LPVOID)GlobalAlloc(GPTR,sizeof(DLDATA));
+  if (!lpdl) {
+      return FALSE;
+  }
   SetProp(hwnd,pDirListProp,(HANDLE)lpdl);
 
   // Setup dl
@@ -228,7 +231,7 @@ int DirList_Fill(HWND hwnd,LPCWSTR lpszDir,DWORD grfFlags,LPCWSTR lpszFileSpec,
   ULONG dwAttributes = 0;
 
   DL_FILTER dlf;
-  SHFILEINFO shfi;
+  SHFILEINFO shfi = { 0 };
 
   LPDLDATA lpdl = (LPVOID)GetProp(hwnd,pDirListProp);
 
@@ -431,7 +434,7 @@ DWORD WINAPI DirList_IconThread(LPVOID lpParam)
   hwnd = lpdl->hwnd;
   iMaxItem = ListView_GetItemCount(hwnd);
 
-  CoInitialize(NULL);
+  (void)CoInitialize(NULL);
 
   // Get IShellIcon
   lpdl->lpsf->lpVtbl->QueryInterface(lpdl->lpsf,&IID_IShellIcon,&lpshi);
@@ -441,8 +444,7 @@ DWORD WINAPI DirList_IconThread(LPVOID lpParam)
     lvi.iItem = iItem;
     lvi.mask  = LVIF_PARAM;
     if (ListView_GetItem(hwnd,&lvi)) {
-
-      SHFILEINFO shfi;
+      SHFILEINFO shfi = { 0 };
       LPITEMIDLIST pidl;
       DWORD dwAttributes = SFGAO_LINK | SFGAO_SHARE;
 
@@ -913,10 +915,10 @@ BOOL DirList_SelectItem(HWND hwnd,LPCWSTR lpszDisplayName,LPCWSTR lpszFullPath)
   #define LVIS_FLAGS LVIS_SELECTED|LVIS_FOCUSED
 
   WCHAR szShortPath[MAX_PATH];
-  SHFILEINFO  shfi;
+  SHFILEINFO  shfi = { 0 };
 
-  LV_FINDINFO lvfi;
-  DLITEM dli;
+  LV_FINDINFO lvfi = { 0 };
+  DLITEM dli = { 0 };
 
   int i = -1;
 
@@ -928,7 +930,7 @@ BOOL DirList_SelectItem(HWND hwnd,LPCWSTR lpszDisplayName,LPCWSTR lpszFullPath)
   if (!lpszDisplayName || !lstrlen(lpszDisplayName))
     SHGetFileInfo(lpszFullPath,0,&shfi,sizeof(SHFILEINFO),SHGFI_DISPLAYNAME);
   else
-    lstrcpyn(shfi.szDisplayName,lpszDisplayName,MAX_PATH);
+    (void)lstrcpyn(shfi.szDisplayName,lpszDisplayName,MAX_PATH);
 
   lvfi.flags = LVFI_STRING;
   lvfi.psz   = shfi.szDisplayName;
@@ -970,7 +972,7 @@ void DirList_CreateFilter(PDL_FILTER pdlf,LPCWSTR lpszFileSpec,
   WCHAR *p;
 
   ZeroMemory(pdlf,sizeof(DL_FILTER));
-  lstrcpyn(pdlf->tFilterBuf,lpszFileSpec,(DL_FILTER_BUFSIZE-1));
+  (void)lstrcpyn(pdlf->tFilterBuf,lpszFileSpec,(DL_FILTER_BUFSIZE-1));
   pdlf->bExcludeFilter = bExcludeFilter;
 
   if (!lstrcmp(lpszFileSpec,L"*.*") || !lstrlen(lpszFileSpec))
@@ -1064,7 +1066,7 @@ BOOL DriveBox_Init(HWND hwnd)
 {
 
   HIMAGELIST hil;
-  SHFILEINFO shfi;
+  SHFILEINFO shfi = { 0 };
 
   hil = (HIMAGELIST)SHGetFileInfo(L"C:\\",0,&shfi,sizeof(SHFILEINFO),
                                   SHGFI_SMALLICON | SHGFI_SYSICONINDEX);
@@ -1390,7 +1392,7 @@ LRESULT DriveBox_DeleteItem(HWND hwnd,LPARAM lParam)
 
   NMCOMBOBOXEX *lpnmcbe;
   COMBOBOXEXITEM cbei;
-  LPDC_ITEMDATA lpdcid;
+  LPDC_ITEMDATA lpdcid = NULL;
 
   lpnmcbe = (LPVOID)lParam;
   cbei.iItem = lpnmcbe->ceItem.iItem;
@@ -1421,7 +1423,7 @@ LRESULT DriveBox_GetDispInfo(HWND hwnd,LPARAM lParam)
 
   NMCOMBOBOXEX *lpnmcbe;
   LPDC_ITEMDATA lpdcid;
-  SHFILEINFO shfi;
+  SHFILEINFO shfi = { 0 };
   WCHAR szTemp[256];
 
   lpnmcbe = (LPVOID)lParam;
@@ -1546,7 +1548,7 @@ BOOL IL_GetDisplayName(LPSHELLFOLDER lpsf,
   {
 
     // Shlwapi.dll provides new function:
-    return StrRetToBuf(&str,pidl,lpszDisplayName,nDisplayName);
+    return SUCCEEDED(StrRetToBufW(&str,pidl,lpszDisplayName,nDisplayName));
     // ...but I suppose my version is faster ;-)
     /*switch (str.uType)
     {

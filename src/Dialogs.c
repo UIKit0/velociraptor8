@@ -843,7 +843,7 @@ BOOL FavoritesDlg(HWND hwnd,LPWSTR lpstrFile)
   if (IDOK == ThemedDialogBoxParam(g_hInstance,MAKEINTRESOURCE(IDD_FAVORITES),
                              hwnd,FavoritesDlgProc,(LPARAM)&dliFavorite))
   {
-    lstrcpyn(lpstrFile,dliFavorite.szFileName,MAX_PATH);
+    (void)lstrcpyn(lpstrFile,dliFavorite.szFileName,MAX_PATH);
     return(TRUE);
   }
 
@@ -972,7 +972,7 @@ DWORD WINAPI FileMRUIconThread(LPVOID lpParam) {
   HWND hwnd;
   LPICONTHREADINFO lpit;
   LV_ITEM lvi;
-  WCHAR tch[MAX_PATH];
+  WCHAR tch[MAX_PATH] = { 0 };
   SHFILEINFO shfi;
   DWORD dwFlags = SHGFI_SMALLICON | SHGFI_SYSICONINDEX | SHGFI_ATTRIBUTES | SHGFI_ATTR_SPECIFIED;
   DWORD dwAttr  = 0;
@@ -985,7 +985,8 @@ DWORD WINAPI FileMRUIconThread(LPVOID lpParam) {
   hwnd = lpit->hwnd;
   iMaxItem = ListView_GetItemCount(hwnd);
 
-  CoInitialize(NULL);
+  // TODO(kjK): crash if returned error
+  (void)CoInitialize(NULL);
 
   ZeroMemory(&lvi,sizeof(LV_ITEM));
 
@@ -1060,7 +1061,7 @@ INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd,UINT umsg,WPARAM wParam,LPARAM lParam)
 
     case WM_INITDIALOG:
       {
-        SHFILEINFO shfi;
+        SHFILEINFO shfi = { 0 };
         LVCOLUMN lvc = { LVCF_FMT|LVCF_TEXT, LVCFMT_LEFT, 0, L"", -1, 0, 0, 0 };
 
         LPICONTHREADINFO lpit = (LPVOID)GlobalAlloc(GPTR,sizeof(ICONTHREADINFO));
@@ -1241,7 +1242,7 @@ INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd,UINT umsg,WPARAM wParam,LPARAM lParam)
             int i;
             WCHAR tch[MAX_PATH];
             LV_ITEM lvi;
-            SHFILEINFO shfi;
+            SHFILEINFO shfi = { 0 };
 
             DWORD dwtid;
             LPICONTHREADINFO lpit = (LPVOID)GetProp(hwnd,L"it");

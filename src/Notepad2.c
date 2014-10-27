@@ -650,8 +650,7 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInst,LPSTR lpCmdLine,int n
   if (ActivatePrevInst())
     return(0);
 
-  // Init OLE and Common Controls
-  OleInitialize(NULL);
+  (void)OleInitialize(NULL);
 
   icex.dwSize = sizeof(INITCOMMONCONTROLSEX);
   icex.dwICC  = ICC_WIN95_CLASSES|ICC_COOL_CLASSES|ICC_BAR_CLASSES|ICC_USEREX_CLASSES;
