@@ -52,11 +52,6 @@ extern BOOL bFixLineEndings;
 extern BOOL bAutoStripBlanks;
 extern WCHAR szCurFile[MAX_PATH+40];
 
-
-//=============================================================================
-//
-//  MsgBox()
-//
 int MsgBox(int iType,UINT uIdMsg,...)
 {
 
@@ -114,11 +109,6 @@ int MsgBox(int iType,UINT uIdMsg,...)
 
 }
 
-
-//=============================================================================
-//
-//  DisplayCmdLineHelp()
-//
 void DisplayCmdLineHelp()
 {
   MSGBOXPARAMS mbp;
@@ -143,11 +133,6 @@ void DisplayCmdLineHelp()
   MessageBoxIndirect(&mbp);
 }
 
-
-//=============================================================================
-//
-//  BFFCallBack()
-//
 int CALLBACK BFFCallBack(HWND hwnd,UINT umsg,LPARAM lParam,LPARAM lpData)
 {
   if (umsg == BFFM_INITIALIZED)
@@ -158,11 +143,6 @@ int CALLBACK BFFCallBack(HWND hwnd,UINT umsg,LPARAM lParam,LPARAM lpData)
   lParam;
 }
 
-
-//=============================================================================
-//
-//  GetDirectory()
-//
 BOOL GetDirectory(HWND hwndParent,int iTitle,LPWSTR pszFolder,LPCWSTR pszBase,BOOL bNewDialogStyle)
 {
 
@@ -202,11 +182,6 @@ BOOL GetDirectory(HWND hwndParent,int iTitle,LPWSTR pszFolder,LPCWSTR pszBase,BO
 
 }
 
-
-//=============================================================================
-//
-//  AboutDlgProc()
-//
 INT_PTR CALLBACK AboutDlgProc(HWND hwnd,UINT umsg,WPARAM wParam,LPARAM lParam)
 {
 
@@ -302,12 +277,6 @@ INT_PTR CALLBACK AboutDlgProc(HWND hwnd,UINT umsg,WPARAM wParam,LPARAM lParam)
   return FALSE;
 }
 
-
-
-//=============================================================================
-//
-//  RunDlgProc()
-//
 INT_PTR CALLBACK RunDlgProc(HWND hwnd,UINT umsg,WPARAM wParam,LPARAM lParam)
 {
 
@@ -461,11 +430,6 @@ INT_PTR CALLBACK RunDlgProc(HWND hwnd,UINT umsg,WPARAM wParam,LPARAM lParam)
 
 }
 
-
-//=============================================================================
-//
-//  RunDlg()
-//
 void RunDlg(HWND hwnd,LPCWSTR lpstrDefault)
 {
 
@@ -474,11 +438,6 @@ void RunDlg(HWND hwnd,LPCWSTR lpstrDefault)
 
 }
 
-
-//=============================================================================
-//
-//  OpenWithDlgProc()
-//
 extern WCHAR tchOpenWithDir[MAX_PATH];
 extern int  flagNoFadeHidden;
 
@@ -628,14 +587,8 @@ INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd,UINT umsg,WPARAM wParam,LPARAM lParam
 
 }
 
-
-//=============================================================================
-//
-//  OpenWithDlg()
-//
 BOOL OpenWithDlg(HWND hwnd,LPCWSTR lpstrFile)
 {
-
   DLITEM dliOpenWith;
   dliOpenWith.mask = DLI_FILENAME;
 
@@ -676,11 +629,6 @@ BOOL OpenWithDlg(HWND hwnd,LPCWSTR lpstrFile)
 
 }
 
-
-//=============================================================================
-//
-//  FavoritesDlgProc()
-//
 extern WCHAR tchFavoritesDir[MAX_PATH];
 //extern int  flagNoFadeHidden;
 
@@ -831,11 +779,6 @@ INT_PTR CALLBACK FavoritesDlgProc(HWND hwnd,UINT umsg,WPARAM wParam,LPARAM lPara
 
 }
 
-
-//=============================================================================
-//
-//  FavoritesDlg()
-//
 BOOL FavoritesDlg(HWND hwnd,LPWSTR lpstrFile)
 {
 
@@ -853,16 +796,9 @@ BOOL FavoritesDlg(HWND hwnd,LPWSTR lpstrFile)
 
 }
 
-
-//=============================================================================
-//
-//  AddToFavDlgProc()
-//
 //  Controls: 100 Edit
-//
 INT_PTR CALLBACK AddToFavDlgProc(HWND hwnd,UINT umsg,WPARAM wParam,LPARAM lParam)
 {
-
   switch(umsg)
   {
 
@@ -912,11 +848,6 @@ INT_PTR CALLBACK AddToFavDlgProc(HWND hwnd,UINT umsg,WPARAM wParam,LPARAM lParam
 
 }
 
-
-//=============================================================================
-//
-//  AddToFavDlg()
-//
 BOOL AddToFavDlg(HWND hwnd,LPCWSTR lpszName,LPCWSTR lpszTarget)
 {
 
@@ -949,12 +880,6 @@ BOOL AddToFavDlg(HWND hwnd,LPCWSTR lpszName,LPCWSTR lpszTarget)
 
 }
 
-
-//=============================================================================
-//
-//  FileMRUDlgProc()
-//
-//
 extern LPMRULIST pFileMRU;
 extern BOOL bSaveRecentFiles;
 extern int  cxFileMRUDlg;
@@ -1355,12 +1280,6 @@ INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd,UINT umsg,WPARAM wParam,LPARAM lParam)
 
 }
 
-
-//=============================================================================
-//
-//  FileMRUDlg()
-//
-//
 BOOL FileMRUDlg(HWND hwnd,LPWSTR lpstrFile)
 {
 
@@ -1372,16 +1291,10 @@ BOOL FileMRUDlg(HWND hwnd,LPWSTR lpstrFile)
 
 }
 
-
-//=============================================================================
-//
-//  ChangeNotifyDlgProc()
-//
 //  Controls: 100 Radio Button
 //            101 Radio Button
 //            102 Radio Button
 //            103 Check Box
-//
 extern int iFileWatchingMode;
 extern BOOL bResetFileWatching;
 
@@ -1419,11 +1332,6 @@ INT_PTR CALLBACK ChangeNotifyDlgProc(HWND hwnd,UINT umsg,WPARAM wParam,LPARAM lP
   return FALSE;
 }
 
-
-//=============================================================================
-//
-//  ChangeNotifyDlg()
-//
 BOOL ChangeNotifyDlg(HWND hwnd)
 {
 
@@ -1440,13 +1348,7 @@ BOOL ChangeNotifyDlg(HWND hwnd)
 
 }
 
-
-//=============================================================================
-//
-//  ColumnWrapDlgProc()
-//
 //  Controls: 100 Edit
-//
 INT_PTR CALLBACK ColumnWrapDlgProc(HWND hwnd,UINT umsg,WPARAM wParam,LPARAM lParam)
 {
 
@@ -1508,11 +1410,6 @@ INT_PTR CALLBACK ColumnWrapDlgProc(HWND hwnd,UINT umsg,WPARAM wParam,LPARAM lPar
 
 }
 
-
-//=============================================================================
-//
-//  ColumnWrapDlg()
-//
 BOOL ColumnWrapDlg(HWND hwnd,UINT uidDlg,int *iNumber)
 {
 
@@ -1528,11 +1425,6 @@ BOOL ColumnWrapDlg(HWND hwnd,UINT uidDlg,int *iNumber)
 
 }
 
-
-//=============================================================================
-//
-//  WordWrapSettingsDlgProc()
-//
 //  Controls: 100 Combo
 //            101 Combo
 //            102 Combo
@@ -1541,7 +1433,6 @@ BOOL ColumnWrapDlg(HWND hwnd,UINT uidDlg,int *iNumber)
 //            201 Text
 //            202 Text
 //            203 Text
-//
 extern int  iWordWrapMode;
 extern int  iWordWrapIndent;
 extern int  iWordWrapSymbols;
@@ -1627,11 +1518,6 @@ INT_PTR CALLBACK WordWrapSettingsDlgProc(HWND hwnd,UINT umsg,WPARAM wParam,LPARA
 
 }
 
-
-//=============================================================================
-//
-//  WordWrapSettingsDlg()
-//
 BOOL WordWrapSettingsDlg(HWND hwnd,UINT uidDlg,int *iNumber)
 {
 
@@ -1647,15 +1533,9 @@ BOOL WordWrapSettingsDlg(HWND hwnd,UINT uidDlg,int *iNumber)
 
 }
 
-
-//=============================================================================
-//
-//  LongLineSettingsDlgProc()
-//
 //  Controls: 100 Edit
 //            101 Radio1
 //            102 Radio2
-//
 extern int iLongLineMode;
 
 INT_PTR CALLBACK LongLineSettingsDlgProc(HWND hwnd,UINT umsg,WPARAM wParam,LPARAM lParam)
@@ -1726,37 +1606,22 @@ INT_PTR CALLBACK LongLineSettingsDlgProc(HWND hwnd,UINT umsg,WPARAM wParam,LPARA
 
 }
 
-
-//=============================================================================
-//
-//  LongLineSettingsDlg()
-//
 BOOL LongLineSettingsDlg(HWND hwnd,UINT uidDlg,int *iNumber)
 {
-
-  INT_PTR iResult;
-
-  iResult = ThemedDialogBoxParam(
+  INT_PTR iResult = ThemedDialogBoxParam(
               g_hInstance,
               MAKEINTRESOURCE(uidDlg),
               hwnd,
               LongLineSettingsDlgProc,(LPARAM)iNumber);
 
   return (iResult == IDOK) ? TRUE : FALSE;
-
 }
 
-
-//=============================================================================
-//
-//  TabSettingsDlgProc()
-//
 //  Controls: 100 Edit
 //            101 Edit
 //            102 Check
 //            103 Check
 //            104 Check
-//
 extern int iTabWidth;
 extern int iIndentWidth;
 extern BOOL bTabsAsSpaces;
@@ -1840,11 +1705,6 @@ INT_PTR CALLBACK TabSettingsDlgProc(HWND hwnd,UINT umsg,WPARAM wParam,LPARAM lPa
 
 }
 
-
-//=============================================================================
-//
-//  TabSettingsDlg()
-//
 BOOL TabSettingsDlg(HWND hwnd,UINT uidDlg,int *iNumber)
 {
 
@@ -1860,12 +1720,6 @@ BOOL TabSettingsDlg(HWND hwnd,UINT uidDlg,int *iNumber)
 
 }
 
-
-//=============================================================================
-//
-//  SelectDefEncodingDlgProc()
-//
-//
 typedef struct encodedlg {
   BOOL bRecodeOnly;
   int  idEncoding;
@@ -1937,11 +1791,6 @@ INT_PTR CALLBACK SelectDefEncodingDlgProc(HWND hwnd,UINT umsg,WPARAM wParam,LPAR
   return FALSE;
 }
 
-
-//=============================================================================
-//
-//  SelectDefEncodingDlg()
-//
 BOOL SelectDefEncodingDlg(HWND hwnd,int *pidREncoding)
 {
 
@@ -1967,12 +1816,6 @@ BOOL SelectDefEncodingDlg(HWND hwnd,int *pidREncoding)
 
 }
 
-
-//=============================================================================
-//
-//  SelectEncodingDlgProc()
-//
-//
 INT_PTR CALLBACK SelectEncodingDlgProc(HWND hwnd,UINT umsg,WPARAM wParam,LPARAM lParam)
 {
 
@@ -2090,11 +1933,6 @@ INT_PTR CALLBACK SelectEncodingDlgProc(HWND hwnd,UINT umsg,WPARAM wParam,LPARAM 
 
 }
 
-
-//=============================================================================
-//
-//  SelectEncodingDlg()
-//
 extern int cxEncodingDlg;
 extern int cyEncodingDlg;
 
@@ -2128,11 +1966,6 @@ BOOL SelectEncodingDlg(HWND hwnd,int *pidREncoding)
 
 }
 
-
-//=============================================================================
-//
-//  RecodeDlg()
-//
 extern int cxRecodeDlg;
 extern int cyRecodeDlg;
 
@@ -2166,15 +1999,9 @@ BOOL RecodeDlg(HWND hwnd,int *pidREncoding)
 
 }
 
-
-//=============================================================================
-//
-//  SelectDefLineEndingDlgProc()
-//
 //  Controls: 100 Combo
 //            IDC_CONSISTENTEOLS
 //            IDC_AUTOSTRIPBLANKS
-//
 INT_PTR CALLBACK SelectDefLineEndingDlgProc(HWND hwnd,UINT umsg,WPARAM wParam,LPARAM lParam)
 {
   static int *piOption;
@@ -2228,11 +2055,6 @@ INT_PTR CALLBACK SelectDefLineEndingDlgProc(HWND hwnd,UINT umsg,WPARAM wParam,LP
   return FALSE;
 }
 
-
-//=============================================================================
-//
-//  SelectDefLineEndingDlg()
-//
 BOOL SelectDefLineEndingDlg(HWND hwnd,int *iOption)
 {
 
@@ -2249,26 +2071,20 @@ BOOL SelectDefLineEndingDlg(HWND hwnd,int *iOption)
 
 }
 
-
-//=============================================================================
-//
-//  InfoBoxDlgProc()
-//
-//
-typedef struct _infobox {
+struct INFOBOX {
   LPWSTR lpstrMessage;
   LPWSTR lpstrSetting;
   BOOL   bDisableCheckBox;
-} INFOBOX, *LPINFOBOX;
+};
 
 INT_PTR CALLBACK InfoBoxDlgProc(HWND hwnd,UINT umsg,WPARAM wParam,LPARAM lParam)
 {
-  LPINFOBOX lpib;
+  INFOBOX* lpib;
 
   switch(umsg)
   {
     case WM_INITDIALOG:
-      lpib = (LPINFOBOX)lParam;
+        lpib = (INFOBOX*) lParam;
       SetWindowLongPtr(hwnd,DWLP_USER,(LONG_PTR)lParam);
       SendDlgItemMessage(hwnd,IDC_INFOBOXICON,STM_SETICON,
         (WPARAM)LoadIcon(NULL,IDI_EXCLAMATION),0);
@@ -2286,7 +2102,7 @@ INT_PTR CALLBACK InfoBoxDlgProc(HWND hwnd,UINT umsg,WPARAM wParam,LPARAM lParam)
         case IDCANCEL:
         case IDYES:
         case IDNO:
-          lpib = (LPINFOBOX)GetWindowLongPtr(hwnd,DWLP_USER);
+            lpib = (INFOBOX*) GetWindowLongPtr(hwnd, DWLP_USER);
           if (IsDlgButtonChecked(hwnd,IDC_INFOBOXCHECK))
             IniSetInt(L"Suppressed Messages",lpib->lpstrSetting,1);
           EndDialog(hwnd,LOWORD(wParam));
@@ -2297,12 +2113,6 @@ INT_PTR CALLBACK InfoBoxDlgProc(HWND hwnd,UINT umsg,WPARAM wParam,LPARAM lParam)
   return FALSE;
 }
 
-
-//=============================================================================
-//
-//  InfoBox()
-//
-//
 extern WCHAR szIniFile[MAX_PATH];
 
 INT_PTR InfoBox(int iType,LPCWSTR lpstrSetting,int uidMessage,...)
@@ -2346,6 +2156,3 @@ INT_PTR InfoBox(int iType,LPCWSTR lpstrSetting,int uidMessage,...)
 
 }
 
-
-
-//  End of Dialogs.c
