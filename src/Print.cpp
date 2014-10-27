@@ -587,5 +587,3 @@ void EditPrintInit() {
         }
     }
 }
-
-// End of Print.cpp
