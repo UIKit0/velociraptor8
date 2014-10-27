@@ -13,7 +13,6 @@
 *
 ******************************************************************************/
 
-
 //=============================================================================
 //
 //  g_hScintilla
@@ -22,14 +21,16 @@
 extern HANDLE g_hScintilla;
 
 __forceinline void InitScintillaHandle(HWND hwnd) {
-  g_hScintilla = (HANDLE)SendMessage(hwnd, SCI_GETDIRECTPOINTER, 0, 0);
+    g_hScintilla = (HANDLE)SendMessage(hwnd, SCI_GETDIRECTPOINTER, 0, 0);
 }
 
 class ScintillaWin;
 
-//LRESULT WINAPI Scintilla_DirectFunction(HANDLE, UINT, WPARAM, LPARAM);
-extern "C" sptr_t __stdcall Scintilla_DirectFunction(ScintillaWin *, UINT, uptr_t, sptr_t);
-#define SciCall(m, w, l) Scintilla_DirectFunction((ScintillaWin*)g_hScintilla,m, w, l)
+// LRESULT WINAPI Scintilla_DirectFunction(HANDLE, UINT, WPARAM, LPARAM);
+extern "C" sptr_t __stdcall Scintilla_DirectFunction(ScintillaWin *, UINT,
+                                                     uptr_t, sptr_t);
+#define SciCall(m, w, l)                                                       \
+    Scintilla_DirectFunction((ScintillaWin *)g_hScintilla, m, w, l)
 
 //=============================================================================
 //
@@ -40,31 +41,42 @@ extern "C" sptr_t __stdcall Scintilla_DirectFunction(ScintillaWin *, UINT, uptr_
 //  0-2: Number of parameters to define
 //
 //
-#define DeclareSciCallR0(fn, msg, ret)                             \
-__forceinline ret SciCall_##fn() {                                 \
-  return((ret)SciCall(SCI_##msg, 0, 0));                           \
+#define DeclareSciCallR0(fn, msg, ret)                                         \
+    \
+__forceinline ret SciCall_##fn() {                                             \
+        return ((ret)SciCall(SCI_##msg, 0, 0));                                \
+    \
 }
-#define DeclareSciCallR1(fn, msg, ret, type1, var1)                \
-__forceinline ret SciCall_##fn(type1 var1) {                       \
-  return((ret)SciCall(SCI_##msg, (WPARAM)(var1), 0));              \
+#define DeclareSciCallR1(fn, msg, ret, type1, var1)                            \
+    \
+__forceinline ret SciCall_##fn(type1 var1) {                                   \
+        return ((ret)SciCall(SCI_##msg, (WPARAM)(var1), 0));                   \
+    \
 }
-#define DeclareSciCallR2(fn, msg, ret, type1, var1, type2, var2)   \
-__forceinline ret SciCall_##fn(type1 var1, type2 var2) {           \
-  return((ret)SciCall(SCI_##msg, (WPARAM)(var1), (LPARAM)(var2))); \
+#define DeclareSciCallR2(fn, msg, ret, type1, var1, type2, var2)               \
+    \
+__forceinline ret SciCall_##fn(type1 var1, type2 var2) {                       \
+        return ((ret)SciCall(SCI_##msg, (WPARAM)(var1), (LPARAM)(var2)));      \
+    \
 }
-#define DeclareSciCallV0(fn, msg)                                  \
-__forceinline LRESULT SciCall_##fn() {                             \
-  return(SciCall(SCI_##msg, 0, 0));                                \
+#define DeclareSciCallV0(fn, msg)                                              \
+    \
+__forceinline LRESULT SciCall_##fn() {                                         \
+        return (SciCall(SCI_##msg, 0, 0));                                     \
+    \
 }
-#define DeclareSciCallV1(fn, msg, type1, var1)                     \
-__forceinline LRESULT SciCall_##fn(type1 var1) {                   \
-  return(SciCall(SCI_##msg, (WPARAM)(var1), 0));                   \
+#define DeclareSciCallV1(fn, msg, type1, var1)                                 \
+    \
+__forceinline LRESULT SciCall_##fn(type1 var1) {                               \
+        return (SciCall(SCI_##msg, (WPARAM)(var1), 0));                        \
+    \
 }
-#define DeclareSciCallV2(fn, msg, type1, var1, type2, var2)        \
-__forceinline LRESULT SciCall_##fn(type1 var1, type2 var2) {       \
-  return(SciCall(SCI_##msg, (WPARAM)(var1), (LPARAM)(var2)));      \
+#define DeclareSciCallV2(fn, msg, type1, var1, type2, var2)                    \
+    \
+__forceinline LRESULT SciCall_##fn(type1 var1, type2 var2) {                   \
+        return (SciCall(SCI_##msg, (WPARAM)(var1), (LPARAM)(var2)));           \
+    \
 }
-
 
 //=============================================================================
 //
@@ -78,16 +90,16 @@ DeclareSciCallV1(GotoLine, GOTOLINE, int, line);
 DeclareSciCallR0(GetCurrentPos, GETCURRENTPOS, int);
 DeclareSciCallR1(LineFromPosition, LINEFROMPOSITION, int, int, position);
 
-
 //=============================================================================
 //
 //  Scrolling and automatic scrolling
 //
 //
 DeclareSciCallV0(ScrollCaret, SCROLLCARET);
-DeclareSciCallV2(SetXCaretPolicy, SETXCARETPOLICY, int, caretPolicy, int, caretSlop);
-DeclareSciCallV2(SetYCaretPolicy, SETYCARETPOLICY, int, caretPolicy, int, caretSlop);
-
+DeclareSciCallV2(SetXCaretPolicy, SETXCARETPOLICY, int, caretPolicy, int,
+                 caretSlop);
+DeclareSciCallV2(SetYCaretPolicy, SETYCARETPOLICY, int, caretPolicy, int,
+                 caretSlop);
 
 //=============================================================================
 //
@@ -97,7 +109,6 @@ DeclareSciCallV2(SetYCaretPolicy, SETYCARETPOLICY, int, caretPolicy, int, caretS
 DeclareSciCallR1(StyleGetFore, STYLEGETFORE, COLORREF, int, styleNumber);
 DeclareSciCallR1(StyleGetBack, STYLEGETBACK, COLORREF, int, styleNumber);
 
-
 //=============================================================================
 //
 //  Margins
@@ -106,20 +117,24 @@ DeclareSciCallR1(StyleGetBack, STYLEGETBACK, COLORREF, int, styleNumber);
 DeclareSciCallV2(SetMarginType, SETMARGINTYPEN, int, margin, int, type);
 DeclareSciCallV2(SetMarginWidth, SETMARGINWIDTHN, int, margin, int, pixelWidth);
 DeclareSciCallV2(SetMarginMask, SETMARGINMASKN, int, margin, int, mask);
-DeclareSciCallV2(SetMarginSensitive, SETMARGINSENSITIVEN, int, margin, BOOL, sensitive);
-DeclareSciCallV2(SetFoldMarginColour, SETFOLDMARGINCOLOUR, BOOL, useSetting, COLORREF, colour);
-DeclareSciCallV2(SetFoldMarginHiColour, SETFOLDMARGINHICOLOUR, BOOL, useSetting, COLORREF, colour);
-
+DeclareSciCallV2(SetMarginSensitive, SETMARGINSENSITIVEN, int, margin, BOOL,
+                 sensitive);
+DeclareSciCallV2(SetFoldMarginColour, SETFOLDMARGINCOLOUR, BOOL, useSetting,
+                 COLORREF, colour);
+DeclareSciCallV2(SetFoldMarginHiColour, SETFOLDMARGINHICOLOUR, BOOL, useSetting,
+                 COLORREF, colour);
 
 //=============================================================================
 //
 //  Markers
 //
 //
-DeclareSciCallV2(MarkerDefine, MARKERDEFINE, int, markerNumber, int, markerSymbols);
-DeclareSciCallV2(MarkerSetFore, MARKERSETFORE, int, markerNumber, COLORREF, colour);
-DeclareSciCallV2(MarkerSetBack, MARKERSETBACK, int, markerNumber, COLORREF, colour);
-
+DeclareSciCallV2(MarkerDefine, MARKERDEFINE, int, markerNumber, int,
+                 markerSymbols);
+DeclareSciCallV2(MarkerSetFore, MARKERSETFORE, int, markerNumber, COLORREF,
+                 colour);
+DeclareSciCallV2(MarkerSetBack, MARKERSETBACK, int, markerNumber, COLORREF,
+                 colour);
 
 //=============================================================================
 //
@@ -134,10 +149,10 @@ DeclareSciCallR1(GetFoldExpanded, GETFOLDEXPANDED, int, int, line);
 DeclareSciCallV1(ToggleFold, TOGGLEFOLD, int, line);
 DeclareSciCallV1(EnsureVisible, ENSUREVISIBLE, int, line);
 
-
 //=============================================================================
 //
 //  Lexer
 //
 //
-DeclareSciCallV2(SetProperty, SETPROPERTY, const char *, key, const char *, value);
+DeclareSciCallV2(SetProperty, SETPROPERTY, const char *, key, const char *,
+                 value);
