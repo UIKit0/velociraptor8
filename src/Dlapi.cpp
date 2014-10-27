@@ -803,7 +803,7 @@ BOOL DirList_SelectItem(HWND hwnd,LPCWSTR lpszDisplayName,LPCWSTR lpszFullPath)
   int i = -1;
 
   if (!lpszFullPath || !lstrlen(lpszFullPath))
-    return(FALSE);
+    return FALSE;
   else
     GetShortPathName(lpszFullPath,szShortPath,MAX_PATH);
 
@@ -828,12 +828,12 @@ BOOL DirList_SelectItem(HWND hwnd,LPCWSTR lpszDisplayName,LPCWSTR lpszFullPath)
       ListView_SetItemState(hwnd,i,LVIS_FLAGS,LVIS_FLAGS);
       ListView_EnsureVisible(hwnd,i,FALSE);
 
-      return(TRUE);
+      return TRUE;
     }
 
   }
 
-  return(FALSE);
+  return FALSE;
 
 }
 
@@ -879,7 +879,7 @@ BOOL DirList_MatchFilter(LPSHELLFOLDER lpsf,LPCITEMIDLIST pidl,PDL_FILTER pdlf)
 
   // All the directories are added
   if (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-    return(TRUE);
+    return TRUE;
 
   // Check if exclude *.* after directories have been added
   if (pdlf->nCount == 0 && pdlf->bExcludeFilter)
@@ -893,9 +893,9 @@ BOOL DirList_MatchFilter(LPSHELLFOLDER lpsf,LPCITEMIDLIST pidl,PDL_FILTER pdlf)
       if (bMatchSpec)
       {
         if (!pdlf->bExcludeFilter)
-          return(TRUE);
+          return TRUE;
         else
-          return(FALSE);
+          return FALSE;
       }
     }
   }

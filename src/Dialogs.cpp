@@ -622,10 +622,10 @@ BOOL OpenWithDlg(HWND hwnd,LPCWSTR lpstrFile)
 
     ShellExecuteEx(&sei);
 
-    return(TRUE);
+    return TRUE;
   }
 
-  return(FALSE);
+  return FALSE;
 
 }
 
@@ -789,10 +789,10 @@ BOOL FavoritesDlg(HWND hwnd,LPWSTR lpstrFile)
                              hwnd,FavoritesDlgProc,(LPARAM)&dliFavorite))
   {
     (void)lstrcpyn(lpstrFile,dliFavorite.szFileName,MAX_PATH);
-    return(TRUE);
+    return TRUE;
   }
 
-  return(FALSE);
+  return FALSE;
 
 }
 
@@ -1809,10 +1809,10 @@ BOOL SelectDefEncodingDlg(HWND hwnd,int *pidREncoding)
 
   if (iResult == IDOK) {
     *pidREncoding = dd.idEncoding;
-    return(TRUE);
+    return TRUE;
   }
   else
-    return(FALSE);
+    return FALSE;
 
 }
 
@@ -1959,10 +1959,10 @@ BOOL SelectEncodingDlg(HWND hwnd,int *pidREncoding)
 
   if (iResult == IDOK) {
     *pidREncoding = dd.idEncoding;
-    return(TRUE);
+    return TRUE;
   }
   else
-    return(FALSE);
+    return FALSE;
 
 }
 
@@ -1992,10 +1992,10 @@ BOOL RecodeDlg(HWND hwnd,int *pidREncoding)
 
   if (iResult == IDOK) {
     *pidREncoding = dd.idEncoding;
-    return(TRUE);
+    return TRUE;
   }
   else
-    return(FALSE);
+    return FALSE;
 
 }
 

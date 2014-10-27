@@ -397,10 +397,10 @@ BOOL __stdcall FoldToggleNode( int ln, FOLD_ACTION action )
   if ((action == FOLD && fExpanded) || (action == EXPAND && !fExpanded))
   {
     SciCall_ToggleFold(ln);
-    return(TRUE);
+    return TRUE;
   }
 
-  return(FALSE);
+  return FALSE;
 }
 
 void __stdcall FoldToggleAll( FOLD_ACTION action )
@@ -559,13 +559,6 @@ void __stdcall FoldAltArrow( int key, int mode )
   }
 }
 
-
-
-//=============================================================================
-//
-//  WinMain()
-//
-//
 int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdShow)
 {
 
@@ -577,7 +570,6 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInst,LPSTR lpCmdLine,int n
   //HMODULE hSciLexer;
   WCHAR wchWorkingDirectory[MAX_PATH];
 
-  // Set global variable g_hInstance
   g_hInstance = hInstance;
 
   // Set the Windows version global variable
@@ -610,43 +602,34 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInst,LPSTR lpCmdLine,int n
     return(0);
   }
 
-  // Check if running with elevated privileges
   fIsElevated = IsElevated();
 
-  // Default Encodings (may already be used for command line parsing)
   Encoding_InitDefaults();
 
-  // Command Line, Ini File and Flags
   ParseCommandLine();
   FindIniFile();
   TestIniFile();
   CreateIniFile();
   LoadFlags();
 
-  // set AppUserModelID
   PrivateSetCurrentProcessExplicitAppUserModelID(g_wchAppUserModelID);
 
-  // Command Line Help Dialog
   if (flagDisplayHelp) {
     DisplayCmdLineHelp();
     return(0);
   }
 
-  // Adapt window class name
   if (fIsElevated)
     StrCat(wchWndClass,L"U");
   if (flagPasteBoard)
     StrCat(wchWndClass,L"B");
 
-  // Relaunch with elevated privileges
   if (RelaunchElevated())
     return(0);
 
-  // Try to run multiple instances
   if (RelaunchMultiInst())
     return(0);
 
-  // Try to activate another window
   if (ActivatePrevInst())
     return(0);
 
@@ -662,7 +645,6 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInst,LPSTR lpCmdLine,int n
 
   Scintilla_RegisterClasses(hInstance);
 
-  // Load Settings
   LoadSettings();
 
   if (!InitApplication(hInstance))
@@ -687,7 +669,6 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInst,LPSTR lpCmdLine,int n
   }
 
   // Save Settings is done elsewhere
-
   Scintilla_ReleaseResources();
   UnregisterClass(wchWndClass,hInstance);
 
@@ -696,22 +677,12 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInst,LPSTR lpCmdLine,int n
 
   OleUninitialize();
 
-  return(int)(msg.wParam);
-
-  hPrevInst;
-
+  return (int)msg.wParam;
 }
 
-
-//=============================================================================
-//
-//  InitApplication()
-//
-//
 BOOL InitApplication(HINSTANCE hInstance)
 {
-
-  WNDCLASS   wc;
+    WNDCLASS   wc = { 0 };
 
   wc.style         = CS_BYTEALIGNWINDOW | CS_DBLCLKS;
   wc.lpfnWndProc   = (WNDPROC)MainWndProc;
@@ -728,12 +699,6 @@ BOOL InitApplication(HINSTANCE hInstance)
 
 }
 
-
-//=============================================================================
-//
-//  InitInstance()
-//
-//
 HWND InitInstance(HINSTANCE hInstance,LPSTR pszCmdLine,int nCmdShow)
 {
 
@@ -7287,10 +7252,9 @@ BOOL CALLBACK EnumWndProc2(HWND hwnd,LPARAM lParam)
 BOOL ActivatePrevInst()
 {
   HWND hwnd = NULL;
-  COPYDATASTRUCT cds;
 
   if ((flagNoReuseWindow && !flagSingleFileInstance) || flagStartAsTrayIcon || flagNewFromClipboard || flagPasteBoard)
-    return(FALSE);
+    return FALSE;
 
   if (flagSingleFileInstance && lpFileArg) {
 
@@ -7367,29 +7331,30 @@ BOOL ActivatePrevInst()
         params->flagSetEOLMode = flagSetEOLMode;
         params->flagTitleExcerpt = 0;
 
+        COPYDATASTRUCT cds;
         cds.dwData = DATA_NOTEPAD2_PARAMS;
         cds.cbData = (DWORD)GlobalSize(params);
         cds.lpData = params;
 
-        SendMessage(hwnd,WM_COPYDATA,(WPARAM)NULL,(LPARAM)&cds);
+        SendMessageW(hwnd,WM_COPYDATA,(WPARAM)NULL,(LPARAM)&cds);
         GlobalFree(params);
 
-        return(TRUE);
+        return TRUE;
       }
 
       else // IsWindowEnabled()
       {
         // Ask...
         if (IDYES == MsgBox(MBYESNO,IDS_ERR_PREVWINDISABLED))
-          return(FALSE);
+          return FALSE;
         else
-          return(TRUE);
+          return TRUE;
       }
     }
   }
 
   if (flagNoReuseWindow)
-    return(FALSE);
+    return FALSE;
 
   hwnd = NULL;
   EnumWindows(EnumWndProc,(LPARAM)&hwnd);
@@ -7474,6 +7439,7 @@ BOOL ActivatePrevInst()
         else
           params->flagTitleExcerpt = 0;
 
+        COPYDATASTRUCT cds;
         cds.dwData = DATA_NOTEPAD2_PARAMS;
         cds.cbData = (DWORD)GlobalSize(params);
         cds.lpData = params;
@@ -7482,19 +7448,19 @@ BOOL ActivatePrevInst()
         GlobalFree(params);
         GlobalFree(lpFileArg);
       }
-      return(TRUE);
+      return TRUE;
     }
     else // IsWindowEnabled()
     {
       // Ask...
       if (IDYES == MsgBox(MBYESNO,IDS_ERR_PREVWINDISABLED))
-        return(FALSE);
+        return FALSE;
       else
-        return(TRUE);
+        return TRUE;
     }
   }
   else
-    return(FALSE);
+    return FALSE;
 }
 
 
@@ -7564,7 +7530,7 @@ BOOL RelaunchMultiInst() {
 BOOL RelaunchElevated() {
 
   if (!IsVista() || fIsElevated || !flagRelaunchElevated || flagDisplayHelp)
-    return(FALSE);
+    return FALSE;
 
   else {
 
@@ -7599,7 +7565,7 @@ BOOL RelaunchElevated() {
     LocalFree(lpArg1);
     LocalFree(lpArg2);
 
-    return(TRUE);
+    return TRUE;
   }
 }
 

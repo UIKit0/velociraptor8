@@ -308,7 +308,7 @@ BOOL EditConvertText(HWND hwnd,UINT cpSource,UINT cpDest,BOOL bSetSavePoint)
   int length, cbText, cbwText;
 
   if (cpSource == cpDest)
-    return(TRUE);
+    return TRUE;
 
   length = (int)SendMessage(hwnd,SCI_GETLENGTH,0,0);
 
@@ -356,7 +356,7 @@ BOOL EditSetNewEncoding(HWND hwnd,int iCurrentEncoding,int iNewEncoding,BOOL bNo
 
     if ((iCurrentEncoding == CPI_DEFAULT && iNewEncoding == CPI_DEFAULT) ||
         (iCurrentEncoding != CPI_DEFAULT && iNewEncoding != CPI_DEFAULT))
-      return(TRUE);
+      return TRUE;
 
     if (SendMessage(hwnd,SCI_GETLENGTH,0,0) == 0) {
 
@@ -371,11 +371,11 @@ BOOL EditSetNewEncoding(HWND hwnd,int iCurrentEncoding,int iNewEncoding,BOOL bNo
           (mEncoding[iNewEncoding].uFlags & NCP_DEFAULT) ? iDefaultCodePage : SC_CP_UTF8,
           bSetSavePoint);
 
-        return(TRUE);
+        return TRUE;
       }
 
       else
-        return(FALSE);
+        return FALSE;
     }
 
     else if ((iCurrentEncoding == CPI_DEFAULT || iNewEncoding == CPI_DEFAULT) &&
@@ -390,15 +390,15 @@ BOOL EditSetNewEncoding(HWND hwnd,int iCurrentEncoding,int iNewEncoding,BOOL bNo
 
       EndWaitCursor();
 
-      return(TRUE);
+      return TRUE;
     }
 
     else
-      return(FALSE);
+      return FALSE;
   }
 
   else
-    return(FALSE);
+    return FALSE;
 }
 
 char* EditGetClipboardText(HWND hwnd)
@@ -488,7 +488,7 @@ BOOL EditCopyAppend(HWND hwnd)
 
   if (!IsClipboardFormatAvailable(CF_UNICODETEXT)) {
     SendMessage(hwnd,SCI_COPY,0,0);
-    return(TRUE);
+    return TRUE;
   }
 
   iCurPos    = (int)SendMessage(hwnd,SCI_GETCURRENTPOS,0,0);
@@ -498,7 +498,7 @@ BOOL EditCopyAppend(HWND hwnd)
 
     if (SC_SEL_RECTANGLE == SendMessage(hwnd,SCI_GETSELECTIONMODE,0,0)) {
       MsgBox(MBWARN,IDS_SELRECT);
-      return(FALSE);
+      return FALSE;
     }
 
     else {
@@ -533,7 +533,7 @@ BOOL EditCopyAppend(HWND hwnd)
 
   if (!OpenClipboard(GetParent(hwnd))) {
     LocalFree(pszTextW);
-    return(FALSE);
+    return FALSE;
   }
 
   hOld   = GetClipboardData(CF_UNICODETEXT);
@@ -553,7 +553,7 @@ BOOL EditCopyAppend(HWND hwnd)
   SetClipboardData(CF_UNICODETEXT,hNew);
   CloseClipboard();
 
-  return(TRUE);
+  return TRUE;
 }
 
 int EditDetectEOLMode(HWND hwnd,char* lpData,DWORD cbData)
@@ -690,10 +690,10 @@ BOOL Encoding_IsValid(int iTestEncoding) {
     if  ((mEncoding[iTestEncoding].uFlags & NCP_INTERNAL) ||
           IsValidCodePage(mEncoding[iTestEncoding].uCodePage) &&
           GetCPInfo(mEncoding[iTestEncoding].uCodePage,&cpi)) {
-      return(TRUE);
+      return TRUE;
     }
   }
-  return(FALSE);
+  return FALSE;
 }
 
 typedef struct _ee {
@@ -872,7 +872,7 @@ BOOL Encoding_GetFromComboboxEx(HWND hwnd,int *pidEncoding)
     else
       MsgBox(MBWARN,IDS_ERR_ENCODINGNA);
   }
-  return(FALSE);
+  return FALSE;
 }
 
 BOOL IsUnicode(const char* pBuffer,int cb,LPBOOL lpbBOM,LPBOOL lpbReverse)
@@ -6537,7 +6537,7 @@ BOOL FileVars_Init(char *lpData,DWORD cbData,LPFILEVARS lpfv) {
 
   ZeroMemory(lpfv,sizeof(FILEVARS));
   if ((fNoFileVariables && bNoEncodingTags) || !lpData || !cbData)
-    return(TRUE);
+    return TRUE;
 
   lstrcpynA(tch,lpData,min(cbData+1,COUNTOF(tch)));
 
@@ -6655,7 +6655,7 @@ BOOL FileVars_Init(char *lpData,DWORD cbData,LPFILEVARS lpfv) {
   if (lpfv->mask & FV_ENCODING)
     lpfv->iEncoding = Encoding_MatchA(lpfv->tchEncoding);
 
-  return(TRUE);
+  return TRUE;
 }
 
 extern int iTabWidth;
@@ -6718,7 +6718,7 @@ BOOL FileVars_Apply(HWND hwnd,LPFILEVARS lpfv) {
 
   iWrapCol = 0;
 
-  return(TRUE);
+  return TRUE;
 }
 
 BOOL FileVars_ParseInt(char* pszData,char* pszName,int* piValue) {
@@ -6757,19 +6757,19 @@ BOOL FileVars_ParseInt(char* pszData,char* pszName,int* piValue) {
 
     itok = sscanf(tch,"%i",piValue);
     if (itok == 1)
-      return(TRUE);
+      return TRUE;
 
     if (tch[0] == 't') {
       *piValue = 1;
-      return(TRUE);
+      return TRUE;
     }
 
     if (tch[0] == 'n' || tch[0] == 'f') {
       *piValue = 0;
-      return(TRUE);
+      return TRUE;
     }
   }
-  return(FALSE);
+  return FALSE;
 }
 
 BOOL FileVars_ParseStr(char* pszData,char* pszName,char* pszValue,int cchValue) {
@@ -6809,18 +6809,18 @@ BOOL FileVars_ParseStr(char* pszData,char* pszName,char* pszValue,int cchValue) 
     StrTrimA(tch," \t:=\"'");
 
     lstrcpynA(pszValue,tch,cchValue);
-    return(TRUE);
+    return TRUE;
   }
-  return(FALSE);
+  return FALSE;
 }
 
 BOOL FileVars_IsUTF8(LPFILEVARS lpfv) {
   if (lpfv->mask & FV_ENCODING) {
     if (lstrcmpiA(lpfv->tchEncoding,"utf-8") == 0 ||
         lstrcmpiA(lpfv->tchEncoding,"utf8") == 0)
-      return(TRUE);
+      return TRUE;
   }
-  return(FALSE);
+  return FALSE;
 }
 
 BOOL FileVars_IsNonUTF8(LPFILEVARS lpfv) {
@@ -6828,9 +6828,9 @@ BOOL FileVars_IsNonUTF8(LPFILEVARS lpfv) {
     if (lstrlenA(lpfv->tchEncoding) &&
         lstrcmpiA(lpfv->tchEncoding,"utf-8") != 0 &&
         lstrcmpiA(lpfv->tchEncoding,"utf8") != 0)
-      return(TRUE);
+      return TRUE;
   }
-  return(FALSE);
+  return FALSE;
 }
 
 BOOL FileVars_IsValidEncoding(LPFILEVARS lpfv) {
@@ -6841,10 +6841,10 @@ BOOL FileVars_IsValidEncoding(LPFILEVARS lpfv) {
     if ((mEncoding[lpfv->iEncoding].uFlags & NCP_INTERNAL) ||
          IsValidCodePage(mEncoding[lpfv->iEncoding].uCodePage) &&
          GetCPInfo(mEncoding[lpfv->iEncoding].uCodePage,&cpi)) {
-      return(TRUE);
+      return TRUE;
     }
   }
-  return(FALSE);
+  return FALSE;
 }
 
 int FileVars_GetEncoding(LPFILEVARS lpfv) {

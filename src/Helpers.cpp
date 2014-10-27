@@ -111,9 +111,9 @@ BOOL IniSectionSetString(LPWSTR lpCachedIniSection,LPCWSTR lpName,LPCWSTR lpStri
     lstrcpy(p,tch);
     p = StrEnd(p) + 1;
     *p = 0;
-    return(TRUE);
+    return TRUE;
   }
-  return(FALSE);
+  return FALSE;
 }
 
 
@@ -164,7 +164,7 @@ BOOL IsElevated() {
   HANDLE hToken = NULL;
 
   if (!IsVista())
-    return(FALSE);
+    return FALSE;
 
   if (OpenProcessToken(GetCurrentProcess(),TOKEN_QUERY,&hToken)) {
 
@@ -302,7 +302,7 @@ BOOL VerifyContrast(COLORREF cr1,COLORREF cr2)
 int CALLBACK EnumFontsProc(CONST LOGFONT *plf,CONST TEXTMETRIC *ptm,DWORD FontType,LPARAM lParam)
 {
   *((PBOOL)lParam) = TRUE;
-  return(FALSE);
+  return FALSE;
 }
 
 BOOL IsFontAvailable(LPCWSTR lpszFontName)
@@ -1064,7 +1064,7 @@ BOOL PathCreateDeskLnk(LPCWSTR pszDocument)
 
   // Try to construct a valid filename...
   if (!SHGetNewLinkInfo(pszDocument,tchLinkDir,tchLnkFileName,&fMustCopy,SHGNLI_PREFIXNAME))
-    return(FALSE);
+    return FALSE;
 
   if (SUCCEEDED(CoCreateInstance(CLSID_ShellLink,NULL,
                                  CLSCTX_INPROC_SERVER,

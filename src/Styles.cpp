@@ -2658,9 +2658,9 @@ BOOL Style_Import(HWND hwnd)
       }
     }
     LocalFree(pIniSection);
-    return(TRUE);
+    return TRUE;
   }
-  return(FALSE);
+  return FALSE;
 }
 
 BOOL Style_Export(HWND hwnd)
@@ -2705,9 +2705,9 @@ BOOL Style_Export(HWND hwnd)
     if (dwError != ERROR_SUCCESS) {
       MsgBox(MBINFO,IDS_EXPORT_FAIL,szFile);
     }
-    return(TRUE);
+    return TRUE;
   }
-  return(FALSE);
+  return FALSE;
 }
 
 void Style_SetLexer(HWND hwnd, EDITLEXER* pLexNew)
