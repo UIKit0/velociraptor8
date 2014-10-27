@@ -40,7 +40,6 @@ typedef struct _keywordlist
 
 } KEYWORDLIST, *PKEYWORDLIST;
 
-
 struct EDITLEXER
 {
   int iLexer;
@@ -49,13 +48,11 @@ struct EDITLEXER
   WCHAR* pszDefExt;
   WCHAR  szExtensions[128];
   PKEYWORDLIST pKeyWords;
-  EDITSTYLE    Styles[0];
+  EDITSTYLE    Styles[];
 };
-
 
 // Number of Lexers in pLexArray
 #define NUMLEXERS 37
-
 
 void   Style_Load();
 void   Style_Save();

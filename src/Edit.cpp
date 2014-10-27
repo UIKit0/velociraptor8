@@ -37,7 +37,7 @@
 #include "helpers.h"
 #include "resource.h"
 #include "SciCall.h"
-
+#include "Common.h"
 
 extern HWND  hwndMain;
 extern HWND  hwndEdit;
@@ -314,8 +314,6 @@ BOOL EditConvertText(HWND hwnd,UINT cpSource,UINT cpDest,BOOL bSetSavePoint)
 {
   struct TextRange tr = { { 0, -1 }, NULL };
   int length, cbText, cbwText;
-  char *pchText;
-  WCHAR *pwchText;
 
   if (cpSource == cpDest)
     return(TRUE);
@@ -339,12 +337,11 @@ BOOL EditConvertText(HWND hwnd,UINT cpSource,UINT cpDest,BOOL bSetSavePoint)
   }
 
   else {
-    pchText = (char*)GlobalAlloc(GPTR,length*5+2);
-
+    AutoStr pchText(length * 5 + 2);
     tr.lpstrText = pchText;
     SendMessage(hwnd,SCI_GETTEXTRANGE,0,(LPARAM)&tr);
 
-    pwchText = (WCHAR*)GlobalAlloc(GPTR,length*3+2);
+    AutoWStr pwchText(length * 3 + 2);
     cbwText  = MultiByteToWideChar(cpSource,0,pchText,length,pwchText,length*3+2);
     cbText   = WideCharToMultiByte(cpDest,0,pwchText,cbwText,pchText,length*5+2,NULL,NULL);
 
@@ -354,16 +351,13 @@ BOOL EditConvertText(HWND hwnd,UINT cpSource,UINT cpDest,BOOL bSetSavePoint)
     SendMessage(hwnd,SCI_CLEARALL,0,0);
     SendMessage(hwnd,SCI_MARKERDELETEALL,(WPARAM)-1,0);
     SendMessage(hwnd,SCI_SETCODEPAGE,cpDest,0);
-    SendMessage(hwnd,SCI_ADDTEXT,cbText,(LPARAM)pchText);
+    SendMessage(hwnd,SCI_ADDTEXT,cbText,(LPARAM)pchText.Get());
     SendMessage(hwnd,SCI_EMPTYUNDOBUFFER,0,0);
     SendMessage(hwnd,SCI_SETUNDOCOLLECTION,1,0);
     SendMessage(hwnd,SCI_GOTOPOS,0,0);
     SendMessage(hwnd,SCI_CHOOSECARETX,0,0);
-
-    GlobalFree(pchText);
-    GlobalFree(pwchText);
   }
-  return(TRUE);
+  return TRUE;
 }
 
 BOOL EditSetNewEncoding(HWND hwnd,int iCurrentEncoding,int iNewEncoding,BOOL bNoUI,BOOL bSetSavePoint) {
