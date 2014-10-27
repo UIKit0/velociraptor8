@@ -9,6 +9,14 @@
       <Configuration>Debug</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="Release Analyze|Win32">
+      <Configuration>Release Analyze</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release Analyze|x64">
+      <Configuration>Release Analyze</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Release|Win32">
       <Configuration>Release</Configuration>
       <Platform>Win32</Platform>
@@ -44,6 +52,15 @@
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Analyze|Win32'" Label="Configuration">
+    <CharacterSet>Unicode</CharacterSet>
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v110_xp</PlatformToolset>
+    <PlatformToolset Condition="'$(VisualStudioVersion)'=='10.0'">v100</PlatformToolset>
+    <PlatformToolset Condition="'$(VisualStudioVersion)'=='12.0'">v120</PlatformToolset>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <CharacterSet>Unicode</CharacterSet>
     <ConfigurationType>Application</ConfigurationType>
@@ -61,6 +78,15 @@
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Analyze|x64'" Label="Configuration">
+    <CharacterSet>Unicode</CharacterSet>
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v110_xp</PlatformToolset>
+    <PlatformToolset Condition="'$(VisualStudioVersion)'=='10.0'">v100</PlatformToolset>
+    <PlatformToolset Condition="'$(VisualStudioVersion)'=='12.0'">v120_xp</PlatformToolset>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
@@ -70,10 +96,16 @@
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release Analyze|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release Analyze|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
@@ -86,6 +118,7 @@
     <OutDir>..\bin\VS2012\$(Configuration)_x86\</OutDir>
     <OutDir Condition="'$(VisualStudioVersion)'=='10.0'">..\bin\VS2010\$(Configuration)_x86\</OutDir>
     <OutDir Condition="'$(VisualStudioVersion)'=='12.0'">..\bin\VS2013\$(Configuration)_x86\</OutDir>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <GenerateManifest>false</GenerateManifest>
@@ -96,6 +129,17 @@
     <OutDir>..\bin\VS2012\$(Configuration)_x86\</OutDir>
     <OutDir Condition="'$(VisualStudioVersion)'=='10.0'">..\bin\VS2010\$(Configuration)_x86\</OutDir>
     <OutDir Condition="'$(VisualStudioVersion)'=='12.0'">..\bin\VS2013\$(Configuration)_x86\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Analyze|Win32'">
+    <GenerateManifest>false</GenerateManifest>
+    <IntDir>..\bin\VS2012\$(Configuration)_x86\obj\</IntDir>
+    <IntDir Condition="'$(VisualStudioVersion)'=='10.0'">..\bin\VS2010\$(Configuration)_x86\obj\</IntDir>
+    <IntDir Condition="'$(VisualStudioVersion)'=='12.0'">..\bin\VS2013\$(Configuration)_x86\obj\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>..\bin\VS2012\$(Configuration)_x86\</OutDir>
+    <OutDir Condition="'$(VisualStudioVersion)'=='10.0'">..\bin\VS2010\$(Configuration)_x86\</OutDir>
+    <OutDir Condition="'$(VisualStudioVersion)'=='12.0'">..\bin\VS2013\$(Configuration)_x86\</OutDir>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <GenerateManifest>false</GenerateManifest>
@@ -117,6 +161,16 @@
     <OutDir Condition="'$(VisualStudioVersion)'=='10.0'">..\bin\VS2010\$(Configuration)_x64\</OutDir>
     <OutDir Condition="'$(VisualStudioVersion)'=='12.0'">..\bin\VS2013\$(Configuration)_x64\</OutDir>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Analyze|x64'">
+    <GenerateManifest>false</GenerateManifest>
+    <IntDir>..\bin\VS2012\$(Configuration)_x64\obj\</IntDir>
+    <IntDir Condition="'$(VisualStudioVersion)'=='10.0'">..\bin\VS2010\$(Configuration)_x64\obj\</IntDir>
+    <IntDir Condition="'$(VisualStudioVersion)'=='12.0'">..\bin\VS2013\$(Configuration)_x64\obj\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>..\bin\VS2012\$(Configuration)_x64\</OutDir>
+    <OutDir Condition="'$(VisualStudioVersion)'=='10.0'">..\bin\VS2010\$(Configuration)_x64\</OutDir>
+    <OutDir Condition="'$(VisualStudioVersion)'=='12.0'">..\bin\VS2013\$(Configuration)_x64\</OutDir>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <AdditionalIncludeDirectories>..\scintilla\include;..\scintilla\lexlib;..\scintilla\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -128,6 +182,7 @@
       <PreprocessorDefinitions>WIN32;STATIC_BUILD;SCI_LEXER;BOOKMARK_EDITION;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
+      <EnablePREfast>false</EnablePREfast>
     </ClCompile>
     <Link>
       <AdditionalDependencies>comctl32.lib;imm32.lib;shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -197,7 +252,63 @@
       <PreprocessorDefinitions>WIN32;BOOKMARK_EDITION;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
   </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release Analyze|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>..\scintilla\include;..\scintilla\lexlib;..\scintilla\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <EnableEnhancedInstructionSet>NoExtensions</EnableEnhancedInstructionSet>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <Optimization>MaxSpeed</Optimization>
+      <PreprocessorDefinitions>WIN32;STATIC_BUILD;SCI_LEXER;BOOKMARK_EDITION;NDEBUG;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <EnablePREfast>true</EnablePREfast>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>comctl32.lib;imm32.lib;shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <MergeSections>.rdata=.text</MergeSections>
+      <OptimizeReferences>true</OptimizeReferences>
+      <SetChecksum>true</SetChecksum>
+      <SubSystem>Windows</SubSystem>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+    <PreBuildEvent>
+      <Command>..\update_rev.bat</Command>
+      <Message>Generating revision number...</Message>
+    </PreBuildEvent>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;BOOKMARK_EDITION;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>..\scintilla\include;..\scintilla\lexlib;..\scintilla\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <Optimization>MaxSpeed</Optimization>
+      <PreprocessorDefinitions>_WIN64;STATIC_BUILD;SCI_LEXER;BOOKMARK_EDITION;NDEBUG;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>comctl32.lib;imm32.lib;shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <MergeSections>.rdata=.text</MergeSections>
+      <OptimizeReferences>true</OptimizeReferences>
+      <SetChecksum>true</SetChecksum>
+      <SubSystem>Windows</SubSystem>
+      <TargetMachine>MachineX64</TargetMachine>
+    </Link>
+    <PreBuildEvent>
+      <Command>..\update_rev.bat</Command>
+      <Message>Generating revision number...</Message>
+    </PreBuildEvent>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_WIN64;BOOKMARK_EDITION;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release Analyze|x64'">
     <ClCompile>
       <AdditionalIncludeDirectories>..\scintilla\include;..\scintilla\lexlib;..\scintilla\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
