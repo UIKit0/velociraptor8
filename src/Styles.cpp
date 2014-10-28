@@ -17,15 +17,9 @@
 *
 *
 ******************************************************************************/
-#if !defined(_WIN32_WINNT)
-#define _WIN32_WINNT 0x501
-#endif
-#include <windows.h>
-#include <commctrl.h>
-#include <commdlg.h>
-#include <shlobj.h>
-#include <shlwapi.h>
-#include <stdio.h>
+
+#include "Common.h"
+
 #include "scintilla.h"
 #include "scilexer.h"
 #include "notepad2.h"

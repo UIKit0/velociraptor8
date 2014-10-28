@@ -342,6 +342,7 @@
     <ClCompile Include="Helpers.cpp" />
     <ClCompile Include="Notepad2.cpp" />
     <ClCompile Include="Print.cpp" />
+    <ClCompile Include="StrUtil.cpp" />
     <ClCompile Include="Styles.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -352,6 +353,7 @@
     <ClInclude Include="Helpers.h" />
     <ClInclude Include="Notepad2.h" />
     <ClInclude Include="SciCall.h" />
+    <ClInclude Include="StrUtil.h" />
     <ClInclude Include="Styles.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Version.h" />

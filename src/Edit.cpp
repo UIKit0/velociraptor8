@@ -18,16 +18,9 @@
 *
 ******************************************************************************/
 
-#if !defined(_WIN32_WINNT)
-#define _WIN32_WINNT 0x501
-#endif
-#include <windows.h>
-#include <shlwapi.h>
-#include <commctrl.h>
-#include <commdlg.h>
-#include <stdio.h>
-#include <string.h>
-#include <limits.h>
+
+#include "Common.h"
+
 #include "scintilla.h"
 #include "scilexer.h"
 #include "notepad2.h"
@@ -37,7 +30,6 @@
 #include "helpers.h"
 #include "resource.h"
 #include "SciCall.h"
-#include "Common.h"
 
 extern HWND hwndMain;
 extern HWND hwndEdit;

@@ -1,4 +1,26 @@
 
+#if !defined(_WIN32_WINNT)
+#define _WIN32_WINNT 0x501
+#endif
+
+#include <windows.h>
+#include <commctrl.h>
+#include <commdlg.h>
+#include <shellapi.h>
+#include <shlobj.h>
+#include <shlwapi.h>
+#include <uxtheme.h>
+
+#include <limits.h>
+#include <stdio.h>
+#include <string.h>
+#include <time.h>
+
+#define COUNTOF(ar) (sizeof(ar) / sizeof(ar[0]))
+#define CSTRLEN(s) (COUNTOF(s) - 1)
+
+#define dimof(X)    (sizeof(X) / sizeof((X)[0]))
+
 #pragma warning(push)
 #pragma warning(disable                                                        \
                 : 6011) // silence /analyze: de-referencing a NULL pointer
@@ -62,3 +84,5 @@ template <typename T> class AutoStruct {
     T *Get() const { return val; }
     operator T *() const { return val; }
 };
+
+#include "StrUtil.h"
