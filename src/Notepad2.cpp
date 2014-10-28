@@ -617,13 +617,13 @@ HWND InitInstance(HINSTANCE hInstance, LPSTR pszCmdLine, int nCmdShow) {
 
     HMONITOR hMonitor = MonitorFromRect(&rc, MONITOR_DEFAULTTONEAREST);
     mi.cbSize = sizeof(mi);
-    GetMonitorInfo(hMonitor, &mi);
+    GetMonitorInfoW(hMonitor, &mi);
 
     if (flagDefaultPos == 1) {
         wi.x = wi.y = wi.cx = wi.cy = CW_USEDEFAULT;
         wi.max = 0;
     } else if (flagDefaultPos >= 4) {
-        SystemParametersInfo(SPI_GETWORKAREA, 0, &rc, 0);
+        SystemParametersInfoW(SPI_GETWORKAREA, 0, &rc, 0);
         if (flagDefaultPos & 8)
             wi.x = (rc.right - rc.left) / 2;
         else
@@ -655,7 +655,7 @@ HWND InitInstance(HINSTANCE hInstance, LPSTR pszCmdLine, int nCmdShow) {
                wi.cx == CW_USEDEFAULT || wi.cy == CW_USEDEFAULT) {
 
         // default window position
-        SystemParametersInfo(SPI_GETWORKAREA, 0, &rc, 0);
+        SystemParametersInfoW(SPI_GETWORKAREA, 0, &rc, 0);
         wi.y = rc.top + 16;
         wi.cy = rc.bottom - rc.top - 32;
         wi.cx = min(rc.right - rc.left - 32, wi.cy);
@@ -692,7 +692,7 @@ HWND InitInstance(HINSTANCE hInstance, LPSTR pszCmdLine, int nCmdShow) {
         }
     }
 
-    hwndMain = CreateWindowEx(0, fullWndClass, L"Notepad2",
+    hwndMain = CreateWindowExW(0, fullWndClass, L"Notepad2",
                               WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN, wi.x, wi.y,
                               wi.cx, wi.cy, NULL, NULL, hInstance, NULL);
 
@@ -726,7 +726,7 @@ HWND InitInstance(HINSTANCE hInstance, LPSTR pszCmdLine, int nCmdShow) {
         BOOL bOpened = FALSE;
 
         // Open from Directory
-        if (PathIsDirectory(lpFileArg)) {
+        if (PathIsDirectoryW(lpFileArg)) {
             WCHAR tchFile[MAX_PATH];
             if (OpenFileDlg(hwndMain, tchFile, COUNTOF(tchFile), lpFileArg))
                 bOpened = FileLoad(FALSE, FALSE, FALSE, FALSE, tchFile);
@@ -862,14 +862,14 @@ HWND InitInstance(HINSTANCE hInstance, LPSTR pszCmdLine, int nCmdShow) {
     UpdateToolbar();
     UpdateStatusbar();
 
-    return (hwndMain);
+    return hwndMain;
 }
 
 LRESULT CALLBACK
-MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
+MainWndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
     static BOOL bShutdownOK;
 
-    switch (umsg) {
+    switch (msg) {
 
         // Quickly handle painting and sizing messages, found in
         // ScintillaWin.cxx
@@ -885,10 +885,10 @@ MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
         case WM_NCLBUTTONDOWN:
         case WM_WINDOWPOSCHANGING:
         case WM_WINDOWPOSCHANGED:
-            return DefWindowProc(hwnd, umsg, wParam, lParam);
+            return DefWindowProc(hwnd, msg, wp, lp);
 
         case WM_CREATE:
-            return MsgCreate(hwnd, wParam, lParam);
+            return MsgCreate(hwnd, wp, lp);
 
         case WM_DESTROY:
         case WM_ENDSESSION:
@@ -956,7 +956,7 @@ MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 
                 bShutdownOK = TRUE;
             }
-            if (umsg == WM_DESTROY)
+            if (msg == WM_DESTROY)
                 PostQuitMessage(0);
             break;
 
@@ -973,21 +973,21 @@ MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 
         // Reinitialize theme-dependent values and resize windows
         case WM_THEMECHANGED:
-            MsgThemeChanged(hwnd, wParam, lParam);
+            MsgThemeChanged(hwnd, wp, lp);
             break;
 
         // update Scintilla colors
         case WM_SYSCOLORCHANGE: {
             extern EDITLEXER *pLexCurrent;
             Style_SetLexer(hwndEdit, pLexCurrent);
-            return DefWindowProc(hwnd, umsg, wParam, lParam);
+            return DefWindowProc(hwnd, msg, wp, lp);
         }
 
         // case WM_TIMER:
         //  break;
 
         case WM_SIZE:
-            MsgSize(hwnd, wParam, lParam);
+            MsgSize(hwnd, wp, lp);
             break;
 
         case WM_SETFOCUS:
@@ -1002,7 +1002,7 @@ MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 
         case WM_DROPFILES: {
             WCHAR szBuf[MAX_PATH + 40];
-            HDROP hDrop = (HDROP)wParam;
+            HDROP hDrop = (HDROP)wp;
 
             // Reset Change Notify
             // bPendingChangeNotify = FALSE;
@@ -1028,7 +1028,7 @@ MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
         } break;
 
         case WM_COPYDATA: {
-            PCOPYDATASTRUCT pcds = (PCOPYDATASTRUCT)lParam;
+            PCOPYDATASTRUCT pcds = (PCOPYDATASTRUCT)lp;
 
             // Reset Change Notify
             // bPendingChangeNotify = FALSE;
@@ -1142,17 +1142,17 @@ MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
             HMENU hmenu;
             int imenu = 0;
             POINT pt;
-            int nID = GetDlgCtrlID((HWND)wParam);
+            int nID = GetDlgCtrlID((HWND)wp);
 
             if ((nID != IDC_EDIT) && (nID != IDC_STATUSBAR) &&
                 (nID != IDC_REBAR) && (nID != IDC_TOOLBAR))
-                return DefWindowProc(hwnd, umsg, wParam, lParam);
+                return DefWindowProc(hwnd, msg, wp, lp);
 
             hmenu = LoadMenu(g_hInstance, MAKEINTRESOURCE(IDR_POPUPMENU));
             // SetMenuDefaultItem(GetSubMenu(hmenu,1),0,FALSE);
 
-            pt.x = (int)(short)LOWORD(lParam);
-            pt.y = (int)(short)HIWORD(lParam);
+            pt.x = (int)(short)LOWORD(lp);
+            pt.y = (int)(short)HIWORD(lp);
 
             switch (nID) {
                 case IDC_EDIT: {
@@ -1202,17 +1202,17 @@ MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
         } break;
 
         case WM_INITMENU:
-            MsgInitMenu(hwnd, wParam, lParam);
+            MsgInitMenu(hwnd, wp, lp);
             break;
 
         case WM_NOTIFY:
-            return MsgNotify(hwnd, wParam, lParam);
+            return MsgNotify(hwnd, wp, lp);
 
         case WM_COMMAND:
-            return MsgCommand(hwnd, wParam, lParam);
+            return MsgCommand(hwnd, wp, lp);
 
         case WM_SYSCOMMAND:
-            switch (wParam) {
+            switch (wp) {
                 case SC_MINIMIZE:
                     ShowOwnedPopups(hwnd, FALSE);
                     if (bMinimizeToTray) {
@@ -1221,15 +1221,15 @@ MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
                         SetNotifyIconTitle(hwnd);
                         return 0;
                     } else
-                        return DefWindowProc(hwnd, umsg, wParam, lParam);
+                        return DefWindowProc(hwnd, msg, wp, lp);
 
                 case SC_RESTORE: {
-                    LRESULT lrv = DefWindowProc(hwnd, umsg, wParam, lParam);
+                    LRESULT lrv = DefWindowProc(hwnd, msg, wp, lp);
                     ShowOwnedPopups(hwnd, TRUE);
                     return (lrv);
                 }
             }
-            return DefWindowProc(hwnd, umsg, wParam, lParam);
+            return DefWindowProc(hwnd, msg, wp, lp);
 
         case WM_CHANGENOTIFY:
             if (iFileWatchingMode == 1 || bModified ||
@@ -1304,18 +1304,18 @@ MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
             else
                 bLastCopyFromMe = FALSE;
             if (hwndNextCBChain)
-                SendMessage(hwndNextCBChain, WM_DRAWCLIPBOARD, wParam, lParam);
+                SendMessage(hwndNextCBChain, WM_DRAWCLIPBOARD, wp, lp);
             break;
 
         case WM_CHANGECBCHAIN:
-            if ((HWND)wParam == hwndNextCBChain)
-                hwndNextCBChain = (HWND)lParam;
+            if ((HWND)wp == hwndNextCBChain)
+                hwndNextCBChain = (HWND)lp;
             if (hwndNextCBChain)
-                SendMessage(hwndNextCBChain, WM_CHANGECBCHAIN, lParam, wParam);
+                SendMessage(hwndNextCBChain, WM_CHANGECBCHAIN, lp, wp);
             break;
 
         case WM_TRAYMESSAGE:
-            switch (lParam) {
+            switch (lp) {
                 case WM_RBUTTONUP: {
 
                     HMENU hMenu =
@@ -1359,21 +1359,22 @@ MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 
         default:
 
-            if (umsg == msgTaskbarCreated) {
+            if (msg == msgTaskbarCreated) {
                 if (!IsWindowVisible(hwnd))
                     ShowNotifyIcon(hwnd, TRUE);
                 SetNotifyIconTitle(hwnd);
                 return 0;
             }
 
-            return DefWindowProc(hwnd, umsg, wParam, lParam);
+            return DefWindowProc(hwnd, msg, wp, lp);
     }
     return 0;
 }
 
 // WM_CREATE
-LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
-    HINSTANCE hInstance = ((LPCREATESTRUCT)lParam)->hInstance;
+LRESULT MsgCreate(HWND hwnd, WPARAM wp, LPARAM lp) {
+    CREATESTRUCTW* cs = (CREATESTRUCTW*) lp;
+    HINSTANCE hInstance = cs->hInstance;
 
     // Setup edit control
     hwndEdit = EditCreate(hwnd);
