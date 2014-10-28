@@ -9,7 +9,7 @@ that we get the benefit of the compiler's type checking.
 extern HANDLE g_hScintilla;
 
 inline void InitScintillaHandle(HWND hwnd) {
-    g_hScintilla = (HANDLE)SendMessage(hwnd, SCI_GETDIRECTPOINTER, 0, 0);
+    g_hScintilla = (HANDLE)SendMessageW(hwnd, SCI_GETDIRECTPOINTER, 0, 0);
 }
 
 class ScintillaWin;
@@ -141,9 +141,26 @@ DeclareSciCallV1(EnsureVisible, ENSUREVISIBLE, int, line);
 DeclareSciCallV2(SetProperty, SETPROPERTY, const char *, key, const char *,
                  value);
 
+inline ScintillaWin* GetSciDirectPtr(HWND hwnd) {
+    return (ScintillaWin*) SendMessageW(hwnd, SCI_GETDIRECTPOINTER, 0, 0);
+}
+
+template <UINT msg>
+inline void SciRetCall(HWND hwnd) {
+    ScintillaWin *w = GetSciDirectPtr(hwnd);
+    Scintilla_DirectFunction(w, msg, 0, 0);
+}
+
+template <UINT msg, typename TRET>
+inline TRET SciRetCall(HWND hwnd) {
+    ScintillaWin *w = GetSciDirectPtr(hwnd);
+    return (TRET) Scintilla_DirectFunction(w, msg, 0, 0);
+}
+
 template <UINT msg, typename T1, typename T2>
 void SciSend(HWND hwnd, T1 v1, T2 v2) {
-    SendMessageW(hwnd, msg, (WPARAM) v1, (LPARAM) v2);
+    ScintillaWin *w = GetSciDirectPtr(hwnd);
+    Scintilla_DirectFunction(w, msg, (WPARAM)v1, (LPARAM)v2);
 }
 
 inline void SetXCaretPolicy(HWND w, int policy, int slop) {
@@ -156,5 +173,9 @@ inline void SetYCaretPolicy(HWND w, int policy, int slop) {
 
 inline void SetSel(HWND w, int anchorPos, int currPos) {
     SciSend<SCI_SETSEL, int, int>(w, anchorPos, currPos);
+}
+
+inline int SciGetLineCount(HWND hwnd) {
+    return SciRetCall<SCI_GETLINECOUNT, int>(hwnd);
 }
 
