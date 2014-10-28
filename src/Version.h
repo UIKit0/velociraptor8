@@ -18,21 +18,20 @@ See License.txt for details about distribution and modification.
 #define DO_STRINGIFY(x) _T(#x)
 #define STRINGIFY(x) DO_STRINGIFY(x)
 
-#define VERSION_MAJOR 4
-#define VERSION_MINOR 2
-#define VERSION_BUILD 25
+#define VERSION_MAJOR 0
+#define VERSION_MINOR 1
+#define VERSION_BUILD 0
 
 #define MY_APPNAME L"Notepad2-mod"
 #define VERSION_FILEVERSION_NUM                                                \
     VERSION_MAJOR, VERSION_MINOR, VERSION_BUILD, VERSION_REV
 #define VERSION_FILEVERSION                                                    \
-    STRINGIFY(VERSION_MAJOR) "." STRINGIFY(VERSION_MINOR) "." STRINGIFY(       \
-        VERSION_BUILD) "." STRINGIFY(VERSION_REV)
+    STRINGIFY(VERSION_MAJOR) "." STRINGIFY(VERSION_MINOR) "." STRINGIFY(VERSION_REV)
 #define VERSION_LEGALCOPYRIGHT_SHORT L"Copyright © 2004-2014"
 #define VERSION_LEGALCOPYRIGHT_LONG L"© Florian Balmer 2004-2014"
-#define VERSION_AUTHORNAME L"Florian Balmer"
+#define VERSION_AUTHORNAME L"Krzysztof Kowalczyk"
 #define VERSION_WEBPAGEDISPLAY L"flo's freeware - http://www.flos-freeware.ch"
-#define VERSION_EMAILDISPLAY L"florian.balmer@gmail.com"
+#define VERSION_EMAILDISPLAY L"kkowalczyk@gmail.com"
 #define VERSION_COMPANYNAME L"Florian Balmer et al."
 #define VERSION_MODPAGEDISPLAY L"http://xhmikosr.github.io/notepad2-mod/"
 
@@ -42,8 +41,7 @@ See License.txt for details about distribution and modification.
         VERSION_MINOR)L"." STRINGIFY(VERSION_BUILD)L" r" STRINGIFY(VERSION_REV)L" (" VERSION_HASH L")"
 #else
 #define VERSION_FILEVERSION_LONG                                                          \
-    L"Notepad2-mod " STRINGIFY(VERSION_MAJOR)L"." STRINGIFY(VERSION_MINOR)L"." STRINGIFY( \
-        VERSION_BUILD)L" r" STRINGIFY(VERSION_REV)L" (" VERSION_HASH L")"
+    L"Notepad2-mod " STRINGIFY(VERSION_MAJOR)L"." STRINGIFY(VERSION_MINOR)L" r" STRINGIFY(VERSION_REV)L" (" VERSION_HASH L")"
 #endif
 
 // Compiler specific

@@ -4854,29 +4854,33 @@ void EditJumpTo(HWND hwnd, int iNewLine, int iNewCol) {
     }
 }
 
-void EditSelectEx(HWND hwnd, int iAnchorPos, int iCurrentPos) {
-    int iNewLine =
-        (int)SendMessage(hwnd, SCI_LINEFROMPOSITION, (WPARAM)iCurrentPos, 0);
-    int iAnchorLine =
-        (int)SendMessage(hwnd, SCI_LINEFROMPOSITION, (WPARAM)iAnchorPos, 0);
+void EditSelectEx(HWND hwnd, int anchorPos, int currentPos) {
+    int newLine =
+        (int)SendMessage(hwnd, SCI_LINEFROMPOSITION, (WPARAM)currentPos, 0);
+    int anchorLine =
+        (int)SendMessage(hwnd, SCI_LINEFROMPOSITION, (WPARAM)anchorPos, 0);
 
-// Ensure that the first and last lines of a selection are always unfolded
-// This needs to be done *before* the SCI_SETSEL message
-#if 0 // TODO(kjk): re-enable it
-  SciCall_EnsureVisible(iAnchorLine);
-  if (iAnchorLine != iNewLine)
-    SciCall_EnsureVisible(iNewLine);
-#endif
+    // Ensure that the first and last lines of a selection are always unfolded
+    // This needs to be done *before* the SCI_SETSEL message
+    SciCall_EnsureVisible(anchorLine);
+    if (anchorLine != newLine) {
+        SciCall_EnsureVisible(newLine);
+    }
 
-    SciCall_EnsureVisible(iNewLine);
+    SciCall_EnsureVisible(newLine);
 
-    SendMessage(hwnd, SCI_SETXCARETPOLICY,
-                CARET_SLOP | CARET_STRICT | CARET_EVEN, 50);
-    SendMessage(hwnd, SCI_SETYCARETPOLICY,
-                CARET_SLOP | CARET_STRICT | CARET_EVEN, 5);
-    SendMessage(hwnd, SCI_SETSEL, iAnchorPos, iCurrentPos);
-    SendMessage(hwnd, SCI_SETXCARETPOLICY, CARET_SLOP | CARET_EVEN, 50);
-    SendMessage(hwnd, SCI_SETYCARETPOLICY, CARET_EVEN, 0);
+    //SendMessage(hwnd, SCI_SETXCARETPOLICY,
+    //            CARET_SLOP | CARET_STRICT | CARET_EVEN, 50);
+    //SendMessage(hwnd, SCI_SETYCARETPOLICY,
+    //            CARET_SLOP | CARET_STRICT | CARET_EVEN, 5);
+    SetXCaretPolicy(hwnd, CARET_SLOP | CARET_STRICT | CARET_EVEN, 50);
+    SetYCaretPolicy(hwnd, CARET_SLOP | CARET_STRICT | CARET_EVEN, 5);
+    //SendMessage(hwnd, SCI_SETSEL, anchorPos, currentPos);
+    SetSel(hwnd, anchorPos, currentPos);
+    //SendMessage(hwnd, SCI_SETXCARETPOLICY, CARET_SLOP | CARET_EVEN, 50);
+    //SendMessage(hwnd, SCI_SETYCARETPOLICY, CARET_EVEN, 0);
+    SetXCaretPolicy(hwnd, CARET_SLOP | CARET_EVEN, 50);
+    SetYCaretPolicy(hwnd, CARET_SLOP | CARET_EVEN, 5);
 }
 
 void EditFixPositions(HWND hwnd) {

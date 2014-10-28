@@ -1353,7 +1353,6 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wp, LPARAM lp) {
     CREATESTRUCTW* cs = (CREATESTRUCTW*) lp;
     HINSTANCE hInstance = cs->hInstance;
 
-    // Setup edit control
     hwndEdit = EditCreate(hwnd);
     InitScintillaHandle(hwndEdit);
 

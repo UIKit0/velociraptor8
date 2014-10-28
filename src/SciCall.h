@@ -8,7 +8,7 @@ that we get the benefit of the compiler's type checking.
 
 extern HANDLE g_hScintilla;
 
-__forceinline void InitScintillaHandle(HWND hwnd) {
+inline void InitScintillaHandle(HWND hwnd) {
     g_hScintilla = (HANDLE)SendMessage(hwnd, SCI_GETDIRECTPOINTER, 0, 0);
 }
 
@@ -20,15 +20,11 @@ extern "C" sptr_t __stdcall Scintilla_DirectFunction(ScintillaWin *, UINT,
 #define SciCall(m, w, l)                                                       \
     Scintilla_DirectFunction((ScintillaWin *)g_hScintilla, m, w, l)
 
-//=============================================================================
-//
 //  DeclareSciCall[RV][0-2] Macros
 //
 //  R: With an explicit return type
 //  V: No return type defined ("void"); defaults to SendMessage's LRESULT
 //  0-2: Number of parameters to define
-//
-//
 #define DeclareSciCallR0(fn, msg, ret)                                         \
     \
 __forceinline ret SciCall_##fn() {                                             \
@@ -144,3 +140,21 @@ DeclareSciCallV1(EnsureVisible, ENSUREVISIBLE, int, line);
 //
 DeclareSciCallV2(SetProperty, SETPROPERTY, const char *, key, const char *,
                  value);
+
+template <UINT msg, typename T1, typename T2>
+void SciSend(HWND hwnd, T1 v1, T2 v2) {
+    SendMessageW(hwnd, msg, (WPARAM) v1, (LPARAM) v2);
+}
+
+inline void SetXCaretPolicy(HWND w, int policy, int slop) {
+    SciSend<SCI_SETXCARETPOLICY, int, int>(w, policy, slop);
+}
+
+inline void SetYCaretPolicy(HWND w, int policy, int slop) {
+    SciSend<SCI_SETYCARETPOLICY, int, int>(w, policy, slop);
+}
+
+inline void SetSel(HWND w, int anchorPos, int currPos) {
+    SciSend<SCI_SETSEL, int, int>(w, anchorPos, currPos);
+}
+
