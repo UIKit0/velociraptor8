@@ -1,24 +1,11 @@
-/******************************************************************************
-*
-*
-* Notepad2
-*
-* Helpers.c
-*   General helper functions
-*   Parts taken from SciTE, (c) Neil Hodgson, http://www.scintilla.org
-*   MinimizeToTray (c) 2000 Matthew Ellis
-*
-* See Readme.txt for more information about this source code.
-* Please send me your comments to this work.
-*
-* See License.txt for details about distribution and modification.
-*
-*                                              (c) Florian Balmer 1996-2011
-*                                                  florian.balmer@gmail.com
-*                                               http://www.flos-freeware.ch
-*
-*
-******************************************************************************/
+/*
+General helper functions
+Parts taken from SciTE, (c) Neil Hodgson, http://www.scintilla.org
+MinimizeToTray (c) 2000 Matthew Ellis
+
+See Readme.txt for more information about this source code.
+See License.txt for details about distribution and modification.
+*/
 
 #include "Common.h"
 #include "scintilla.h"

@@ -1,22 +1,8 @@
-/******************************************************************************
-*
-*
-* Notepad2
-*
-* Dlapi.h
-*   Definitions for Directory Listing APIs
-*
-* See Readme.txt for more information about this source code.
-* Please send me your comments to this work.
-*
-* See License.txt for details about distribution and modification.
-*
-*                                              (c) Florian Balmer 1996-2011
-*                                                  florian.balmer@gmail.com
-*                                               http://www.flos-freeware.ch
-*
-*
-******************************************************************************/
+/*
+Definitions for Directory Listing APIs
+See Readme.txt for more information about this source code
+See License.txt for details about distribution and modification
+*/
 
 #ifndef _DLAPI_H_
 #define _DLAPI_H_

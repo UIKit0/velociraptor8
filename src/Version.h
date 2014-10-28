@@ -1,16 +1,6 @@
-/******************************************************************************
-*
-* Notepad2-mod
-*
-* Version.h
-*
-* See License.txt for details about distribution and modification.
-*
-*                                       (c) XhmikosR 2010-2014
-*                                       https://github.com/XhmikosR/notepad2-mod
-*
-*
-******************************************************************************/
+/*
+See License.txt for details about distribution and modification.
+*/
 
 #ifndef NOTEPAD2_VERSION_H
 #define NOTEPAD2_VERSION_H

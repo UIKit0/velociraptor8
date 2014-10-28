@@ -1,29 +1,11 @@
-/******************************************************************************
-*
-*
-* Notepad2
-*
-* Dlapi.c
-*   Directory Listing APIs used in Notepad2
-*
-* See Readme.txt for more information about this source code.
-* Please send me your comments to this work.
-*
-* See License.txt for details about distribution and modification.
-*
-*                                              (c) Florian Balmer 1996-2011
-*                                                  florian.balmer@gmail.com
-*                                               http://www.flos-freeware.ch
-*
-*
-******************************************************************************/
+/*
+Directory Listing APIs used in Notepad2
+See Readme.txt for more information about this source code.
+See License.txt for details about distribution and modification.
+*/
 
 #include "Common.h"
 #include "dlapi.h"
-
-//==== DirList ================================================================
-
-//==== DLDATA Structure =======================================================
 
 struct DLDATA {
     HWND hwnd;                // HWND of ListView Control
