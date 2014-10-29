@@ -130,8 +130,10 @@ EXIT /B
 :SUBMSVC
 ECHO.
 TITLE Building Notepad2-mod with MSVC2013 - %~1 "%~2|%~3"...
+echo on
 "MSBuild.exe" /nologo Notepad2.sln /t:%~1 /p:Configuration=%~2;Platform=%~3^
  /consoleloggerparameters:Verbosity=minimal /maxcpucount /nodeReuse:true
+echo off
 IF %ERRORLEVEL% NEQ 0 CALL :SUBMSG "ERROR" "Compilation failed!"
 EXIT /B
 
