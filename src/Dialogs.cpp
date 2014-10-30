@@ -230,7 +230,7 @@ AboutDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
                                      NULL, SW_SHOWNORMAL);
                     } else if (pnmhdr->idFrom == IDC_MOD_PAGE) {
                         ShellExecute(hwnd, L"open",
-                                     L"http://xhmikosr.github.io/notepad2-mod/",
+                                     L"http://blog.kowalczyk.info/velociraptor8/",
                                      NULL, NULL, SW_SHOWNORMAL);
                     }
                 } break;

@@ -482,7 +482,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine,
             NULL, ERROR_OLD_WIN_VERSION,
             MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // Default language
             (LPWSTR) & lpMsgBuf, 0, NULL);
-        MessageBox(NULL, (LPCWSTR)lpMsgBuf, L"Notepad2-mod",
+        MessageBox(NULL, (LPCWSTR)lpMsgBuf, L"velociraptor8",
                    MB_OK | MB_ICONEXCLAMATION);
         LocalFree(lpMsgBuf);
         return 0;

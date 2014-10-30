@@ -22,7 +22,7 @@ See License.txt for details about distribution and modification.
 #define VERSION_MINOR 1
 #define VERSION_BUILD 0
 
-#define MY_APPNAME L"Notepad2-mod"
+#define MY_APPNAME L"velociraptor8"
 #define VERSION_FILEVERSION_NUM                                                \
     VERSION_MAJOR, VERSION_MINOR, VERSION_BUILD, VERSION_REV
 #define VERSION_FILEVERSION                                                    \
@@ -33,15 +33,15 @@ See License.txt for details about distribution and modification.
 #define VERSION_WEBPAGEDISPLAY L"flo's freeware - http://www.flos-freeware.ch"
 #define VERSION_EMAILDISPLAY L"kkowalczyk@gmail.com"
 #define VERSION_COMPANYNAME L"Florian Balmer et al."
-#define VERSION_MODPAGEDISPLAY L"http://xhmikosr.github.io/notepad2-mod/"
+#define VERSION_MODPAGEDISPLAY L"http://blog.kowalczyk.info/software/velociraptor8/"
 
 #if defined(_WIN64)
 #define VERSION_FILEVERSION_LONG                                               \
-    L"Notepad2-mod (64-bit) " STRINGIFY(VERSION_MAJOR)L"." STRINGIFY(          \
+    L"velociraptor8 (64-bit) " STRINGIFY(VERSION_MAJOR)L"." STRINGIFY(          \
         VERSION_MINOR)L"." STRINGIFY(VERSION_BUILD)L" r" STRINGIFY(VERSION_REV)L" (" VERSION_HASH L")"
 #else
 #define VERSION_FILEVERSION_LONG                                                          \
-    L"Notepad2-mod " STRINGIFY(VERSION_MAJOR)L"." STRINGIFY(VERSION_MINOR)L" r" STRINGIFY(VERSION_REV)L" (" VERSION_HASH L")"
+    L"velociraptor8 " STRINGIFY(VERSION_MAJOR)L"." STRINGIFY(VERSION_MINOR)L" r" STRINGIFY(VERSION_REV)L" (" VERSION_HASH L")"
 #endif
 
 // Compiler specific
