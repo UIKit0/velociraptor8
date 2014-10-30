@@ -85,9 +85,6 @@
     <None Include="..\res\Next.bmp">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="..\res\velociraptor8.ico">
-      <Filter>Resource Files</Filter>
-    </None>
     <None Include="..\res\Open.bmp">
       <Filter>Resource Files</Filter>
     </None>
@@ -107,6 +104,9 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="Notepad2.ver">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\res\Notepad2.ico">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

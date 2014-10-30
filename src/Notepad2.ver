@@ -1,25 +1,10 @@
-/******************************************************************* mode:rc **
-*
-*
-* Notepad2
-*
-* Notepad2.ver
-*   Notepad2 version information
-*
-* See Readme.txt for more information about this source code.
-* Please send me your comments to this work.
-*
-* See License.txt for details about distribution and modification.
-*
-*                                              (c) Florian Balmer 1996-2011
-*                                                  florian.balmer@gmail.com
-*                                               http://www.flos-freeware.ch
-*
-*
-******************************************************************************/
+/*
+Notepad2 version information
+See Readme.txt for more information about this source code.
+See License.txt for details about distribution and modification.
+*/
 
-
-#include "version.h"
+#include "Version.h"
 
 #ifdef _WIN32
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
@@ -27,8 +12,8 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #endif //_WIN32
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION    VERSION_FILEVERSION_NUM
- PRODUCTVERSION VERSION_FILEVERSION_NUM
+ FILEVERSION    VER_RESOURCE
+ PRODUCTVERSION VER_RESOURCE
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS VS_FF_PATCHED | VS_FF_DEBUG

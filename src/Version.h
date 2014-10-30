@@ -8,25 +8,66 @@ See License.txt for details about distribution and modification.
 #include "VersionRev.h"
 
 #ifndef _T
-#if !defined(ISPP_INVOKED) && (defined(UNICODE) || defined(_UNICODE))
-#define _T(text) L##text
+	#if !defined(ISPP_INVOKED) && (defined(UNICODE) || defined(_UNICODE))
+		#define _T(text) L##text
+	#else
+		#define _T(text) text
+	#endif
+#endif
+
+#define _QUOTEME(x) #x
+#define QM(x) _QUOTEME(x)
+#define _QUOTEME2(x, y) _QUOTEME(x##y)
+#define QM2(x, y) _QUOTEME2(x, y)
+#define _QUOTEME3(x, y, z) _QUOTEME(x##y##z)
+#define QM3(x, y, z) _QUOTEME3(x, y, z)
+#define _QUOTEME4(x, y, z, u) _QUOTEME(x##y##z##u)
+#define QM4(x, y, z, u) _QUOTEME4(x, y, z, u)
+
+#ifndef CURR_VERSION
+#define CURR_VERSION 0.1.0
+#endif
+#ifndef CURR_VERSION_COMMA
+#define CURR_VERSION_COMMA 0,1,0
+#endif
+
+// VER_QUALIFIER allows people who recompile SumatraPDF to add
+// a distinguishing string at the end of the version number
+// (e.g. version 2.3.2z or 2.4opt or 2.5x64)
+#if !defined(VER_QUALIFIER) && defined(DEBUG)
+// adds " (dbg)" after the version in debug builds
+#define VER_QUALIFIER \x20(dbg)
+#endif
+
+// version as displayed in UI and included in resources
+#ifndef PRE_RELEASE_VER
+ #ifndef VER_QUALIFIER
+  #define CURR_VERSION_STRA QM(CURR_VERSION)
+ #else
+  #define CURR_VERSION_STRA QM2(CURR_VERSION, VER_QUALIFIER)
+ #endif
+ #define VER_RESOURCE_STR  CURR_VERSION_STRA
+ #define VER_RESOURCE      CURR_VERSION_COMMA,0
+ #define UPDATE_CHECK_VER  TEXT(QM(CURR_VERSION))
 #else
-#define _T(text) text
+ #ifndef VER_QUALIFIER
+   #define CURR_VERSION_STRA QM3(CURR_VERSION, ., PRE_RELEASE_VER)
+   #define VER_RESOURCE_STR  QM3(CURR_VERSION, .0., PRE_RELEASE_VER)
+ #else
+   #define CURR_VERSION_STRA QM4(CURR_VERSION, ., PRE_RELEASE_VER, VER_QUALIFIER)
+   #define VER_RESOURCE_STR  QM4(CURR_VERSION, .0., PRE_RELEASE_VER, VER_QUALIFIER)
+ #endif
+ #define VER_RESOURCE      CURR_VERSION_COMMA,PRE_RELEASE_VER
+ #define UPDATE_CHECK_VER  TEXT(QM(PRE_RELEASE_VER))
 #endif
-#endif
+#define CURR_VERSION_STR TEXT(CURR_VERSION_STRA)
 
 #define DO_STRINGIFY(x) _T(#x)
 #define STRINGIFY(x) DO_STRINGIFY(x)
 
-#define VERSION_MAJOR 0
-#define VERSION_MINOR 1
-#define VERSION_BUILD 0
 
 #define MY_APPNAME L"velociraptor8"
-#define VERSION_FILEVERSION_NUM                                                \
-    VERSION_MAJOR, VERSION_MINOR, VERSION_BUILD, VERSION_REV
-#define VERSION_FILEVERSION                                                    \
-    STRINGIFY(VERSION_MAJOR) "." STRINGIFY(VERSION_MINOR) "." STRINGIFY(VERSION_REV)
+#define VERSION_FILEVERSION  VER_RESOURCE
 #define VERSION_LEGALCOPYRIGHT_SHORT L"Copyright © 2004-2014"
 #define VERSION_LEGALCOPYRIGHT_LONG L"© Florian Balmer 2004-2014"
 #define VERSION_AUTHORNAME L"Krzysztof Kowalczyk"
@@ -36,12 +77,9 @@ See License.txt for details about distribution and modification.
 #define VERSION_MODPAGEDISPLAY "http://blog.kowalczyk.info/software/velociraptor8/"
 
 #if defined(_WIN64)
-#define VERSION_FILEVERSION_LONG                                               \
-    L"velociraptor8 (64-bit) " STRINGIFY(VERSION_MAJOR)L"." STRINGIFY(          \
-        VERSION_MINOR)L"." STRINGIFY(VERSION_BUILD)L" r" STRINGIFY(VERSION_REV)L" (" VERSION_HASH L")"
+#define VERSION_FILEVERSION_LONG L"velociraptor8 (64-bit) " CURR_VERSION_STR
 #else
-#define VERSION_FILEVERSION_LONG                                                          \
-    L"velociraptor8 " STRINGIFY(VERSION_MAJOR)L"." STRINGIFY(VERSION_MINOR)L" r" STRINGIFY(VERSION_REV)L" (" VERSION_HASH L")"
+#define VERSION_FILEVERSION_LONG L"velociraptor8 " CURR_VERSION_STR
 #endif
 
 // Compiler specific

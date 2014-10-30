@@ -828,17 +828,16 @@ extern int cxFileMRUDlg;
 extern int cyFileMRUDlg;
 extern int flagNoFadeHidden;
 
-typedef struct tagIconThreadInfo {
+struct IconThreadInfo {
     HWND hwnd;                // HWND of ListView Control
     HANDLE hExitThread;       // Flag is set when Icon Thread should terminate
     HANDLE hTerminatedThread; // Flag is set when Icon Thread has terminated
-
-} ICONTHREADINFO, *LPICONTHREADINFO;
+};
 
 DWORD WINAPI FileMRUIconThread(LPVOID lpParam) {
 
     HWND hwnd;
-    LPICONTHREADINFO lpit;
+    IconThreadInfo *lpit;
     LV_ITEM lvi;
     WCHAR tch[MAX_PATH] = { 0 };
     SHFILEINFO shfi;
@@ -848,7 +847,7 @@ DWORD WINAPI FileMRUIconThread(LPVOID lpParam) {
     int iItem = 0;
     int iMaxItem;
 
-    lpit = (LPICONTHREADINFO)lpParam;
+    lpit = (IconThreadInfo*) lpParam;
     ResetEvent(lpit->hTerminatedThread);
 
     hwnd = lpit->hwnd;
@@ -931,8 +930,8 @@ FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
             LVCOLUMN lvc = { LVCF_FMT | LVCF_TEXT, LVCFMT_LEFT, 0, L"",
                              -1,                   0,           0, 0 };
 
-            LPICONTHREADINFO lpit =
-                (LPICONTHREADINFO)GlobalAlloc(GPTR, sizeof(ICONTHREADINFO));
+            IconThreadInfo *lpit =
+                (IconThreadInfo*) GlobalAlloc(GPTR, sizeof(IconThreadInfo));
             SetProp(hwnd, L"it", (HANDLE)lpit);
             lpit->hwnd = GetDlgItem(hwnd, IDC_FILEMRU);
             lpit->hExitThread = CreateEvent(NULL, TRUE, FALSE, NULL);
@@ -972,7 +971,7 @@ FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
             return TRUE;
 
         case WM_DESTROY: {
-            LPICONTHREADINFO lpit = (LPICONTHREADINFO)GetProp(hwnd, L"it");
+            IconThreadInfo *lpit = (IconThreadInfo*) GetProp(hwnd, L"it");
             SetEvent(lpit->hExitThread);
             while (WaitForSingleObject(lpit->hTerminatedThread, 0) !=
                    WAIT_OBJECT_0) {
@@ -1114,8 +1113,8 @@ FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
                     SHFILEINFO shfi = { 0 };
 
                     DWORD dwtid;
-                    LPICONTHREADINFO lpit =
-                        (LPICONTHREADINFO)GetProp(hwnd, L"it");
+                    IconThreadInfo *lpit =
+                        (IconThreadInfo*) GetProp(hwnd, L"it");
 
                     SetEvent(lpit->hExitThread);
                     while (WaitForSingleObject(lpit->hTerminatedThread, 0) !=
