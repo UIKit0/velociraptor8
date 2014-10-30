@@ -573,7 +573,7 @@ $(NP2_SRC_OBJDIR)\Notepad2.res: \
     $(NP2_RES)\Encoding.bmp \
     $(NP2_RES)\Next.bmp \
     $(NP2_RES)\Notepad2.exe.manifest \
-    $(NP2_RES)\Notepad2.ico \
+    $(NP2_RES)\velociraptor8.ico \
     $(NP2_RES)\Open.bmp \
     $(NP2_RES)\Pick.bmp \
     $(NP2_RES)\Prev.bmp \
