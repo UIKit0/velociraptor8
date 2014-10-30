@@ -666,7 +666,7 @@ BOOL DirList_PropertyDlg(HWND hwnd, int iItem) {
 }
 
 //  Get long pathname for currently displayed directory
-BOOL DirList_GetLongPathName(HWND hwnd, LPWSTR lpszLongPath) {
+BOOL DirList_GetLongPathName(HWND hwnd, WCHAR * lpszLongPath) {
     WCHAR tch[MAX_PATH];
     DLDATA* lpdl = (DLDATA*)GetProp(hwnd, pDirListProp);
     if (SHGetPathFromIDListW(lpdl->pidl, tch)) {
@@ -929,7 +929,7 @@ int DriveBox_Fill(HWND hwnd) {
     return ((int)SendMessage(hwnd, CB_GETCOUNT, 0, 0));
 }
 
-BOOL DriveBox_GetSelDrive(HWND hwnd, LPWSTR lpszDrive, int nDrive,
+BOOL DriveBox_GetSelDrive(HWND hwnd, WCHAR * lpszDrive, int nDrive,
                           BOOL fNoSlash) {
 
     COMBOBOXEXITEM cbei;
@@ -1148,7 +1148,7 @@ UINT IL_GetSize(LPCITEMIDLIST pidl) {
 // Gets the Display Name of a pidl. lpsf is the parent IShellFolder Interface
 // dwFlags specify a SHGDN_xx value
 BOOL IL_GetDisplayName(LPSHELLFOLDER lpsf, LPCITEMIDLIST pidl, DWORD dwFlags,
-                       LPWSTR lpszDisplayName, int nDisplayName) {
+    WCHAR * lpszDisplayName, int nDisplayName) {
 
     STRRET str;
 

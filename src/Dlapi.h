@@ -96,7 +96,7 @@ BOOL DirList_PropertyDlg(HWND, int);
 
 //==== DlGetLongPathName() ====================================================
 
-BOOL DirList_GetLongPathName(HWND, LPWSTR);
+BOOL DirList_GetLongPathName(HWND, WCHAR *);
 
 //==== DlSelectItem() =========================================================
 
@@ -121,7 +121,7 @@ BOOL DirList_MatchFilter(LPSHELLFOLDER, LPCITEMIDLIST, PDL_FILTER);
 
 BOOL DriveBox_Init(HWND);
 int DriveBox_Fill(HWND);
-BOOL DriveBox_GetSelDrive(HWND, LPWSTR, int, BOOL);
+BOOL DriveBox_GetSelDrive(HWND, WCHAR *, int, BOOL);
 BOOL DriveBox_SelectDrive(HWND, LPCWSTR);
 BOOL DriveBox_PropertyDlg(HWND);
 
@@ -140,6 +140,6 @@ LPITEMIDLIST IL_Create(LPCITEMIDLIST, UINT, LPCITEMIDLIST, UINT);
 UINT IL_GetSize(LPCITEMIDLIST);
 
 //==== IL_GetDisplayName() ====================================================
-BOOL IL_GetDisplayName(LPSHELLFOLDER, LPCITEMIDLIST, DWORD, LPWSTR, int);
+BOOL IL_GetDisplayName(LPSHELLFOLDER, LPCITEMIDLIST, DWORD, WCHAR *, int);
 
 #endif

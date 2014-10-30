@@ -14,7 +14,7 @@ See License.txt for details about distribution and modification.
 
 //  Manipulation of (cached) ini file sections
 int IniSectionGetString(LPCWSTR lpCachedIniSection, LPCWSTR lpName,
-                        LPCWSTR lpDefault, LPWSTR lpReturnedString,
+    LPCWSTR lpDefault, WCHAR * lpReturnedString,
                         int cchReturnedString) {
     WCHAR *p = (WCHAR *)lpCachedIniSection;
     WCHAR tch[256];
@@ -61,7 +61,7 @@ int IniSectionGetInt(LPCWSTR lpCachedIniSection, LPCWSTR lpName, int iDefault) {
     return (iDefault);
 }
 
-BOOL IniSectionSetString(LPWSTR lpCachedIniSection, LPCWSTR lpName,
+BOOL IniSectionSetString(WCHAR * lpCachedIniSection, LPCWSTR lpName,
                          LPCWSTR lpString) {
     WCHAR tch[32 + 512 * 3 + 32];
     WCHAR *p = lpCachedIniSection;
@@ -670,7 +670,7 @@ int StatusCalcPaneWidth(HWND hwnd, LPCWSTR lpsz) {
     return (size.cx + 9);
 }
 
-int Toolbar_GetButtons(HWND hwnd, int cmdBase, LPWSTR lpszButtons,
+int Toolbar_GetButtons(HWND hwnd, int cmdBase, WCHAR * lpszButtons,
                        int cchButtons) {
     WCHAR tchButtons[512];
     WCHAR tchItem[32];
@@ -746,7 +746,7 @@ BOOL IsCmdEnabled(HWND hwnd, UINT uId) {
         return (!(ustate & (MF_GRAYED | MF_DISABLED)));
 }
 
-int FormatString(LPWSTR lpOutput, int nOutput, UINT uIdFormat, ...) {
+int FormatString(WCHAR * lpOutput, int nOutput, UINT uIdFormat, ...) {
     WCHAR *p = (WCHAR *)LocalAlloc(LPTR, sizeof(WCHAR) * nOutput);
 
     if (GetString(uIdFormat, p, nOutput))
@@ -757,7 +757,7 @@ int FormatString(LPWSTR lpOutput, int nOutput, UINT uIdFormat, ...) {
     return lstrlen(lpOutput);
 }
 
-void PathRelativeToApp(LPWSTR lpszSrc, LPWSTR lpszDest, int cchDest,
+void PathRelativeToApp(WCHAR * lpszSrc, WCHAR * lpszDest, int cchDest,
                        BOOL bSrcIsFile, BOOL bUnexpandEnv,
                        BOOL bUnexpandMyDocs) {
 
@@ -803,7 +803,7 @@ void PathRelativeToApp(LPWSTR lpszSrc, LPWSTR lpszDest, int cchDest,
         lstrcpyn(lpszDest, wchResult, (cchDest == 0) ? MAX_PATH : cchDest);
 }
 
-void PathAbsoluteFromApp(LPWSTR lpszSrc, LPWSTR lpszDest, int cchDest,
+void PathAbsoluteFromApp(WCHAR * lpszSrc, WCHAR * lpszDest, int cchDest,
                          BOOL bExpandEnv) {
 
     WCHAR wchPath[MAX_PATH];
@@ -913,7 +913,7 @@ BOOL PathGetLnkPath(LPCWSTR pszLnkFile, LPWSTR pszResPath, int cchResPath) {
 
 //  Purpose: Determine wheter pszPath is a Windows Shell Link File which
 //           refers to a directory
-BOOL PathIsLnkToDirectory(LPCWSTR pszPath, LPWSTR pszResPath, int cchResPath) {
+BOOL PathIsLnkToDirectory(LPCWSTR pszPath, WCHAR * pszResPath, int cchResPath) {
 
     WCHAR tchResPath[MAX_PATH];
 
@@ -1038,8 +1038,8 @@ BOOL PathCreateFavLnk(LPCWSTR pszName, LPCWSTR pszTarget, LPCWSTR pszDir) {
     return bSucceeded;
 }
 
-BOOL StrLTrim(LPWSTR pszSource, LPCWSTR pszTrimChars) {
-    LPWSTR psz;
+BOOL StrLTrim(WCHAR * pszSource, LPCWSTR pszTrimChars) {
+    WCHAR * psz;
 
     if (!pszSource || !*pszSource)
         return FALSE;

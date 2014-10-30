@@ -1440,13 +1440,13 @@ BOOL EditLoadFile(HWND hwnd, LPCWSTR pszFile, BOOL bSkipEncodingDetection,
 
         lpDataUTF8 = (char *)GlobalAlloc(GPTR, (cbData * 3) + 2);
         cbData = WideCharToMultiByte(
-            CP_UTF8, 0, (bBOM) ? (LPWSTR)lpData + 1 : (LPWSTR)lpData,
+            CP_UTF8, 0, (bBOM) ? (WCHAR *) lpData + 1 : (LPWSTR) lpData,
             (bBOM) ? (cbData) / sizeof(WCHAR) : cbData / sizeof(WCHAR) + 1,
             lpDataUTF8, (int)GlobalSize(lpDataUTF8), NULL, NULL);
 
         if (cbData == 0) {
             cbData = WideCharToMultiByte(
-                CP_ACP, 0, (bBOM) ? (LPWSTR)lpData + 1 : (LPWSTR)lpData, (-1),
+                CP_ACP, 0, (bBOM) ? (WCHAR *) lpData + 1 : (LPWSTR) lpData, (-1),
                 lpDataUTF8, (int)GlobalSize(lpDataUTF8), NULL, NULL);
             *pbUnicodeErr = TRUE;
         }
@@ -1490,7 +1490,7 @@ BOOL EditLoadFile(HWND hwnd, LPCWSTR pszFile, BOOL bSkipEncodingDetection,
         } else {
 
             UINT uCodePage = CP_UTF8;
-            LPWSTR lpDataWide;
+            WCHAR * lpDataWide;
             int cbDataWide;
 
             if (iSrcEncoding != -1)
@@ -1635,7 +1635,7 @@ BOOL EditSaveFile(HWND hwnd, LPCWSTR pszFile, int iEncoding,
           }*/
 
         if (mEncoding[iEncoding].uFlags & NCP_UNICODE) {
-            LPWSTR lpDataWide;
+            WCHAR * lpDataWide;
             int cbDataWide;
 
             SetEndOfFile(hFile);
@@ -1682,7 +1682,7 @@ BOOL EditSaveFile(HWND hwnd, LPCWSTR pszFile, int iEncoding,
             BOOL bCancelDataLoss = FALSE;
             UINT uCodePage = mEncoding[iEncoding].uCodePage;
 
-            LPWSTR lpDataWide = (WCHAR *)GlobalAlloc(GPTR, cbData * 2 + 16);
+            WCHAR * lpDataWide = (WCHAR *) GlobalAlloc(GPTR, cbData * 2 + 16);
             int cbDataWide = MultiByteToWideChar(
                 CP_UTF8, 0, lpData, cbData, lpDataWide,
                 (int)GlobalSize(lpDataWide) / sizeof(WCHAR));
@@ -1761,7 +1761,7 @@ void EditInvertCase(HWND hwnd) {
                             (int)SendMessage(hwnd, SCI_GETSELECTIONSTART, 0, 0);
 
             char *pszText = (char *)GlobalAlloc(GPTR, (iSelCount) + 2);
-            LPWSTR pszTextW = (WCHAR *)GlobalAlloc(GPTR, (iSelCount * 2) + 2);
+            WCHAR * pszTextW = (WCHAR *) GlobalAlloc(GPTR, (iSelCount * 2) + 2);
 
             if (pszText == NULL || pszTextW == NULL) {
                 GlobalFree(pszText);
@@ -1780,11 +1780,11 @@ void EditInvertCase(HWND hwnd) {
             for (i = 0; i < cchTextW; i++) {
                 if (IsCharUpperW(pszTextW[i])) {
                     pszTextW[i] = LOWORD(
-                        CharLowerW((LPWSTR)(LONG_PTR)MAKELONG(pszTextW[i], 0)));
+                        CharLowerW((WCHAR *) (LONG_PTR) MAKELONG(pszTextW[i], 0)));
                     bChanged = TRUE;
                 } else if (IsCharLowerW(pszTextW[i])) {
                     pszTextW[i] = LOWORD(
-                        CharUpperW((LPWSTR)(LONG_PTR)MAKELONG(pszTextW[i], 0)));
+                        CharUpperW((WCHAR *) (LONG_PTR) MAKELONG(pszTextW[i], 0)));
                     bChanged = TRUE;
                 }
             }
@@ -1833,7 +1833,7 @@ void EditTitleCase(HWND hwnd) {
                             (int)SendMessage(hwnd, SCI_GETSELECTIONSTART, 0, 0);
 
             char *pszText = (char *)GlobalAlloc(GPTR, (iSelCount) + 2);
-            LPWSTR pszTextW = (WCHAR *)GlobalAlloc(GPTR, (iSelCount * 2) + 2);
+            WCHAR * pszTextW = (WCHAR *) GlobalAlloc(GPTR, (iSelCount * 2) + 2);
 
             if (pszText == NULL || pszTextW == NULL) {
                 GlobalFree(pszText);
@@ -1851,7 +1851,7 @@ void EditTitleCase(HWND hwnd) {
 
             if (IsW7()) {
 
-                LPWSTR pszMappedW =
+                WCHAR * pszMappedW =
                     (WCHAR *)LocalAlloc(LPTR, LocalSize(pszTextW));
 
                 if (LCMapString(LOCALE_SYSTEM_DEFAULT,
@@ -1882,13 +1882,13 @@ void EditTitleCase(HWND hwnd) {
                         if (bNewWord) {
                             if (IsCharLowerW(pszTextW[i])) {
                                 pszTextW[i] = LOWORD(CharUpperW(
-                                    (LPWSTR)MAKELONG(pszTextW[i], 0)));
+                                    (WCHAR *) MAKELONG(pszTextW[i], 0)));
                                 bChanged = TRUE;
                             }
                         } else {
                             if (IsCharUpperW(pszTextW[i])) {
                                 pszTextW[i] = LOWORD(CharLowerW(
-                                    (LPWSTR)MAKELONG(pszTextW[i], 0)));
+                                    (WCHAR *) MAKELONG(pszTextW[i], 0)));
                                 bChanged = TRUE;
                             }
                         }
@@ -1910,13 +1910,13 @@ void EditTitleCase(HWND hwnd) {
                     } else {
                         if (bNewWord) {
                             if (IsCharLowerW(pszTextW[i])) {
-                                pszTextW[i] = LOWORD(CharUpperW((LPWSTR)(
+                                pszTextW[i] = LOWORD(CharUpperW((WCHAR *)(
                                     LONG_PTR)MAKELONG(pszTextW[i], 0)));
                                 bChanged = TRUE;
                             }
                         } else {
                             if (IsCharUpperW(pszTextW[i])) {
-                                pszTextW[i] = LOWORD(CharLowerW((LPWSTR)(
+                                pszTextW[i] = LOWORD(CharLowerW((WCHAR *)(
                                     LONG_PTR)MAKELONG(pszTextW[i], 0)));
                                 bChanged = TRUE;
                             }
@@ -1967,7 +1967,7 @@ void EditSentenceCase(HWND hwnd) {
                             (int)SendMessage(hwnd, SCI_GETSELECTIONSTART, 0, 0);
 
             char *pszText = (char *)GlobalAlloc(GPTR, (iSelCount) + 2);
-            LPWSTR pszTextW = (WCHAR *)GlobalAlloc(GPTR, (iSelCount * 2) + 2);
+            WCHAR * pszTextW = (WCHAR *) GlobalAlloc(GPTR, (iSelCount * 2) + 2);
 
             if (pszText == NULL || pszTextW == NULL) {
                 GlobalFree(pszText);
@@ -1990,14 +1990,14 @@ void EditSentenceCase(HWND hwnd) {
                     if (IsCharAlphaNumericW(pszTextW[i])) {
                         if (bNewSentence) {
                             if (IsCharLowerW(pszTextW[i])) {
-                                pszTextW[i] = LOWORD(CharUpperW((LPWSTR)(
+                                pszTextW[i] = LOWORD(CharUpperW((WCHAR *) (
                                     LONG_PTR)MAKELONG(pszTextW[i], 0)));
                                 bChanged = TRUE;
                             }
                             bNewSentence = FALSE;
                         } else {
                             if (IsCharUpperW(pszTextW[i])) {
-                                pszTextW[i] = LOWORD(CharLowerW((LPWSTR)(
+                                pszTextW[i] = LOWORD(CharLowerW((WCHAR *) (
                                     LONG_PTR)MAKELONG(pszTextW[i], 0)));
                                 bChanged = TRUE;
                             }
@@ -2042,12 +2042,12 @@ void EditURLEncode(HWND hwnd) {
                             (int)SendMessage(hwnd, SCI_GETSELECTIONSTART, 0, 0);
 
             char *pszText;
-            LPWSTR pszTextW;
+            WCHAR * pszTextW;
 
             DWORD cchEscaped;
             char *pszEscaped;
             DWORD cchEscapedW;
-            LPWSTR pszEscapedW;
+            WCHAR * pszEscapedW;
 
             pszText = (char *)LocalAlloc(LPTR, (iSelCount) + 2);
             if (pszText == NULL) {
@@ -2125,12 +2125,12 @@ void EditURLDecode(HWND hwnd) {
                             (int)SendMessage(hwnd, SCI_GETSELECTIONSTART, 0, 0);
 
             char *pszText;
-            LPWSTR pszTextW;
+            WCHAR * pszTextW;
 
             DWORD cchUnescaped;
             char *pszUnescaped;
             DWORD cchUnescapedW;
-            LPWSTR pszUnescapedW;
+            WCHAR * pszUnescapedW;
 
             pszText = (char *)LocalAlloc(LPTR, (iSelCount) + 2);
             if (pszText == NULL) {
@@ -2414,10 +2414,10 @@ void EditModifyNumber(HWND hwnd, BOOL bIncrease) {
 
 void EditTabsToSpaces(HWND hwnd, int nTabWidth, BOOL bOnlyIndentingWS) {
     char *pszText;
-    LPWSTR pszTextW;
+    WCHAR * pszTextW;
     int cchTextW;
     int iTextW;
-    LPWSTR pszConvW;
+    WCHAR * pszConvW;
     int cchConvW;
     int cchConvM;
     int i, j;
@@ -2541,10 +2541,10 @@ void EditTabsToSpaces(HWND hwnd, int nTabWidth, BOOL bOnlyIndentingWS) {
 
 void EditSpacesToTabs(HWND hwnd, int nTabWidth, BOOL bOnlyIndentingWS) {
     char *pszText;
-    LPWSTR pszTextW;
+    WCHAR * pszTextW;
     int cchTextW;
     int iTextW;
-    LPWSTR pszConvW;
+    WCHAR * pszConvW;
     int cchConvW;
     int cchConvM;
     int i, j, t;
@@ -4153,10 +4153,10 @@ void EditRemoveBlankLines(HWND hwnd, BOOL bMerge) {
 
 void EditWrapToColumn(HWND hwnd, int nColumn /*,int nTabWidth*/) {
     char *pszText;
-    LPWSTR pszTextW;
+    WCHAR * pszTextW;
     int cchTextW;
     int iTextW;
-    LPWSTR pszConvW;
+    WCHAR * pszConvW;
     int cchConvW;
     int cchConvM;
     int iLineLength;
@@ -4927,14 +4927,14 @@ void EditEnsureSelectionVisible(HWND hwnd) {
     EditSelectEx(hwnd, iAnchorPos, iCurrentPos);
 }
 
-void EditGetExcerpt(HWND hwnd, LPWSTR lpszExcerpt, DWORD cchExcerpt) {
+void EditGetExcerpt(HWND hwnd, WCHAR * lpszExcerpt, DWORD cchExcerpt) {
     WCHAR tch[256] = L"";
     WCHAR *p;
     DWORD cch = 0;
     UINT cpEdit;
     struct TextRange tr;
     char *pszText;
-    LPWSTR pszTextW;
+    WCHAR * pszTextW;
 
     int iCurPos = (int)SendMessage(hwnd, SCI_GETCURRENTPOS, 0, 0);
     int iAnchorPos = (int)SendMessage(hwnd, SCI_GETANCHOR, 0, 0);
@@ -6443,14 +6443,14 @@ BOOL EditLinenumDlg(HWND hwnd) {
 
 //  Controls: 100 Input
 //            101 Input
-typedef struct _modlinesdata {
-    LPWSTR pwsz1;
-    LPWSTR pwsz2;
-} MODLINESDATA, *PMODLINESDATA;
+struct  MODLINESDATA{
+    WCHAR * pwsz1;
+    WCHAR * pwsz2;
+};
 
 INT_PTR CALLBACK
 EditModifyLinesDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
-    static PMODLINESDATA pdata;
+    static MODLINESDATA *pdata;
 
     static int id_hover;
     static int id_capture;
@@ -6480,7 +6480,7 @@ EditModifyLinesDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
                 hCursorHover =
                     LoadCursor(g_hInstance, MAKEINTRESOURCE(IDC_ARROW));
 
-            pdata = (PMODLINESDATA)lParam;
+            pdata = (MODLINESDATA*)lParam;
             SetDlgItemTextW(hwnd, 100, pdata->pwsz1);
             SendDlgItemMessage(hwnd, 100, EM_LIMITTEXT, 255, 0);
             SetDlgItemTextW(hwnd, 101, pdata->pwsz2);
@@ -6608,7 +6608,7 @@ EditModifyLinesDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
     return FALSE;
 }
 
-BOOL EditModifyLinesDlg(HWND hwnd, LPWSTR pwsz1, LPWSTR pwsz2) {
+BOOL EditModifyLinesDlg(HWND hwnd, WCHAR * pwsz1, WCHAR * pwsz2) {
 
     INT_PTR iResult;
     MODLINESDATA data = { pwsz1, pwsz2 };
@@ -6672,17 +6672,17 @@ BOOL EditAlignDlg(HWND hwnd, int *piAlignMode) {
 
 //  Controls: 100 Input
 //            101 Input
-typedef struct _encloseselectiondata {
-    LPWSTR pwsz1;
-    LPWSTR pwsz2;
-} ENCLOSESELDATA, *PENCLOSESELDATA;
+struct ENCLOSESELDATA {
+    WCHAR * pwsz1;
+    WCHAR * pwsz2;
+};
 
 INT_PTR CALLBACK EditEncloseSelectionDlgProc(HWND hwnd, UINT umsg,
                                              WPARAM wParam, LPARAM lParam) {
-    static PENCLOSESELDATA pdata;
+    static ENCLOSESELDATA *pdata;
     switch (umsg) {
         case WM_INITDIALOG: {
-            pdata = (PENCLOSESELDATA)lParam;
+            pdata = (ENCLOSESELDATA*)lParam;
             SendDlgItemMessage(hwnd, 100, EM_LIMITTEXT, 255, 0);
             SetDlgItemTextW(hwnd, 100, pdata->pwsz1);
             SendDlgItemMessage(hwnd, 101, EM_LIMITTEXT, 255, 0);
@@ -6706,7 +6706,7 @@ INT_PTR CALLBACK EditEncloseSelectionDlgProc(HWND hwnd, UINT umsg,
     return FALSE;
 }
 
-BOOL EditEncloseSelectionDlg(HWND hwnd, LPWSTR pwszOpen, LPWSTR pwszClose) {
+BOOL EditEncloseSelectionDlg(HWND hwnd, WCHAR * pwszOpen, WCHAR * pwszClose) {
 
     INT_PTR iResult;
     ENCLOSESELDATA data = { pwszOpen, pwszClose };
@@ -6720,17 +6720,17 @@ BOOL EditEncloseSelectionDlg(HWND hwnd, LPWSTR pwszOpen, LPWSTR pwszClose) {
 
 //  Controls: 100 Input
 //            101 Input
-typedef struct _tagsdata {
-    LPWSTR pwsz1;
-    LPWSTR pwsz2;
-} TAGSDATA, *PTAGSDATA;
+struct TAGSDATA {
+    WCHAR * pwsz1;
+    WCHAR * pwsz2;
+};
 
 INT_PTR CALLBACK
 EditInsertTagDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
-    static PTAGSDATA pdata;
+    static TAGSDATA* pdata;
     switch (umsg) {
         case WM_INITDIALOG: {
-            pdata = (PTAGSDATA)lParam;
+            pdata = (TAGSDATA*)lParam;
             SendDlgItemMessage(hwnd, 100, EM_LIMITTEXT, 254, 0);
             SetDlgItemTextW(hwnd, 100, L"<tag>");
             SendDlgItemMessage(hwnd, 101, EM_LIMITTEXT, 255, 0);
@@ -6808,7 +6808,7 @@ EditInsertTagDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
     return FALSE;
 }
 
-BOOL EditInsertTagDlg(HWND hwnd, LPWSTR pwszOpen, LPWSTR pwszClose) {
+BOOL EditInsertTagDlg(HWND hwnd, WCHAR * pwszOpen, WCHAR * pwszClose) {
     TAGSDATA data = { pwszOpen, pwszClose };
 
     INT_PTR iResult =

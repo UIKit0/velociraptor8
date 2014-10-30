@@ -26,10 +26,10 @@ __inline BOOL IniSetInt(LPCWSTR lpSection, LPCWSTR lpName, int i) {
     GetPrivateProfileSection(lpSection, lpBuf, cchBuf, szIniFile);
 #define SaveIniSection(lpSection, lpBuf)                                       \
     WritePrivateProfileSection(lpSection, lpBuf, szIniFile)
-int IniSectionGetString(LPCWSTR, LPCWSTR, LPCWSTR, LPWSTR, int);
+int IniSectionGetString(LPCWSTR, LPCWSTR, LPCWSTR, WCHAR *, int);
 int IniSectionGetInt(LPCWSTR, LPCWSTR, int);
-BOOL IniSectionSetString(LPWSTR, LPCWSTR, LPCWSTR);
-__inline BOOL IniSectionSetInt(LPWSTR lpCachedIniSection, LPCWSTR lpName,
+BOOL IniSectionSetString(WCHAR *, LPCWSTR, LPCWSTR);
+__inline BOOL IniSectionSetInt(WCHAR * lpCachedIniSection, LPCWSTR lpName,
                                int i) {
     WCHAR tch[32];
     wsprintf(tch, L"%i", i);
@@ -110,32 +110,32 @@ inline int GetString(UINT id, WCHAR *buf, int cchBufMax) {
 
 #define StrEnd(pStart) (pStart + lstrlen(pStart))
 
-int FormatString(LPWSTR, int, UINT, ...);
+int FormatString(WCHAR *, int, UINT, ...);
 
-void PathRelativeToApp(LPWSTR, LPWSTR, int, BOOL, BOOL, BOOL);
-void PathAbsoluteFromApp(LPWSTR, LPWSTR, int, BOOL);
+void PathRelativeToApp(WCHAR *, WCHAR *, int, BOOL, BOOL, BOOL);
+void PathAbsoluteFromApp(WCHAR *, WCHAR *, int, BOOL);
 
 BOOL PathIsLnkFile(LPCWSTR);
-BOOL PathGetLnkPath(LPCWSTR, LPWSTR, int);
-BOOL PathIsLnkToDirectory(LPCWSTR, LPWSTR, int);
+BOOL PathGetLnkPath(LPCWSTR, WCHAR *, int);
+BOOL PathIsLnkToDirectory(LPCWSTR, WCHAR *, int);
 BOOL PathCreateDeskLnk(LPCWSTR);
 BOOL PathCreateFavLnk(LPCWSTR, LPCWSTR, LPCWSTR);
 
-BOOL StrLTrim(LPWSTR, LPCWSTR);
-BOOL TrimString(LPWSTR);
-BOOL ExtractFirstArgument(LPCWSTR, LPWSTR, LPWSTR);
+BOOL StrLTrim(WCHAR *, LPCWSTR);
+BOOL TrimString(WCHAR *);
+BOOL ExtractFirstArgument(LPCWSTR, WCHAR *, WCHAR *);
 
-void PrepareFilterStr(LPWSTR);
+void PrepareFilterStr(WCHAR *);
 
-void StrTab2Space(LPWSTR);
-void PathFixBackslashes(LPWSTR);
+void StrTab2Space(WCHAR *);
+void PathFixBackslashes(WCHAR *);
 
-void ExpandEnvironmentStringsEx(LPWSTR, DWORD);
-void PathCanonicalizeEx(LPWSTR);
-DWORD GetLongPathNameEx(LPWSTR, DWORD);
+void ExpandEnvironmentStringsEx(WCHAR *, DWORD);
+void PathCanonicalizeEx(WCHAR *);
+DWORD GetLongPathNameEx(WCHAR *, DWORD);
 DWORD_PTR SHGetFileInfo2(LPCWSTR, DWORD, SHFILEINFO *, UINT, UINT);
 
-int FormatNumberStr(LPWSTR);
+int FormatNumberStr(WCHAR *);
 BOOL SetDlgItemIntEx(HWND, int, UINT);
 
 #define MBCSToWChar(c, a, w, i) MultiByteToWideChar(c, 0, a, -1, w, i)
@@ -158,7 +158,7 @@ typedef struct _mrulist {
     WCHAR szRegKey[256];
     int iFlags;
     int iSize;
-    LPWSTR pszItems[MRU_MAXITEMS];
+    WCHAR * pszItems[MRU_MAXITEMS];
 
 } MRULIST, *PMRULIST, *LPMRULIST;
 
@@ -169,7 +169,7 @@ BOOL MRU_AddFile(LPMRULIST, LPCWSTR, BOOL, BOOL);
 BOOL MRU_Delete(LPMRULIST, int);
 BOOL MRU_DeleteFileFromStore(LPMRULIST, LPCWSTR);
 BOOL MRU_Empty(LPMRULIST);
-int MRU_Enum(LPMRULIST, int, LPWSTR, int);
+int MRU_Enum(LPMRULIST, int, WCHAR *, int);
 BOOL MRU_Load(LPMRULIST);
 BOOL MRU_Save(LPMRULIST);
 BOOL MRU_MergeSave(LPMRULIST, BOOL, BOOL, BOOL);
@@ -192,7 +192,7 @@ typedef struct {
 #pragma pack(pop)
 #endif
 
-BOOL GetThemedDialogFont(LPWSTR, WORD *);
+BOOL GetThemedDialogFont(WCHAR *, WORD *);
 DLGTEMPLATE *LoadThemedDialogTemplate(LPCTSTR, HINSTANCE);
 #define ThemedDialogBox(hInstance, lpTemplate, hWndParent, lpDialogFunc)       \
     ThemedDialogBoxParam(hInstance, lpTemplate, hWndParent, lpDialogFunc, 0)

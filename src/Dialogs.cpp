@@ -121,7 +121,7 @@ int CALLBACK BFFCallBack(HWND hwnd, UINT umsg, LPARAM lParam, LPARAM lpData) {
     lParam;
 }
 
-BOOL GetDirectory(HWND hwndParent, int iTitle, LPWSTR pszFolder,
+BOOL GetDirectory(HWND hwndParent, int iTitle, WCHAR * pszFolder,
                   LPCWSTR pszBase, BOOL bNewDialogStyle) {
 
     BROWSEINFO bi;
@@ -742,7 +742,7 @@ FavoritesDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
     return FALSE;
 }
 
-BOOL FavoritesDlg(HWND hwnd, LPWSTR lpstrFile) {
+BOOL FavoritesDlg(HWND hwnd, WCHAR * lpstrFile) {
 
     DLITEM dliFavorite;
     dliFavorite.mask = DLI_FILENAME;
@@ -765,7 +765,7 @@ AddToFavDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
         WCHAR *pszName;
 
         case WM_INITDIALOG:
-            pszName = (LPWSTR)lParam;
+            pszName = (WCHAR *) lParam;
             SetWindowLongPtr(hwnd, DWLP_USER, (LONG_PTR)pszName);
 
             SendDlgItemMessage(hwnd, 100, EM_LIMITTEXT, MAX_PATH - 1, 0);
@@ -784,7 +784,7 @@ AddToFavDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
                     break;
 
                 case IDOK:
-                    pszName = (LPWSTR)GetWindowLongPtr(hwnd, DWLP_USER);
+                    pszName = (WCHAR *) GetWindowLongPtr(hwnd, DWLP_USER);
                     GetDlgItemText(hwnd, 100, pszName, MAX_PATH - 1);
                     EndDialog(hwnd, IDOK);
                     break;
@@ -1213,7 +1213,7 @@ FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
                                         GetDlgItem(hwnd, IDC_FILEMRU)));
                             }
                         } else {
-                            lstrcpy((LPWSTR)GetWindowLongPtr(hwnd, DWLP_USER),
+                            lstrcpy((WCHAR *) GetWindowLongPtr(hwnd, DWLP_USER),
                                     tch);
                             EndDialog(hwnd, IDOK);
                         }
@@ -1231,7 +1231,7 @@ FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
     return FALSE;
 }
 
-BOOL FileMRUDlg(HWND hwnd, LPWSTR lpstrFile) {
+BOOL FileMRUDlg(HWND hwnd, WCHAR * lpstrFile) {
 
     if (IDOK == ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_FILEMRU),
                                      hwnd, FileMRUDlgProc, (LPARAM)lpstrFile))
@@ -1971,8 +1971,8 @@ BOOL SelectDefLineEndingDlg(HWND hwnd, int *iOption) {
 }
 
 struct INFOBOX {
-    LPWSTR lpstrMessage;
-    LPWSTR lpstrSetting;
+    WCHAR * lpstrMessage;
+    WCHAR * lpstrSetting;
     BOOL bDisableCheckBox;
 };
 
@@ -2032,7 +2032,7 @@ INT_PTR InfoBox(int iType, LPCWSTR lpstrSetting, int uidMessage, ...) {
     ib.lpstrMessage = (WCHAR *)LocalAlloc(LPTR, 1024 * sizeof(WCHAR));
     wvsprintf(ib.lpstrMessage, wchFormat,
               (va_list)((PUINT_PTR) & uidMessage + 1));
-    ib.lpstrSetting = (LPWSTR)lpstrSetting;
+    ib.lpstrSetting = (WCHAR *) lpstrSetting;
     ib.bDisableCheckBox =
         (lstrlen(szIniFile) == 0 || lstrlen(lpstrSetting) == 0 || iMode == 2)
             ? TRUE

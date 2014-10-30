@@ -144,13 +144,13 @@ BOOL bTransparentModeAvailable;
 BOOL bShowToolbar;
 BOOL bShowStatusbar;
 
-typedef struct _wi {
+struct WININFO {
     int x;
     int y;
     int cx;
     int cy;
     int max;
-} WININFO;
+};
 
 WININFO wi;
 BOOL bStickyWinPos;

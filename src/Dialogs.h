@@ -13,13 +13,13 @@ See License.txt for details about distribution and modification
 
 int MsgBox(int, UINT, ...);
 void DisplayCmdLineHelp();
-BOOL GetDirectory(HWND, int, LPWSTR, LPCWSTR, BOOL);
+BOOL GetDirectory(HWND, int, WCHAR *, LPCWSTR, BOOL);
 INT_PTR CALLBACK AboutDlgProc(HWND, UINT, WPARAM, LPARAM);
 void RunDlg(HWND, LPCWSTR);
 BOOL OpenWithDlg(HWND, LPCWSTR);
-BOOL FavoritesDlg(HWND, LPWSTR);
+BOOL FavoritesDlg(HWND, WCHAR *);
 BOOL AddToFavDlg(HWND, LPCWSTR, LPCWSTR);
-BOOL FileMRUDlg(HWND, LPWSTR);
+BOOL FileMRUDlg(HWND, WCHAR *);
 BOOL ChangeNotifyDlg(HWND);
 BOOL ColumnWrapDlg(HWND, UINT, int *);
 BOOL WordWrapSettingsDlg(HWND, UINT, int *);
