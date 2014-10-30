@@ -15,6 +15,7 @@ See License.txt for details about distribution and modification.
 #include "helpers.h"
 #include "SciCall.h"
 #include "resource.h"
+#include "Version.h"
 
 // Local and global Variables for Notepad2.c
 HWND hwndStatus;
@@ -4142,6 +4143,10 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
         case IDM_HELP_ABOUT:
             ThemedDialogBox(g_hInstance, MAKEINTRESOURCE(IDD_ABOUT), hwnd,
                             AboutDlgProc);
+            break;
+
+        case IDM_WEBSITE:
+            ShellExecuteA(hwnd, "open", VERSION_MODPAGEDISPLAY, NULL, NULL, SW_SHOWNORMAL);
             break;
 
         case CMD_ESCAPE:

@@ -351,9 +351,10 @@ BEGIN
         MENUITEM "Save Settings On E&xit",      IDM_VIEW_SAVESETTINGS
         MENUITEM "Save Settings &Now\tF7",      IDM_VIEW_SAVESETTINGSNOW
     END
-    POPUP "&?"
+    POPUP "&Help"
     BEGIN
         MENUITEM "&About...\tF1",               IDM_HELP_ABOUT
+        MENUITEM "&Website",                    IDM_WEBSITE
     END
 END
 

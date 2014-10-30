@@ -33,7 +33,7 @@ See License.txt for details about distribution and modification.
 #define VERSION_WEBPAGEDISPLAY L"flo's freeware - http://www.flos-freeware.ch"
 #define VERSION_EMAILDISPLAY L"kkowalczyk@gmail.com"
 #define VERSION_COMPANYNAME L"Florian Balmer et al."
-#define VERSION_MODPAGEDISPLAY L"http://blog.kowalczyk.info/software/velociraptor8/"
+#define VERSION_MODPAGEDISPLAY "http://blog.kowalczyk.info/software/velociraptor8/"
 
 #if defined(_WIN64)
 #define VERSION_FILEVERSION_LONG                                               \

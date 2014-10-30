@@ -167,6 +167,7 @@ AboutDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
     switch (umsg) {
         case WM_INITDIALOG: {
             WCHAR wch[256];
+            char buf[256];
             LOGFONT lf;
 
             SetDlgItemText(hwnd, IDC_VERSION, VERSION_FILEVERSION_LONG);
@@ -203,11 +204,12 @@ AboutDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
             }
 
             if (GetDlgItem(hwnd, IDC_MOD_PAGE) == NULL) {
-                SetDlgItemText(hwnd, IDC_MOD_PAGE, VERSION_MODPAGEDISPLAY);
+                SetDlgItemTextA(hwnd, IDC_MOD_PAGE, VERSION_MODPAGEDISPLAY);
                 ShowWindow(GetDlgItem(hwnd, IDC_MOD_PAGE2), SW_SHOWNORMAL);
             } else {
-                wsprintf(wch, L"<A>%s</A>", VERSION_MODPAGEDISPLAY);
-                SetDlgItemText(hwnd, IDC_MOD_PAGE, wch);
+                // TODO(kjk): safe version
+                sprintf(buf, "<A>%s</A>", VERSION_MODPAGEDISPLAY);
+                SetDlgItemTextA(hwnd, IDC_MOD_PAGE, buf);
             }
 
             CenterDlgInParent(hwnd);
