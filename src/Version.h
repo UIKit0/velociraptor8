@@ -25,7 +25,7 @@ See License.txt for details about distribution and modification.
 #define QM4(x, y, z, u) _QUOTEME4(x, y, z, u)
 
 #ifndef CURR_VERSION
-#define CURR_VERSION 0.1.0
+#define CURR_VERSION 0.1
 #endif
 #ifndef CURR_VERSION_COMMA
 #define CURR_VERSION_COMMA 0,1,0

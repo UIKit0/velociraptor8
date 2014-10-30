@@ -170,10 +170,10 @@ AboutDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
             char buf[256];
             LOGFONT lf;
 
-            SetDlgItemText(hwnd, IDC_VERSION, VERSION_FILEVERSION_LONG);
-            SetDlgItemText(hwnd, IDC_COPYRIGHT, VERSION_LEGALCOPYRIGHT_SHORT);
-            SetDlgItemText(hwnd, IDC_AUTHORNAME, VERSION_AUTHORNAME);
-            SetDlgItemText(hwnd, IDC_COMPILER, VERSION_COMPILER);
+            SetDlgItemTextW(hwnd, IDC_VERSION, VERSION_FILEVERSION_LONG);
+            SetDlgItemTextW(hwnd, IDC_COPYRIGHT, VERSION_LEGALCOPYRIGHT_SHORT);
+            SetDlgItemTextW(hwnd, IDC_AUTHORNAME, VERSION_AUTHORNAME);
+            SetDlgItemTextW(hwnd, IDC_COMPILER, VERSION_COMPILER);
 
             if (hFontTitle)
                 DeleteObject(hFontTitle);
