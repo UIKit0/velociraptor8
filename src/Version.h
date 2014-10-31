@@ -76,6 +76,12 @@ See License.txt for details about distribution and modification.
 #define VERSION_COMPANYNAME L"Florian Balmer et al."
 #define VERSION_MODPAGEDISPLAY "http://blog.kowalczyk.info/software/velociraptor8/"
 
+#if defined(PRE_RELEASE_VER)
+#define AUTO_UPDATE_URL "http://kjkpub.s3.amazonaws.com/software/ve8/pre_rel_latest_ver.txt"
+#else
+#define AUTO_UPDATE_URL "http://kjkpub.s3.amazonaws.com/software/ve8/rel_latest_ver.txt"
+#endif
+
 #if defined(_WIN64)
 #define VERSION_FILEVERSION_LONG L"velociraptor8 (64-bit) " CURR_VERSION_STR
 #else

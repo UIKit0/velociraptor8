@@ -9,7 +9,7 @@ size_t Len(const WCHAR *s) { return wcslen(s); }
 }
 
 // returns either bufOut or newly allocated 
-char *WcharToUtf8Buf(const WCHAR *s, char *bufOut, size_t cbBufOutSize) {
+char *WstrToUtf8Buf(const WCHAR *s, char *bufOut, size_t cbBufOutSize) {
     CrashIf(!bufOut || (0 == cbBufOutSize));
     size_t cbNeeds = (size_t)WideCharToMultiByte(CP_UTF8, 0, s, -1, NULL, 0, NULL, NULL);
     if (cbNeeds >= cbBufOutSize) {
@@ -21,3 +21,17 @@ char *WcharToUtf8Buf(const WCHAR *s, char *bufOut, size_t cbBufOutSize) {
     return bufOut;
 }
 
+WCHAR *Utf8ToWstrBuf(const char *s, WCHAR *bufOut, size_t cchBufOutSize) {
+    size_t cchNeeds = (size_t) MultiByteToWideChar(CP_UTF8, 0, s,-1, NULL, 0);
+    if (cchNeeds >= cchBufOutSize) {
+        bufOut = AllocMustN<WCHAR>(cchNeeds + 1);
+    }
+    size_t res = (size_t) MultiByteToWideChar(CP_UTF8, 0, s, -1, bufOut, cchNeeds);
+    CrashIf(res > cchNeeds);
+    bufOut[res] = 0;
+    return bufOut;
+}
+
+WCHAR *Utf8ToWstr(const char *s) {
+    return Utf8ToWstrBuf(s, NULL, 0);
+}

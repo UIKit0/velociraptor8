@@ -17,6 +17,7 @@ See License.txt for details about distribution and modification.
 #include "resource.h"
 #include "Version.h"
 #include "UITask.h"
+#include "Http.h"
 
 // Local and global Variables for Notepad2.c
 HWND hwndStatus;
@@ -559,6 +560,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine,
     // example of using uitask::Post()
     uitask::Post([] {
         OutputDebugStringA("hello2");
+    });
+#endif
+
+#if 1
+    HttpGetAsync(AUTO_UPDATE_URL, [](HttpRsp* r) {
+        OutputDebugStringA("got data");
     });
 #endif
 
