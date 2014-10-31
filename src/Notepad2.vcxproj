@@ -119,6 +119,7 @@
     <OutDir Condition="'$(VisualStudioVersion)'=='10.0'">..\bin\VS2010\$(Configuration)_x86\</OutDir>
     <OutDir Condition="'$(VisualStudioVersion)'=='12.0'">..\bin\VS2013\$(Configuration)_x86\</OutDir>
     <RunCodeAnalysis>false</RunCodeAnalysis>
+    <PreBuildEventUseInBuild>false</PreBuildEventUseInBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <GenerateManifest>false</GenerateManifest>
@@ -129,6 +130,7 @@
     <OutDir>..\bin\VS2012\$(Configuration)_x86\</OutDir>
     <OutDir Condition="'$(VisualStudioVersion)'=='10.0'">..\bin\VS2010\$(Configuration)_x86\</OutDir>
     <OutDir Condition="'$(VisualStudioVersion)'=='12.0'">..\bin\VS2013\$(Configuration)_x86\</OutDir>
+    <PreBuildEventUseInBuild>false</PreBuildEventUseInBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Analyze|Win32'">
     <GenerateManifest>false</GenerateManifest>
@@ -140,6 +142,7 @@
     <OutDir Condition="'$(VisualStudioVersion)'=='10.0'">..\bin\VS2010\$(Configuration)_x86\</OutDir>
     <OutDir Condition="'$(VisualStudioVersion)'=='12.0'">..\bin\VS2013\$(Configuration)_x86\</OutDir>
     <RunCodeAnalysis>true</RunCodeAnalysis>
+    <PreBuildEventUseInBuild>false</PreBuildEventUseInBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <GenerateManifest>false</GenerateManifest>
@@ -150,6 +153,7 @@
     <OutDir>..\bin\VS2012\$(Configuration)_x64\</OutDir>
     <OutDir Condition="'$(VisualStudioVersion)'=='10.0'">..\bin\VS2010\$(Configuration)_x64\</OutDir>
     <OutDir Condition="'$(VisualStudioVersion)'=='12.0'">..\bin\VS2013\$(Configuration)_x64\</OutDir>
+    <PreBuildEventUseInBuild>false</PreBuildEventUseInBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <GenerateManifest>false</GenerateManifest>
@@ -160,6 +164,7 @@
     <OutDir>..\bin\VS2012\$(Configuration)_x64\</OutDir>
     <OutDir Condition="'$(VisualStudioVersion)'=='10.0'">..\bin\VS2010\$(Configuration)_x64\</OutDir>
     <OutDir Condition="'$(VisualStudioVersion)'=='12.0'">..\bin\VS2013\$(Configuration)_x64\</OutDir>
+    <PreBuildEventUseInBuild>false</PreBuildEventUseInBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Analyze|x64'">
     <GenerateManifest>false</GenerateManifest>
@@ -170,6 +175,7 @@
     <OutDir>..\bin\VS2012\$(Configuration)_x64\</OutDir>
     <OutDir Condition="'$(VisualStudioVersion)'=='10.0'">..\bin\VS2010\$(Configuration)_x64\</OutDir>
     <OutDir Condition="'$(VisualStudioVersion)'=='12.0'">..\bin\VS2013\$(Configuration)_x64\</OutDir>
+    <PreBuildEventUseInBuild>false</PreBuildEventUseInBuild>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
