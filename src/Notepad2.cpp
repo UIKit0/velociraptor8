@@ -16,6 +16,7 @@ See License.txt for details about distribution and modification.
 #include "SciCall.h"
 #include "resource.h"
 #include "Version.h"
+#include "UITask.h"
 
 // Local and global Variables for Notepad2.c
 HWND hwndStatus;
@@ -451,6 +452,23 @@ void __stdcall FoldAltArrow(int key, int mode) {
     }
 }
 
+static bool CheckWinVer() {
+    // TODO(kjK): change to at least XP
+    if (Is2k()) {
+        return true;
+    }
+    char* buf = nullptr;
+    FormatMessageA(
+        FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM |
+        FORMAT_MESSAGE_IGNORE_INSERTS,
+        NULL, ERROR_OLD_WIN_VERSION,
+        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // Default language
+        (char*)&buf, 0, NULL);
+    MessageBoxA(NULL, (const char*) buf, "velociraptor8", MB_OK | MB_ICONEXCLAMATION);
+    LocalFree(buf);
+    return false;
+}
+
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine,
                    int nCmdShow) {
     MSG msg;
@@ -474,18 +492,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine,
 
     SetErrorMode(SEM_FAILCRITICALERRORS | SEM_NOOPENFILEERRORBOX);
 
-    // check if running at least on Windows 2000
-    if (!Is2k()) {
-        LPVOID lpMsgBuf;
-        FormatMessage(
-            FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM |
-                FORMAT_MESSAGE_IGNORE_INSERTS,
-            NULL, ERROR_OLD_WIN_VERSION,
-            MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // Default language
-            (LPWSTR) & lpMsgBuf, 0, NULL);
-        MessageBox(NULL, (LPCWSTR)lpMsgBuf, L"velociraptor8",
-                   MB_OK | MB_ICONEXCLAMATION);
-        LocalFree(lpMsgBuf);
+    if (!CheckWinVer()) {
         return 0;
     }
 
@@ -528,6 +535,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine,
                  ICC_USEREX_CLASSES;
     InitCommonControlsEx(&icex);
 
+    uitask::Initialize();
+
     msgTaskbarCreated = RegisterWindowMessage(L"TaskbarCreated");
 
     hModUxTheme = LoadLibrary(L"uxtheme.dll");
@@ -545,6 +554,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine,
     hAccMain = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDR_MAINWND));
     hAccFindReplace =
         LoadAccelerators(hInstance, MAKEINTRESOURCE(IDR_ACCFINDREPLACE));
+
+#if 0
+    // example of using uitask::Post()
+    uitask::Post([] {
+        OutputDebugStringA("hello2");
+    });
+#endif
 
     while (GetMessage(&msg, NULL, 0, 0)) {
         if (IsWindow(hDlgFindReplace) &&
@@ -567,6 +583,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine,
         FreeLibrary(hModUxTheme);
 
     OleUninitialize();
+    uitask::Destroy();
 
     return (int)msg.wParam;
 }
