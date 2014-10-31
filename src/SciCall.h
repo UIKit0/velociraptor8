@@ -157,25 +157,39 @@ inline TRET SciRetCall(HWND hwnd) {
     return (TRET) Scintilla_DirectFunction(w, msg, 0, 0);
 }
 
+template <UINT msg, typename T1>
+void SciNoRetCall(HWND hwnd, T1 v1) {
+    ScintillaWin *w = GetSciDirectPtr(hwnd);
+    Scintilla_DirectFunction(w, msg, (WPARAM) v1, 0);
+}
+
 template <UINT msg, typename T1, typename T2>
-void SciSend(HWND hwnd, T1 v1, T2 v2) {
+void SciNoRetCall(HWND hwnd, T1 v1, T2 v2) {
     ScintillaWin *w = GetSciDirectPtr(hwnd);
     Scintilla_DirectFunction(w, msg, (WPARAM)v1, (LPARAM)v2);
 }
 
 inline void SetXCaretPolicy(HWND w, int policy, int slop) {
-    SciSend<SCI_SETXCARETPOLICY, int, int>(w, policy, slop);
+    SciNoRetCall<SCI_SETXCARETPOLICY, int, int>(w, policy, slop);
 }
 
 inline void SetYCaretPolicy(HWND w, int policy, int slop) {
-    SciSend<SCI_SETYCARETPOLICY, int, int>(w, policy, slop);
+    SciNoRetCall<SCI_SETYCARETPOLICY, int, int>(w, policy, slop);
 }
 
 inline void SetSel(HWND w, int anchorPos, int currPos) {
-    SciSend<SCI_SETSEL, int, int>(w, anchorPos, currPos);
+    SciNoRetCall<SCI_SETSEL, int, int>(w, anchorPos, currPos);
 }
 
 inline int SciGetLineCount(HWND hwnd) {
     return SciRetCall<SCI_GETLINECOUNT, int>(hwnd);
+}
+
+inline void SciSetHScrollBar(HWND hwnd, bool visible) {
+    SciNoRetCall<SCI_SETHSCROLLBAR, bool>(hwnd, visible);
+}
+
+inline bool SciGetHScrollBar(HWND hwnd) {
+    return SciRetCall<SCI_GETHSCROLLBAR, bool>(hwnd);
 }
 

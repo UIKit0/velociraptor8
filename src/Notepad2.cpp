@@ -670,7 +670,7 @@ HWND InitInstance(HINSTANCE hInstance, LPSTR pszCmdLine, int nCmdShow) {
         }
     }
 
-    hwndMain = CreateWindowExW(0, fullWndClass, L"Notepad2",
+    hwndMain = CreateWindowExW(0, fullWndClass, L"Velociraptor8",
                               WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN, wi.x, wi.y,
                               wi.cx, wi.cy, NULL, NULL, hInstance, NULL);
 

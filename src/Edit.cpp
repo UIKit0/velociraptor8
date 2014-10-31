@@ -375,6 +375,7 @@ HWND EditCreate(HWND hwndParent) {
                        WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS, 0, 0, 0, 0,
                        hwndParent, (HMENU)IDC_EDIT, g_hInstance, NULL);
 
+    //SciSetHScrollBar(hwnd, false);
     SendMessage(hwnd, SCI_SETCODEPAGE, iDefaultCodePage, 0);
     SendMessage(hwnd, SCI_SETEOLMODE, SC_EOL_CRLF, 0);
     SendMessage(hwnd, SCI_SETPASTECONVERTENDINGS, 1, 0);
