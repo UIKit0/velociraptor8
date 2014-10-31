@@ -5,6 +5,10 @@
 // per RFC 1945 10.15 and 3.7, a user agent product token shouldn't contain whitespace
 #define USER_AGENT L"BaseHTTP"
 
+bool IsHttpRspOk(const HttpRsp* rsp) {
+    return (rsp->error == ERROR_SUCCESS) && (rsp->httpStatusCode == 200);
+}
+
 // returns ERROR_SUCCESS or an error code
 static void HttpGet(const char *urlA, HttpRsp *rspOut) {
     rspOut->error = ERROR_SUCCESS;
@@ -22,6 +26,11 @@ static void HttpGet(const char *urlA, HttpRsp *rspOut) {
     if (!hReq)
         goto Error;
 
+    DWORD headerBuffSize = sizeof(DWORD);
+    if (!HttpQueryInfoW(hReq, HTTP_QUERY_STATUS_CODE | HTTP_QUERY_FLAG_NUMBER, &rspOut->httpStatusCode, &headerBuffSize, NULL)) {
+        goto Error;
+    }
+
     for (;;) {
         char buf[1024];
         DWORD dwRead = 0;
@@ -33,11 +42,6 @@ static void HttpGet(const char *urlA, HttpRsp *rspOut) {
         }
         rspOut->data.append((const char*) buf, (size_t) dwRead);
     };
-
-    DWORD headerBuffSize = sizeof(DWORD);
-    if (!HttpQueryInfoW(hReq, HTTP_QUERY_STATUS_CODE | HTTP_QUERY_FLAG_NUMBER, &rspOut->httpStatusCode, &headerBuffSize, NULL)) {
-        goto Error;
-    }
 
 Exit:
     if (hReq)
