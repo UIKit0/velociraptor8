@@ -190,6 +190,9 @@
       <WarningLevel>Level3</WarningLevel>
       <EnablePREfast>false</EnablePREfast>
       <DisableSpecificWarnings>4800</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <StringPooling>true</StringPooling>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
     </ClCompile>
     <Link>
       <AdditionalDependencies>comctl32.lib;imm32.lib;shlwapi.lib;Wininet.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -217,6 +220,10 @@
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DisableSpecificWarnings>4800</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <StringPooling>true</StringPooling>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <OmitFramePointers>false</OmitFramePointers>
     </ClCompile>
     <Link>
       <AdditionalDependencies>comctl32.lib;imm32.lib;shlwapi.lib;Wininet.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -237,11 +244,16 @@
       <AdditionalIncludeDirectories>..\scintilla\include;..\scintilla\lexlib;..\scintilla\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <EnableEnhancedInstructionSet>NoExtensions</EnableEnhancedInstructionSet>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <Optimization>MaxSpeed</Optimization>
+      <Optimization>MinSpace</Optimization>
       <PreprocessorDefinitions>WIN32;STATIC_BUILD;SCI_LEXER;BOOKMARK_EDITION;NDEBUG;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DisableSpecificWarnings>4800</DisableSpecificWarnings>
+      <StringPooling>true</StringPooling>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <ShowIncludes>false</ShowIncludes>
+      <FavorSizeOrSpeed>Size</FavorSizeOrSpeed>
     </ClCompile>
     <Link>
       <AdditionalDependencies>comctl32.lib;imm32.lib;shlwapi.lib;Wininet.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -272,6 +284,9 @@
       <WarningLevel>Level3</WarningLevel>
       <EnablePREfast>true</EnablePREfast>
       <DisableSpecificWarnings>4800</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <StringPooling>true</StringPooling>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
     </ClCompile>
     <Link>
       <AdditionalDependencies>comctl32.lib;imm32.lib;shlwapi.lib;Wininet.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -300,6 +315,10 @@
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DisableSpecificWarnings>4800</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <StringPooling>true</StringPooling>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <OmitFramePointers>false</OmitFramePointers>
     </ClCompile>
     <Link>
       <AdditionalDependencies>comctl32.lib;imm32.lib;shlwapi.lib;Wininet.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -328,6 +347,10 @@
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DisableSpecificWarnings>4800</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <StringPooling>true</StringPooling>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <OmitFramePointers>false</OmitFramePointers>
     </ClCompile>
     <Link>
       <AdditionalDependencies>comctl32.lib;imm32.lib;shlwapi.lib;Wininet.lib;%(AdditionalDependencies)</AdditionalDependencies>
