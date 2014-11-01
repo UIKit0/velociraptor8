@@ -38,12 +38,12 @@ inline BOOL IniSectionSetInt(WCHAR * lpCachedIniSection, const WCHAR* lpName,
 }
 
 inline void BeginWaitCursor() {
-    SendMessage(gDoc->hwndEdit, SCI_SETCURSOR, (WPARAM)SC_CURSORWAIT, 0);
+    SendMessage(gDoc->hwndScintilla, SCI_SETCURSOR, (WPARAM)SC_CURSORWAIT, 0);
 }
 
 inline void EndWaitCursor() {
     POINT pt;
-    SendMessage(gDoc->hwndEdit, SCI_SETCURSOR, (WPARAM)SC_CURSORNORMAL, 0);
+    SendMessage(gDoc->hwndScintilla, SCI_SETCURSOR, (WPARAM) SC_CURSORNORMAL, 0);
     GetCursorPos(&pt);
     SetCursorPos(pt.x, pt.y);
 }

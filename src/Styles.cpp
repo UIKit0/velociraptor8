@@ -6527,7 +6527,7 @@ Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
                                     pCurrentLexer->pszDefExt);
                     }
 
-                    Style_SetLexer(gDoc->hwndEdit, pLexCurrent);
+                    Style_SetLexer(gDoc->hwndScintilla, pLexCurrent);
                     UpdateLineNumberWidth();
                 } break;
 
