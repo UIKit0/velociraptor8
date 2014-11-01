@@ -13,6 +13,5 @@
 /build/packages
 /build/temp_zip*
 /distrib/Notepad2-mod.*.exe
-/res/Notepad2.exe.manifest
 /signinfo_notepad2-mod.txt
 

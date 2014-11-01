@@ -8,7 +8,7 @@ See License.txt for details about distribution and modification.
 
 #include "scintilla.h"
 #include "scilexer.h"
-#include "notepad2.h"
+#include "ve8.h"
 #include "edit.h"
 #include "styles.h"
 #include "dialogs.h"

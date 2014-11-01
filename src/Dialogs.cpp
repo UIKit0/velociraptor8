@@ -6,7 +6,7 @@ See License.txt for details about distribution and modification.
 
 #include "Common.h"
 #include "scintilla.h"
-#include "notepad2.h"
+#include "ve8.h"
 #include "edit.h"
 #include "dlapi.h"
 #include "dialogs.h"

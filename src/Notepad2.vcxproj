@@ -390,12 +390,12 @@
     <ClInclude Include="Edit.h" />
     <ClInclude Include="Helpers.h" />
     <ClInclude Include="Http.h" />
-    <ClInclude Include="Notepad2.h" />
     <ClInclude Include="SciCall.h" />
     <ClInclude Include="StrUtil.h" />
     <ClInclude Include="Styles.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="UITask.h" />
+    <ClInclude Include="ve8.h" />
     <ClInclude Include="Version.h" />
     <ClInclude Include="WinUtil.h" />
   </ItemGroup>
