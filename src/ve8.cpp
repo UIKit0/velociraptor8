@@ -23,11 +23,12 @@ See License.txt for details about distribution and modification.
 HWND hwndStatus;
 HWND hwndToolbar;
 HWND hwndReBar;
-HWND hwndEdit;
 HWND hwndEditFrame;
 HWND hwndMain;
-HWND hwndNextCBChain = NULL;
-HWND hDlgFindReplace = NULL;
+HWND hwndNextCBChain;
+HWND hDlgFindReplace;
+
+Document *gDoc;
 
 #define NUMTOOLBITMAPS 25
 #define NUMINITIALTOOLS 24
@@ -410,7 +411,7 @@ void __stdcall FoldClick(int ln, int mode) {
     FoldPerformAction(ln, mode, SNIFF);
 
     if (fGotoFoldPoint)
-        EditJumpTo(hwndEdit, ln + 1, 0);
+        EditJumpTo(gDoc->hwndEdit, ln + 1, 0);
 }
 
 void __stdcall FoldAltArrow(int key, int mode) {
@@ -426,7 +427,7 @@ void __stdcall FoldAltArrow(int key, int mode) {
             for (ln = ln + 1; ln < lnTotal; ++ln) {
                 if (SciCall_GetFoldLevel(ln) & SC_FOLDLEVELHEADERFLAG &&
                     SciCall_GetLineVisible(ln)) {
-                    EditJumpTo(hwndEdit, ln + 1, 0);
+                    EditJumpTo(gDoc->hwndEdit, ln + 1, 0);
                     return;
                 }
             }
@@ -437,7 +438,7 @@ void __stdcall FoldAltArrow(int key, int mode) {
             for (ln = ln - 1; ln >= 0; --ln) {
                 if (SciCall_GetFoldLevel(ln) & SC_FOLDLEVELHEADERFLAG &&
                     SciCall_GetLineVisible(ln)) {
-                    EditJumpTo(hwndEdit, ln + 1, 0);
+                    EditJumpTo(gDoc->hwndEdit, ln + 1, 0);
                     return;
                 }
             }
@@ -735,8 +736,8 @@ HWND InitInstance(HINSTANCE hInstance, LPSTR pszCmdLine, int nCmdShow) {
         } else {
             if (bOpened = FileLoad(FALSE, FALSE, FALSE, FALSE, lpFileArg)) {
                 if (flagJumpTo) { // Jump to position
-                    EditJumpTo(hwndEdit, iInitialLine, iInitialColumn);
-                    EditEnsureSelectionVisible(hwndEdit);
+                    EditJumpTo(gDoc->hwndEdit, iInitialLine, iInitialColumn);
+                    EditEnsureSelectionVisible(gDoc->hwndEdit);
                 }
             }
         }
@@ -758,7 +759,7 @@ HWND InitInstance(HINSTANCE hInstance, LPSTR pszCmdLine, int nCmdShow) {
             iEncoding = iSrcEncoding;
             iOriginalEncoding = iSrcEncoding;
             SendMessage(
-                hwndEdit, SCI_SETCODEPAGE,
+                gDoc->hwndEdit, SCI_SETCODEPAGE,
                 (iEncoding == CPI_DEFAULT) ? iDefaultCodePage : SC_CP_UTF8, 0);
         }
     }
@@ -770,20 +771,20 @@ HWND InitInstance(HINSTANCE hInstance, LPSTR pszCmdLine, int nCmdShow) {
 
     // Check for /c [if no file is specified] -- even if a file is specified
     /*else */ if (flagNewFromClipboard) {
-        if (SendMessage(hwndEdit, SCI_CANPASTE, 0, 0)) {
+        if (SendMessage(gDoc->hwndEdit, SCI_CANPASTE, 0, 0)) {
             BOOL bAutoIndent2 = bAutoIndent;
             bAutoIndent = 0;
-            EditJumpTo(hwndEdit, -1, 0);
-            SendMessage(hwndEdit, SCI_BEGINUNDOACTION, 0, 0);
-            if (SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0) > 0)
-                SendMessage(hwndEdit, SCI_NEWLINE, 0, 0);
-            SendMessage(hwndEdit, SCI_PASTE, 0, 0);
-            SendMessage(hwndEdit, SCI_NEWLINE, 0, 0);
-            SendMessage(hwndEdit, SCI_ENDUNDOACTION, 0, 0);
+            EditJumpTo(gDoc->hwndEdit, -1, 0);
+            SendMessage(gDoc->hwndEdit, SCI_BEGINUNDOACTION, 0, 0);
+            if (SendMessage(gDoc->hwndEdit, SCI_GETLENGTH, 0, 0) > 0)
+                SendMessage(gDoc->hwndEdit, SCI_NEWLINE, 0, 0);
+            SendMessage(gDoc->hwndEdit, SCI_PASTE, 0, 0);
+            SendMessage(gDoc->hwndEdit, SCI_NEWLINE, 0, 0);
+            SendMessage(gDoc->hwndEdit, SCI_ENDUNDOACTION, 0, 0);
             bAutoIndent = bAutoIndent2;
             if (flagJumpTo)
-                EditJumpTo(hwndEdit, iInitialLine, iInitialColumn);
-            EditEnsureSelectionVisible(hwndEdit);
+                EditJumpTo(gDoc->hwndEdit, iInitialLine, iInitialColumn);
+            EditEnsureSelectionVisible(gDoc->hwndEdit);
         }
     }
 
@@ -803,9 +804,9 @@ HWND InitInstance(HINSTANCE hInstance, LPSTR pszCmdLine, int nCmdShow) {
 
     // Match Text
     if (flagMatchText && lpMatchArg) {
-        if (lstrlen(lpMatchArg) && SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0)) {
+        if (lstrlen(lpMatchArg) && SendMessage(gDoc->hwndEdit, SCI_GETLENGTH, 0, 0)) {
 
-            UINT cp = (UINT)SendMessage(hwndEdit, SCI_GETCODEPAGE, 0, 0);
+            UINT cp = (UINT) SendMessage(gDoc->hwndEdit, SCI_GETCODEPAGE, 0, 0);
             WideCharToMultiByte(cp, 0, lpMatchArg, -1, efrData.szFind,
                                 COUNTOF(efrData.szFind), NULL, NULL);
             WideCharToMultiByte(CP_UTF8, 0, lpMatchArg, -1, efrData.szFindUTF8,
@@ -819,14 +820,14 @@ HWND InitInstance(HINSTANCE hInstance, LPSTR pszCmdLine, int nCmdShow) {
 
             if (flagMatchText & 2) {
                 if (!flagJumpTo)
-                    EditJumpTo(hwndEdit, -1, 0);
-                EditFindPrev(hwndEdit, &efrData, FALSE);
-                EditEnsureSelectionVisible(hwndEdit);
+                    EditJumpTo(gDoc->hwndEdit, -1, 0);
+                EditFindPrev(gDoc->hwndEdit, &efrData, FALSE);
+                EditEnsureSelectionVisible(gDoc->hwndEdit);
             } else {
                 if (!flagJumpTo)
-                    SendMessage(hwndEdit, SCI_DOCUMENTSTART, 0, 0);
-                EditFindNext(hwndEdit, &efrData, FALSE);
-                EditEnsureSelectionVisible(hwndEdit);
+                    SendMessage(gDoc->hwndEdit, SCI_DOCUMENTSTART, 0, 0);
+                EditFindNext(gDoc->hwndEdit, &efrData, FALSE);
+                EditEnsureSelectionVisible(gDoc->hwndEdit);
             }
         }
         GlobalFree(lpMatchArg);
@@ -850,10 +851,10 @@ HWND InitInstance(HINSTANCE hInstance, LPSTR pszCmdLine, int nCmdShow) {
     // check if a lexer was specified from the command line
     if (flagLexerSpecified) {
         if (lpSchemeArg) {
-            Style_SetLexerFromName(hwndEdit, szCurFile, lpSchemeArg);
+            Style_SetLexerFromName(gDoc->hwndEdit, szCurFile, lpSchemeArg);
             LocalFree(lpSchemeArg);
         } else if (iInitialLexer >= 0 && iInitialLexer < NUMLEXERS)
-            Style_SetLexerFromID(hwndEdit, iInitialLexer);
+            Style_SetLexerFromID(gDoc->hwndEdit, iInitialLexer);
         flagLexerSpecified = 0;
     }
 
@@ -981,7 +982,7 @@ MainWndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
         // update Scintilla colors
         case WM_SYSCOLORCHANGE: {
             extern EditLexer *pLexCurrent;
-            Style_SetLexer(hwndEdit, pLexCurrent);
+            Style_SetLexer(gDoc->hwndEdit, pLexCurrent);
             return DefWindowProc(hwnd, msg, wp, lp);
         }
 
@@ -993,7 +994,7 @@ MainWndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
             break;
 
         case WM_SETFOCUS:
-            SetFocus(hwndEdit);
+            SetFocus(gDoc->hwndEdit);
 
             UpdateToolbar();
             UpdateStatusbar();
@@ -1100,10 +1101,10 @@ MainWndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
                                 lstrcpyn(CharNext(wchExt),
                                          StrEnd(&params->wchData) + 1, 30);
                                 Style_SetLexerFromName(
-                                    hwndEdit, &params->wchData, wchExt);
+                                    gDoc->hwndEdit, &params->wchData, wchExt);
                             } else if (params->iInitialLexer >= 0 &&
                                        params->iInitialLexer < NUMLEXERS)
-                                Style_SetLexerFromID(hwndEdit,
+                                       Style_SetLexerFromID(gDoc->hwndEdit,
                                                      params->iInitialLexer);
                         }
 
@@ -1125,9 +1126,9 @@ MainWndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
                 if (params->flagJumpTo) {
                     if (params->iInitialLine == 0)
                         params->iInitialLine = 1;
-                    EditJumpTo(hwndEdit, params->iInitialLine,
+                    EditJumpTo(gDoc->hwndEdit, params->iInitialLine,
                                params->iInitialColumn);
-                    EditEnsureSelectionVisible(hwndEdit);
+                    EditEnsureSelectionVisible(gDoc->hwndEdit);
                 }
 
                 flagLexerSpecified = 0;
@@ -1159,30 +1160,30 @@ MainWndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
             switch (nID) {
                 case IDC_EDIT: {
                     int iSelStart =
-                        (int)SendMessage(hwndEdit, SCI_GETSELECTIONSTART, 0, 0);
+                        (int) SendMessage(gDoc->hwndEdit, SCI_GETSELECTIONSTART, 0, 0);
                     int iSelEnd =
-                        (int)SendMessage(hwndEdit, SCI_GETSELECTIONEND, 0, 0);
+                        (int) SendMessage(gDoc->hwndEdit, SCI_GETSELECTIONEND, 0, 0);
 
                     if (iSelStart == iSelEnd && pt.x != -1 && pt.y != -1) {
                         int iNewPos;
                         POINT ptc = { pt.x, pt.y };
-                        ScreenToClient(hwndEdit, &ptc);
+                        ScreenToClient(gDoc->hwndEdit, &ptc);
                         iNewPos =
-                            (int)SendMessage(hwndEdit, SCI_POSITIONFROMPOINT,
+                            (int) SendMessage(gDoc->hwndEdit, SCI_POSITIONFROMPOINT,
                                              (WPARAM)ptc.x, (LPARAM)ptc.y);
-                        SendMessage(hwndEdit, SCI_GOTOPOS, (WPARAM)iNewPos, 0);
+                        SendMessage(gDoc->hwndEdit, SCI_GOTOPOS, (WPARAM) iNewPos, 0);
                     }
 
                     if (pt.x == -1 && pt.y == -1) {
                         int iCurrentPos =
-                            (int)SendMessage(hwndEdit, SCI_GETCURRENTPOS, 0, 0);
+                            (int) SendMessage(gDoc->hwndEdit, SCI_GETCURRENTPOS, 0, 0);
                         pt.x =
-                            (int)SendMessage(hwndEdit, SCI_POINTXFROMPOSITION,
+                            (int) SendMessage(gDoc->hwndEdit, SCI_POINTXFROMPOSITION,
                                              0, (LPARAM)iCurrentPos);
                         pt.y =
-                            (int)SendMessage(hwndEdit, SCI_POINTYFROMPOSITION,
+                            (int) SendMessage(gDoc->hwndEdit, SCI_POINTYFROMPOSITION,
                                              0, (LPARAM)iCurrentPos);
-                        ClientToScreen(hwndEdit, &pt);
+                        ClientToScreen(gDoc->hwndEdit, &pt);
                     }
                     imenu = 0;
                 } break;
@@ -1245,41 +1246,41 @@ MainWndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
                     MsgBox(MBYESNO, IDS_FILECHANGENOTIFY) == IDYES) {
 
                     int iCurPos =
-                        (int)SendMessage(hwndEdit, SCI_GETCURRENTPOS, 0, 0);
+                        (int) SendMessage(gDoc->hwndEdit, SCI_GETCURRENTPOS, 0, 0);
                     int iAnchorPos =
-                        (int)SendMessage(hwndEdit, SCI_GETANCHOR, 0, 0);
+                        (int) SendMessage(gDoc->hwndEdit, SCI_GETANCHOR, 0, 0);
                     int iVisTopLine = (int)SendMessage(
-                        hwndEdit, SCI_GETFIRSTVISIBLELINE, 0, 0);
+                        gDoc->hwndEdit, SCI_GETFIRSTVISIBLELINE, 0, 0);
                     int iDocTopLine =
-                        (int)SendMessage(hwndEdit, SCI_DOCLINEFROMVISIBLE,
+                        (int) SendMessage(gDoc->hwndEdit, SCI_DOCLINEFROMVISIBLE,
                                          (WPARAM)iVisTopLine, 0);
                     int iXOffset =
-                        (int)SendMessage(hwndEdit, SCI_GETXOFFSET, 0, 0);
+                        (int) SendMessage(gDoc->hwndEdit, SCI_GETXOFFSET, 0, 0);
                     BOOL bIsTail =
                         (iCurPos == iAnchorPos) &&
-                        (iCurPos == SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0));
+                        (iCurPos == SendMessage(gDoc->hwndEdit, SCI_GETLENGTH, 0, 0));
 
                     iWeakSrcEncoding = iEncoding;
                     if (FileLoad(TRUE, FALSE, TRUE, FALSE, szCurFile)) {
 
                         if (bIsTail && iFileWatchingMode == 2) {
-                            EditJumpTo(hwndEdit, -1, 0);
-                            EditEnsureSelectionVisible(hwndEdit);
-                        } else if (SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0) >=
+                            EditJumpTo(gDoc->hwndEdit, -1, 0);
+                            EditEnsureSelectionVisible(gDoc->hwndEdit);
+                        } else if (SendMessage(gDoc->hwndEdit, SCI_GETLENGTH, 0, 0) >=
                                    4) {
                             char tch[5] = "";
-                            SendMessage(hwndEdit, SCI_GETTEXT, 5, (LPARAM)tch);
+                            SendMessage(gDoc->hwndEdit, SCI_GETTEXT, 5, (LPARAM) tch);
                             if (lstrcmpiA(tch, ".LOG") != 0) {
                                 int iNewTopLine;
-                                SendMessage(hwndEdit, SCI_SETSEL, iAnchorPos,
+                                SendMessage(gDoc->hwndEdit, SCI_SETSEL, iAnchorPos,
                                             iCurPos);
-                                SendMessage(hwndEdit, SCI_ENSUREVISIBLE,
+                                SendMessage(gDoc->hwndEdit, SCI_ENSUREVISIBLE,
                                             (WPARAM)iDocTopLine, 0);
                                 iNewTopLine = (int)SendMessage(
-                                    hwndEdit, SCI_GETFIRSTVISIBLELINE, 0, 0);
-                                SendMessage(hwndEdit, SCI_LINESCROLL, 0,
+                                    gDoc->hwndEdit, SCI_GETFIRSTVISIBLELINE, 0, 0);
+                                SendMessage(gDoc->hwndEdit, SCI_LINESCROLL, 0,
                                             (LPARAM)iVisTopLine - iNewTopLine);
-                                SendMessage(hwndEdit, SCI_SETXOFFSET,
+                                SendMessage(gDoc->hwndEdit, SCI_SETXOFFSET,
                                             (WPARAM)iXOffset, 0);
                             }
                         }
@@ -1378,29 +1379,31 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wp, LPARAM lp) {
     CREATESTRUCTW* cs = (CREATESTRUCTW*) lp;
     HINSTANCE hInstance = cs->hInstance;
 
-    hwndEdit = EditCreate(hwnd);
-    InitScintillaHandle(hwndEdit);
+    CrashIf(gDoc);
+    gDoc = AllocMust<Document>();
+    gDoc->hwndEdit = EditCreate(hwnd);
+    InitScintillaHandle(gDoc->hwndEdit);
 
     // Tabs
-    SendMessage(hwndEdit, SCI_SETUSETABS, !bTabsAsSpaces, 0);
-    SendMessage(hwndEdit, SCI_SETTABINDENTS, bTabIndents, 0);
-    SendMessage(hwndEdit, SCI_SETBACKSPACEUNINDENTS, bBackspaceUnindents, 0);
-    SendMessage(hwndEdit, SCI_SETTABWIDTH, iTabWidth, 0);
-    SendMessage(hwndEdit, SCI_SETINDENT, iIndentWidth, 0);
+    SendMessage(gDoc->hwndEdit, SCI_SETUSETABS, !bTabsAsSpaces, 0);
+    SendMessage(gDoc->hwndEdit, SCI_SETTABINDENTS, bTabIndents, 0);
+    SendMessage(gDoc->hwndEdit, SCI_SETBACKSPACEUNINDENTS, bBackspaceUnindents, 0);
+    SendMessage(gDoc->hwndEdit, SCI_SETTABWIDTH, iTabWidth, 0);
+    SendMessage(gDoc->hwndEdit, SCI_SETINDENT, iIndentWidth, 0);
 
     // Indent Guides
-    Style_SetIndentGuides(hwndEdit, bShowIndentGuides);
+    Style_SetIndentGuides(gDoc->hwndEdit, bShowIndentGuides);
 
     // Word wrap
     if (!fWordWrap)
-        SendMessage(hwndEdit, SCI_SETWRAPMODE, SC_WRAP_NONE, 0);
+        SendMessage(gDoc->hwndEdit, SCI_SETWRAPMODE, SC_WRAP_NONE, 0);
     else
-        SendMessage(hwndEdit, SCI_SETWRAPMODE,
+        SendMessage(gDoc->hwndEdit, SCI_SETWRAPMODE,
                     (iWordWrapMode == 0) ? SC_WRAP_WORD : SC_WRAP_CHAR, 0);
     if (iWordWrapIndent == 5)
-        SendMessage(hwndEdit, SCI_SETWRAPINDENTMODE, SC_WRAPINDENT_SAME, 0);
+        SendMessage(gDoc->hwndEdit, SCI_SETWRAPINDENTMODE, SC_WRAPINDENT_SAME, 0);
     else if (iWordWrapIndent == 6)
-        SendMessage(hwndEdit, SCI_SETWRAPINDENTMODE, SC_WRAPINDENT_INDENT, 0);
+        SendMessage(gDoc->hwndEdit, SCI_SETWRAPINDENTMODE, SC_WRAPINDENT_INDENT, 0);
     else {
         int i = 0;
         switch (iWordWrapIndent) {
@@ -1417,8 +1420,8 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wp, LPARAM lp) {
                 i = (iIndentWidth) ? 2 * iIndentWidth : 2 * iTabWidth;
                 break;
         }
-        SendMessage(hwndEdit, SCI_SETWRAPSTARTINDENT, i, 0);
-        SendMessage(hwndEdit, SCI_SETWRAPINDENTMODE, SC_WRAPINDENT_FIXED, 0);
+        SendMessage(gDoc->hwndEdit, SCI_SETWRAPSTARTINDENT, i, 0);
+        SendMessage(gDoc->hwndEdit, SCI_SETWRAPINDENTMODE, SC_WRAPINDENT_FIXED, 0);
     }
     if (bShowWordWrapSymbols) {
         int wrapVisualFlags = 0;
@@ -1443,29 +1446,29 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wp, LPARAM lp) {
                 wrapVisualFlags |= SC_WRAPVISUALFLAG_START;
                 break;
         }
-        SendMessage(hwndEdit, SCI_SETWRAPVISUALFLAGSLOCATION,
+        SendMessage(gDoc->hwndEdit, SCI_SETWRAPVISUALFLAGSLOCATION,
                     wrapVisualFlagsLocation, 0);
-        SendMessage(hwndEdit, SCI_SETWRAPVISUALFLAGS, wrapVisualFlags, 0);
+        SendMessage(gDoc->hwndEdit, SCI_SETWRAPVISUALFLAGS, wrapVisualFlags, 0);
     } else {
-        SendMessage(hwndEdit, SCI_SETWRAPVISUALFLAGS, 0, 0);
+        SendMessage(gDoc->hwndEdit, SCI_SETWRAPVISUALFLAGS, 0, 0);
     }
 
     // Long Lines
     if (bMarkLongLines)
-        SendMessage(hwndEdit, SCI_SETEDGEMODE,
+        SendMessage(gDoc->hwndEdit, SCI_SETEDGEMODE,
                     (iLongLineMode == EDGE_LINE) ? EDGE_LINE : EDGE_BACKGROUND,
                     0);
     else
-        SendMessage(hwndEdit, SCI_SETEDGEMODE, EDGE_NONE, 0);
-    SendMessage(hwndEdit, SCI_SETEDGECOLUMN, iLongLinesLimit, 0);
+        SendMessage(gDoc->hwndEdit, SCI_SETEDGEMODE, EDGE_NONE, 0);
+    SendMessage(gDoc->hwndEdit, SCI_SETEDGECOLUMN, iLongLinesLimit, 0);
 
     // Margins
-    SendMessage(hwndEdit, SCI_SETMARGINWIDTHN, 2, 0);
-    SendMessage(hwndEdit, SCI_SETMARGINWIDTHN, 1,
+    SendMessage(gDoc->hwndEdit, SCI_SETMARGINWIDTHN, 2, 0);
+    SendMessage(gDoc->hwndEdit, SCI_SETMARGINWIDTHN, 1,
                 (bShowSelectionMargin) ? 16 : 0);
     UpdateLineNumberWidth();
-    // SendMessage(hwndEdit,SCI_SETMARGINWIDTHN,0,
-    //  (bShowLineNumbers)?SendMessage(hwndEdit,SCI_TEXTWIDTH,STYLE_LINENUMBER,(LPARAM)L"_999999_"):0);
+    // SendMessage(gDoc->hwndEdit,SCI_SETMARGINWIDTHN,0,
+    //  (bShowLineNumbers)?SendMessage(gDoc->hwndEdit,SCI_TEXTWIDTH,STYLE_LINENUMBER,(LPARAM)L"_999999_"):0);
 
     // Code folding
     SciCall_SetMarginType(MARGIN_FOLD_INDEX, SC_MARGIN_SYMBOL);
@@ -1482,9 +1485,9 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wp, LPARAM lp) {
     SciCall_SetFoldFlags(16);
 
     // Nonprinting characters
-    SendMessage(hwndEdit, SCI_SETVIEWWS,
+    SendMessage(gDoc->hwndEdit, SCI_SETVIEWWS,
                 (bViewWhiteSpace) ? SCWS_VISIBLEALWAYS : SCWS_INVISIBLE, 0);
-    SendMessage(hwndEdit, SCI_SETVIEWEOL, bViewEOLs, 0);
+    SendMessage(gDoc->hwndEdit, SCI_SETVIEWEOL, bViewEOLs, 0);
 
     hwndEditFrame = CreateWindowEx(
         WS_EX_CLIENTEDGE, WC_LISTVIEW, NULL,
@@ -1497,10 +1500,10 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wp, LPARAM lp) {
 
         bIsAppThemed = TRUE;
 
-        SetWindowLongPtr(hwndEdit, GWL_EXSTYLE,
-                         GetWindowLongPtr(hwndEdit, GWL_EXSTYLE) &
+        SetWindowLongPtr(gDoc->hwndEdit, GWL_EXSTYLE,
+            GetWindowLongPtr(gDoc->hwndEdit, GWL_EXSTYLE) &
                              ~WS_EX_CLIENTEDGE);
-        SetWindowPos(hwndEdit, NULL, 0, 0, 0, 0,
+        SetWindowPos(gDoc->hwndEdit, NULL, 0, 0, 0, 0,
                      SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
 
         if (IsVista()) {
@@ -1553,7 +1556,7 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wp, LPARAM lp) {
         MRU_Create(L"Recent Replace", (/*IsWindowsNT()*/ 1) ? MRU_UTF8 : 0, 16);
     MRU_Load(mruReplace);
 
-    if (hwndEdit == NULL || hwndEditFrame == NULL || hwndStatus == NULL ||
+    if (gDoc->hwndEdit == NULL || hwndEditFrame == NULL || hwndStatus == NULL ||
         hwndToolbar == NULL || hwndReBar == NULL)
         return (-1);
 
@@ -1759,10 +1762,10 @@ void MsgThemeChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
     if (PrivateIsAppThemed()) {
         bIsAppThemed = TRUE;
 
-        SetWindowLongPtr(hwndEdit, GWL_EXSTYLE,
-                         GetWindowLongPtr(hwndEdit, GWL_EXSTYLE) &
+        SetWindowLongPtr(gDoc->hwndEdit, GWL_EXSTYLE,
+            GetWindowLongPtr(gDoc->hwndEdit, GWL_EXSTYLE) &
                              ~WS_EX_CLIENTEDGE);
-        SetWindowPos(hwndEdit, NULL, 0, 0, 0, 0,
+        SetWindowPos(gDoc->hwndEdit, NULL, 0, 0, 0, 0,
                      SWP_NOZORDER | SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE);
 
         if (IsVista()) {
@@ -1781,10 +1784,10 @@ void MsgThemeChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
     } else {
         bIsAppThemed = FALSE;
 
-        SetWindowLongPtr(hwndEdit, GWL_EXSTYLE,
+        SetWindowLongPtr(gDoc->hwndEdit, GWL_EXSTYLE,
                          WS_EX_CLIENTEDGE |
-                             GetWindowLongPtr(hwndEdit, GWL_EXSTYLE));
-        SetWindowPos(hwndEdit, NULL, 0, 0, 0, 0,
+                         GetWindowLongPtr(gDoc->hwndEdit, GWL_EXSTYLE));
+        SetWindowPos(gDoc->hwndEdit, NULL, 0, 0, 0, 0,
                      SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
 
         cxEditFrame = 0;
@@ -1854,7 +1857,7 @@ void MsgSize(HWND hwnd, WPARAM wParam, LPARAM lParam) {
     DeferWindowPos(hdwp, hwndEditFrame, NULL, x, y, cx, cy,
                    SWP_NOZORDER | SWP_NOACTIVATE);
 
-    DeferWindowPos(hdwp, hwndEdit, NULL, x + cxEditFrame, y + cyEditFrame,
+    DeferWindowPos(hdwp, gDoc->hwndEdit, NULL, x + cxEditFrame, y + cyEditFrame,
                    cx - 2 * cxEditFrame, cy - 2 * cyEditFrame,
                    SWP_NOZORDER | SWP_NOACTIVATE);
 
@@ -1930,18 +1933,18 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
     EnableCmd(hmenu, IDM_FILE_RECENT, (MRU_Enum(pFileMRU, 0, NULL, 0) > 0));
 
     EnableCmd(hmenu, IDM_EDIT_UNDO,
-              SendMessage(hwndEdit, SCI_CANUNDO, 0, 0) /*&& !bReadOnly*/);
+        SendMessage(gDoc->hwndEdit, SCI_CANUNDO, 0, 0) /*&& !bReadOnly*/);
     EnableCmd(hmenu, IDM_EDIT_REDO,
-              SendMessage(hwndEdit, SCI_CANREDO, 0, 0) /*&& !bReadOnly*/);
+        SendMessage(gDoc->hwndEdit, SCI_CANREDO, 0, 0) /*&& !bReadOnly*/);
 
-    i = (int)SendMessage(hwndEdit, SCI_GETSELECTIONEND, 0, 0) -
-        (int)SendMessage(hwndEdit, SCI_GETSELECTIONSTART, 0, 0);
-    i2 = (int)SendMessage(hwndEdit, SCI_CANPASTE, 0, 0);
+    i = (int) SendMessage(gDoc->hwndEdit, SCI_GETSELECTIONEND, 0, 0) -
+        (int) SendMessage(gDoc->hwndEdit, SCI_GETSELECTIONSTART, 0, 0);
+    i2 = (int) SendMessage(gDoc->hwndEdit, SCI_CANPASTE, 0, 0);
 
     EnableCmd(hmenu, IDM_EDIT_CUT, i /*&& !bReadOnly*/);
     EnableCmd(hmenu, IDM_EDIT_COPY, i /*&& !bReadOnly*/);
     EnableCmd(hmenu, IDM_EDIT_COPYALL,
-              SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0) /*&& !bReadOnly*/);
+        SendMessage(gDoc->hwndEdit, SCI_GETLENGTH, 0, 0) /*&& !bReadOnly*/);
     EnableCmd(hmenu, IDM_EDIT_COPYADD, i /*&& !bReadOnly*/);
     EnableCmd(hmenu, IDM_EDIT_PASTE, i2 /*&& !bReadOnly*/);
     EnableCmd(hmenu, IDM_EDIT_SWAP, i || i2 /*&& !bReadOnly*/);
@@ -1970,11 +1973,11 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
     EnableCmd(hmenu, IDM_EDIT_SORTLINES,
               SendMessage(
-                  hwndEdit, SCI_LINEFROMPOSITION,
-                  (WPARAM)SendMessage(hwndEdit, SCI_GETSELECTIONEND, 0, 0), 0) -
-                      SendMessage(hwndEdit, SCI_LINEFROMPOSITION,
+              gDoc->hwndEdit, SCI_LINEFROMPOSITION,
+              (WPARAM) SendMessage(gDoc->hwndEdit, SCI_GETSELECTIONEND, 0, 0), 0) -
+              SendMessage(gDoc->hwndEdit, SCI_LINEFROMPOSITION,
                                   (WPARAM)SendMessage(
-                                      hwndEdit, SCI_GETSELECTIONSTART, 0, 0),
+                                  gDoc->hwndEdit, SCI_GETSELECTIONSTART, 0, 0),
                                   0) >=
                   1);
 
@@ -2011,7 +2014,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
     EnableCmd(hmenu, IDM_VIEW_SHOWEXCERPT, i);
 
-    i = (int)SendMessage(hwndEdit, SCI_GETLEXER, 0, 0);
+    i = (int) SendMessage(gDoc->hwndEdit, SCI_GETLEXER, 0, 0);
     EnableCmd(hmenu, IDM_EDIT_LINECOMMENT,
               !(i == SCLEX_NULL || i == SCLEX_CSS || i == SCLEX_DIFF));
     EnableCmd(hmenu, IDM_EDIT_STREAMCOMMENT,
@@ -2032,7 +2035,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
     // EnableCmd(hmenu,IDM_EDIT_INSERT_FILENAME,!bReadOnly);
     // EnableCmd(hmenu,IDM_EDIT_INSERT_PATHNAME,!bReadOnly);
 
-    i = (int)SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0);
+    i = (int)SendMessage(gDoc->hwndEdit, SCI_GETLENGTH, 0, 0);
     EnableCmd(hmenu, IDM_EDIT_FIND, i);
     EnableCmd(hmenu, IDM_EDIT_SAVEFIND, i);
     EnableCmd(hmenu, IDM_EDIT_FINDNEXT, i);
@@ -2052,7 +2055,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
     EnableCmd(hmenu, IDM_VIEW_TOGGLEFOLDS, i && bShowCodeFolding);
     CheckCmd(hmenu, IDM_VIEW_FOLDING, bShowCodeFolding);
 
-    CheckCmd(hmenu, IDM_VIEW_USE2NDDEFAULT, Style_GetUse2ndDefault(hwndEdit));
+    CheckCmd(hmenu, IDM_VIEW_USE2NDDEFAULT, Style_GetUse2ndDefault(gDoc->hwndEdit));
 
     CheckCmd(hmenu, IDM_VIEW_WORDWRAP, fWordWrap);
     CheckCmd(hmenu, IDM_VIEW_LONGLINEMARKER, bMarkLongLines);
@@ -2094,7 +2097,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
     EnableCmd(hmenu, IDM_VIEW_CUSTOMIZETB, bShowToolbar);
     CheckCmd(hmenu, IDM_VIEW_STATUSBAR, bShowStatusbar);
 
-    i = (int)SendMessage(hwndEdit, SCI_GETLEXER, 0, 0);
+    i = (int) SendMessage(gDoc->hwndEdit, SCI_GETLEXER, 0, 0);
     // EnableCmd(hmenu,IDM_VIEW_AUTOCLOSETAGS,(i == SCLEX_HTML || i ==
     // SCLEX_XML));
     CheckCmd(hmenu, IDM_VIEW_AUTOCLOSETAGS,
@@ -2172,14 +2175,14 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
                 WCHAR tchCurFile2[MAX_PATH];
 
                 int iCurPos =
-                    (int)SendMessage(hwndEdit, SCI_GETCURRENTPOS, 0, 0);
+                    (int) SendMessage(gDoc->hwndEdit, SCI_GETCURRENTPOS, 0, 0);
                 int iAnchorPos =
-                    (int)SendMessage(hwndEdit, SCI_GETANCHOR, 0, 0);
+                    (int) SendMessage(gDoc->hwndEdit, SCI_GETANCHOR, 0, 0);
                 int iVisTopLine =
-                    (int)SendMessage(hwndEdit, SCI_GETFIRSTVISIBLELINE, 0, 0);
+                    (int) SendMessage(gDoc->hwndEdit, SCI_GETFIRSTVISIBLELINE, 0, 0);
                 int iDocTopLine = (int)SendMessage(
-                    hwndEdit, SCI_DOCLINEFROMVISIBLE, (WPARAM)iVisTopLine, 0);
-                int iXOffset = (int)SendMessage(hwndEdit, SCI_GETXOFFSET, 0, 0);
+                    gDoc->hwndEdit, SCI_DOCLINEFROMVISIBLE, (WPARAM) iVisTopLine, 0);
+                int iXOffset = (int) SendMessage(gDoc->hwndEdit, SCI_GETXOFFSET, 0, 0);
 
                 if ((bModified || iEncoding != iOriginalEncoding) &&
                     MsgBox(MBOKCANCEL, IDS_ASK_REVERT) != IDOK)
@@ -2189,20 +2192,20 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
                 iWeakSrcEncoding = iEncoding;
                 if (FileLoad(TRUE, FALSE, TRUE, FALSE, tchCurFile2)) {
-                    if (SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0) >= 4) {
+                    if (SendMessage(gDoc->hwndEdit, SCI_GETLENGTH, 0, 0) >= 4) {
                         char tch[5] = "";
-                        SendMessage(hwndEdit, SCI_GETTEXT, 5, (LPARAM)tch);
+                        SendMessage(gDoc->hwndEdit, SCI_GETTEXT, 5, (LPARAM) tch);
                         if (lstrcmpiA(tch, ".LOG") != 0) {
                             int iNewTopLine;
-                            SendMessage(hwndEdit, SCI_SETSEL, iAnchorPos,
+                            SendMessage(gDoc->hwndEdit, SCI_SETSEL, iAnchorPos,
                                         iCurPos);
-                            SendMessage(hwndEdit, SCI_ENSUREVISIBLE,
+                            SendMessage(gDoc->hwndEdit, SCI_ENSUREVISIBLE,
                                         (WPARAM)iDocTopLine, 0);
                             iNewTopLine = (int)SendMessage(
-                                hwndEdit, SCI_GETFIRSTVISIBLELINE, 0, 0);
-                            SendMessage(hwndEdit, SCI_LINESCROLL, 0,
+                                gDoc->hwndEdit, SCI_GETFIRSTVISIBLELINE, 0, 0);
+                            SendMessage(gDoc->hwndEdit, SCI_LINESCROLL, 0,
                                         (LPARAM)iVisTopLine - iNewTopLine);
-                            SendMessage(hwndEdit, SCI_SETXOFFSET,
+                            SendMessage(gDoc->hwndEdit, SCI_SETXOFFSET,
                                         (WPARAM)iXOffset, 0);
                         }
                     }
@@ -2224,7 +2227,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
         case IDM_FILE_READONLY:
             // bReadOnly = (bReadOnly) ? FALSE : TRUE;
-            // SendMessage(hwndEdit,SCI_SETREADONLY,bReadOnly,0);
+            // SendMessage(gDoc->hwndEdit,SCI_SETREADONLY,bReadOnly,0);
             // UpdateToolbar();
             // UpdateStatusbar();
             if (lstrlen(szCurFile)) {
@@ -2433,7 +2436,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
             break;
 
         case IDM_FILE_PAGESETUP:
-            EditPrintSetup(hwndEdit);
+            EditPrintSetup(gDoc->hwndEdit);
             break;
 
         case IDM_FILE_PRINT: {
@@ -2453,7 +2456,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
             GetString(IDS_PRINT_PAGENUM, tchPageFmt, COUNTOF(tchPageFmt));
 
-            if (!EditPrint(hwndEdit, pszTitle, tchPageFmt))
+            if (!EditPrint(gDoc->hwndEdit, pszTitle, tchPageFmt))
                 MsgBox(MBWARN, IDS_PRINT_ERROR, pszTitle);
         } break;
 
@@ -2575,11 +2578,11 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
                 }
             }
 
-            if (EditSetNewEncoding(hwndEdit, iEncoding, iNewEncoding,
+            if (EditSetNewEncoding(gDoc->hwndEdit, iEncoding, iNewEncoding,
                                    (flagSetEncoding),
                                    lstrlen(szCurFile) == 0)) {
 
-                if (SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0) == 0) {
+                if (SendMessage(gDoc->hwndEdit, SCI_GETLENGTH, 0, 0) == 0) {
                     iEncoding = iNewEncoding;
                     iOriginalEncoding = iNewEncoding;
                 } else {
@@ -2636,9 +2639,9 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
             int iNewEOLMode =
                 iLineEndings[LOWORD(wParam) - IDM_LINEENDINGS_CRLF];
             iEOLMode = iNewEOLMode;
-            SendMessage(hwndEdit, SCI_SETEOLMODE, iEOLMode, 0);
-            SendMessage(hwndEdit, SCI_CONVERTEOLS, iEOLMode, 0);
-            EditFixPositions(hwndEdit);
+            SendMessage(gDoc->hwndEdit, SCI_SETEOLMODE, iEOLMode, 0);
+            SendMessage(gDoc->hwndEdit, SCI_CONVERTEOLS, iEOLMode, 0);
+            EditFixPositions(gDoc->hwndEdit);
             UpdateToolbar();
             UpdateStatusbar();
             SetWindowTitle(hwnd, uidsAppTitle, fIsElevated, IDS_UNTITLED,
@@ -2652,78 +2655,78 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
             break;
 
         case IDM_EDIT_UNDO:
-            SendMessage(hwndEdit, SCI_UNDO, 0, 0);
+            SendMessage(gDoc->hwndEdit, SCI_UNDO, 0, 0);
             break;
 
         case IDM_EDIT_REDO:
-            SendMessage(hwndEdit, SCI_REDO, 0, 0);
+            SendMessage(gDoc->hwndEdit, SCI_REDO, 0, 0);
             break;
 
         case IDM_EDIT_CUT:
             if (flagPasteBoard)
                 bLastCopyFromMe = TRUE;
-            SendMessage(hwndEdit, SCI_CUT, 0, 0);
+            SendMessage(gDoc->hwndEdit, SCI_CUT, 0, 0);
             break;
 
         case IDM_EDIT_COPY:
             if (flagPasteBoard)
                 bLastCopyFromMe = TRUE;
-            SendMessage(hwndEdit, SCI_COPY, 0, 0);
+            SendMessage(gDoc->hwndEdit, SCI_COPY, 0, 0);
             UpdateToolbar();
             break;
 
         case IDM_EDIT_COPYALL:
             if (flagPasteBoard)
                 bLastCopyFromMe = TRUE;
-            SendMessage(hwndEdit, SCI_COPYRANGE, 0,
-                        SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0));
+            SendMessage(gDoc->hwndEdit, SCI_COPYRANGE, 0,
+                SendMessage(gDoc->hwndEdit, SCI_GETLENGTH, 0, 0));
             UpdateToolbar();
             break;
 
         case IDM_EDIT_COPYADD:
             if (flagPasteBoard)
                 bLastCopyFromMe = TRUE;
-            EditCopyAppend(hwndEdit);
+            EditCopyAppend(gDoc->hwndEdit);
             UpdateToolbar();
             break;
 
         case IDM_EDIT_PASTE:
-            SendMessage(hwndEdit, SCI_PASTE, 0, 0);
+            SendMessage(gDoc->hwndEdit, SCI_PASTE, 0, 0);
             break;
 
         case IDM_EDIT_SWAP:
-            if (SendMessage(hwndEdit, SCI_GETSELECTIONEND, 0, 0) -
-                    SendMessage(hwndEdit, SCI_GETSELECTIONSTART, 0, 0) ==
+            if (SendMessage(gDoc->hwndEdit, SCI_GETSELECTIONEND, 0, 0) -
+                SendMessage(gDoc->hwndEdit, SCI_GETSELECTIONSTART, 0, 0) ==
                 0) {
                 int iNewPos;
-                int iPos = (int)SendMessage(hwndEdit, SCI_GETCURRENTPOS, 0, 0);
-                SendMessage(hwndEdit, SCI_PASTE, 0, 0);
-                iNewPos = (int)SendMessage(hwndEdit, SCI_GETCURRENTPOS, 0, 0);
-                SendMessage(hwndEdit, SCI_SETSEL, iPos, iNewPos);
+                int iPos = (int) SendMessage(gDoc->hwndEdit, SCI_GETCURRENTPOS, 0, 0);
+                SendMessage(gDoc->hwndEdit, SCI_PASTE, 0, 0);
+                iNewPos = (int) SendMessage(gDoc->hwndEdit, SCI_GETCURRENTPOS, 0, 0);
+                SendMessage(gDoc->hwndEdit, SCI_SETSEL, iPos, iNewPos);
                 SendMessage(hwnd, WM_COMMAND,
                             MAKELONG(IDM_EDIT_CLEARCLIPBOARD, 1), 0);
             } else {
-                int iPos = (int)SendMessage(hwndEdit, SCI_GETCURRENTPOS, 0, 0);
-                int iAnchor = (int)SendMessage(hwndEdit, SCI_GETANCHOR, 0, 0);
-                char *pClip = EditGetClipboardText(hwndEdit);
+                int iPos = (int) SendMessage(gDoc->hwndEdit, SCI_GETCURRENTPOS, 0, 0);
+                int iAnchor = (int) SendMessage(gDoc->hwndEdit, SCI_GETANCHOR, 0, 0);
+                char *pClip = EditGetClipboardText(gDoc->hwndEdit);
                 if (flagPasteBoard)
                     bLastCopyFromMe = TRUE;
-                SendMessage(hwndEdit, SCI_BEGINUNDOACTION, 0, 0);
-                SendMessage(hwndEdit, SCI_CUT, 0, 0);
-                SendMessage(hwndEdit, SCI_REPLACESEL, (WPARAM)0, (LPARAM)pClip);
+                SendMessage(gDoc->hwndEdit, SCI_BEGINUNDOACTION, 0, 0);
+                SendMessage(gDoc->hwndEdit, SCI_CUT, 0, 0);
+                SendMessage(gDoc->hwndEdit, SCI_REPLACESEL, (WPARAM) 0, (LPARAM) pClip);
                 if (iPos > iAnchor)
-                    SendMessage(hwndEdit, SCI_SETSEL, iAnchor,
+                    SendMessage(gDoc->hwndEdit, SCI_SETSEL, iAnchor,
                                 iAnchor + lstrlenA(pClip));
                 else
-                    SendMessage(hwndEdit, SCI_SETSEL, iPos + lstrlenA(pClip),
+                    SendMessage(gDoc->hwndEdit, SCI_SETSEL, iPos + lstrlenA(pClip),
                                 iPos);
-                SendMessage(hwndEdit, SCI_ENDUNDOACTION, 0, 0);
+                SendMessage(gDoc->hwndEdit, SCI_ENDUNDOACTION, 0, 0);
                 LocalFree(pClip);
             }
             break;
 
         case IDM_EDIT_CLEAR:
-            SendMessage(hwndEdit, SCI_CLEAR, 0, 0);
+            SendMessage(gDoc->hwndEdit, SCI_CLEAR, 0, 0);
             break;
 
         case IDM_EDIT_CLEARCLIPBOARD:
@@ -2738,224 +2741,224 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
             break;
 
         case IDM_EDIT_SELECTALL:
-            SendMessage(hwndEdit, SCI_SELECTALL, 0, 0);
-            // SendMessage(hwndEdit,SCI_SETSEL,0,(LPARAM)-1);
+            SendMessage(gDoc->hwndEdit, SCI_SELECTALL, 0, 0);
+            // SendMessage(gDoc->hwndEdit,SCI_SETSEL,0,(LPARAM)-1);
             break;
 
         case IDM_EDIT_SELECTWORD: {
-            int iSel = (int)SendMessage(hwndEdit, SCI_GETSELECTIONEND, 0, 0) -
-                       (int)SendMessage(hwndEdit, SCI_GETSELECTIONSTART, 0, 0);
+            int iSel = (int) SendMessage(gDoc->hwndEdit, SCI_GETSELECTIONEND, 0, 0) -
+                (int) SendMessage(gDoc->hwndEdit, SCI_GETSELECTIONSTART, 0, 0);
 
-            int iPos = (int)SendMessage(hwndEdit, SCI_GETCURRENTPOS, 0, 0);
+            int iPos = (int) SendMessage(gDoc->hwndEdit, SCI_GETCURRENTPOS, 0, 0);
 
             if (iSel == 0) {
 
                 int iWordStart = (int)SendMessage(
-                    hwndEdit, SCI_WORDSTARTPOSITION, iPos, TRUE);
+                    gDoc->hwndEdit, SCI_WORDSTARTPOSITION, iPos, TRUE);
                 int iWordEnd =
-                    (int)SendMessage(hwndEdit, SCI_WORDENDPOSITION, iPos, TRUE);
+                    (int) SendMessage(gDoc->hwndEdit, SCI_WORDENDPOSITION, iPos, TRUE);
 
                 if (iWordStart == iWordEnd) // we are in whitespace salad...
                 {
-                    iWordStart = (int)SendMessage(hwndEdit, SCI_WORDENDPOSITION,
+                    iWordStart = (int) SendMessage(gDoc->hwndEdit, SCI_WORDENDPOSITION,
                                                   iPos, FALSE);
-                    iWordEnd = (int)SendMessage(hwndEdit, SCI_WORDENDPOSITION,
+                    iWordEnd = (int) SendMessage(gDoc->hwndEdit, SCI_WORDENDPOSITION,
                                                 iWordStart, TRUE);
                     if (iWordStart != iWordEnd) {
                         // if (SCLEX_HTML ==
-                        // SendMessage(hwndEdit,SCI_GETLEXER,0,0) &&
+                        // SendMessage(gDoc->hwndEdit,SCI_GETLEXER,0,0) &&
                         //    SCE_HPHP_VARIABLE ==
-                        // SendMessage(hwndEdit,SCI_GETSTYLEAT,(WPARAM)iWordStart,0)
+                        // SendMessage(gDoc->hwndEdit,SCI_GETSTYLEAT,(WPARAM)iWordStart,0)
                         // &&
                         //    '$' ==
-                        // (char)SendMessage(hwndEdit,SCI_GETCHARAT,(WPARAM)iWordStart-1,0))
+                        // (char)SendMessage(gDoc->hwndEdit,SCI_GETCHARAT,(WPARAM)iWordStart-1,0))
                         //  iWordStart--;
-                        SendMessage(hwndEdit, SCI_SETSEL, iWordStart, iWordEnd);
+                        SendMessage(gDoc->hwndEdit, SCI_SETSEL, iWordStart, iWordEnd);
                     }
                 } else {
-                    // if (SCLEX_HTML == SendMessage(hwndEdit,SCI_GETLEXER,0,0)
+                    // if (SCLEX_HTML == SendMessage(gDoc->hwndEdit,SCI_GETLEXER,0,0)
                     // &&
                     //    SCE_HPHP_VARIABLE ==
-                    // SendMessage(hwndEdit,SCI_GETSTYLEAT,(WPARAM)iWordStart,0)
+                    // SendMessage(gDoc->hwndEdit,SCI_GETSTYLEAT,(WPARAM)iWordStart,0)
                     // &&
                     //    '$' ==
-                    // (char)SendMessage(hwndEdit,SCI_GETCHARAT,(WPARAM)iWordStart-1,0))
+                    // (char)SendMessage(gDoc->hwndEdit,SCI_GETCHARAT,(WPARAM)iWordStart-1,0))
                     //  iWordStart--;
-                    SendMessage(hwndEdit, SCI_SETSEL, iWordStart, iWordEnd);
+                    SendMessage(gDoc->hwndEdit, SCI_SETSEL, iWordStart, iWordEnd);
                 }
 
-                iSel = (int)SendMessage(hwndEdit, SCI_GETSELECTIONEND, 0, 0) -
-                       (int)SendMessage(hwndEdit, SCI_GETSELECTIONSTART, 0, 0);
+                iSel = (int) SendMessage(gDoc->hwndEdit, SCI_GETSELECTIONEND, 0, 0) -
+                    (int) SendMessage(gDoc->hwndEdit, SCI_GETSELECTIONSTART, 0, 0);
 
                 if (iSel == 0) {
-                    int iLine = (int)SendMessage(hwndEdit, SCI_LINEFROMPOSITION,
+                    int iLine = (int) SendMessage(gDoc->hwndEdit, SCI_LINEFROMPOSITION,
                                                  iPos, 0);
                     int iLineStart = (int)SendMessage(
-                        hwndEdit, SCI_GETLINEINDENTPOSITION, iLine, 0);
+                        gDoc->hwndEdit, SCI_GETLINEINDENTPOSITION, iLine, 0);
                     int iLineEnd = (int)SendMessage(
-                        hwndEdit, SCI_GETLINEENDPOSITION, iLine, 0);
-                    SendMessage(hwndEdit, SCI_SETSEL, iLineStart, iLineEnd);
+                        gDoc->hwndEdit, SCI_GETLINEENDPOSITION, iLine, 0);
+                    SendMessage(gDoc->hwndEdit, SCI_SETSEL, iLineStart, iLineEnd);
                 }
             } else {
                 int iLine =
-                    (int)SendMessage(hwndEdit, SCI_LINEFROMPOSITION, iPos, 0);
+                    (int) SendMessage(gDoc->hwndEdit, SCI_LINEFROMPOSITION, iPos, 0);
                 int iLineStart = (int)SendMessage(
-                    hwndEdit, SCI_GETLINEINDENTPOSITION, iLine, 0);
+                    gDoc->hwndEdit, SCI_GETLINEINDENTPOSITION, iLine, 0);
                 int iLineEnd = (int)SendMessage(
-                    hwndEdit, SCI_GETLINEENDPOSITION, iLine, 0);
-                SendMessage(hwndEdit, SCI_SETSEL, iLineStart, iLineEnd);
+                    gDoc->hwndEdit, SCI_GETLINEENDPOSITION, iLine, 0);
+                SendMessage(gDoc->hwndEdit, SCI_SETSEL, iLineStart, iLineEnd);
             }
         } break;
 
         case IDM_EDIT_SELECTLINE: {
             int iSelStart =
-                (int)SendMessage(hwndEdit, SCI_GETSELECTIONSTART, 0, 0);
-            int iSelEnd = (int)SendMessage(hwndEdit, SCI_GETSELECTIONEND, 0, 0);
+                (int) SendMessage(gDoc->hwndEdit, SCI_GETSELECTIONSTART, 0, 0);
+            int iSelEnd = (int) SendMessage(gDoc->hwndEdit, SCI_GETSELECTIONEND, 0, 0);
             int iLineStart =
-                (int)SendMessage(hwndEdit, SCI_LINEFROMPOSITION, iSelStart, 0);
+                (int) SendMessage(gDoc->hwndEdit, SCI_LINEFROMPOSITION, iSelStart, 0);
             int iLineEnd =
-                (int)SendMessage(hwndEdit, SCI_LINEFROMPOSITION, iSelEnd, 0);
+                (int) SendMessage(gDoc->hwndEdit, SCI_LINEFROMPOSITION, iSelEnd, 0);
             iSelStart =
-                (int)SendMessage(hwndEdit, SCI_POSITIONFROMLINE, iLineStart, 0);
-            iSelEnd = (int)SendMessage(hwndEdit, SCI_POSITIONFROMLINE,
+                (int) SendMessage(gDoc->hwndEdit, SCI_POSITIONFROMLINE, iLineStart, 0);
+            iSelEnd = (int) SendMessage(gDoc->hwndEdit, SCI_POSITIONFROMLINE,
                                        iLineEnd + 1, 0);
-            SendMessage(hwndEdit, SCI_SETSEL, iSelStart, iSelEnd);
-            SendMessage(hwndEdit, SCI_CHOOSECARETX, 0, 0);
+            SendMessage(gDoc->hwndEdit, SCI_SETSEL, iSelStart, iSelEnd);
+            SendMessage(gDoc->hwndEdit, SCI_CHOOSECARETX, 0, 0);
         } break;
 
         case IDM_EDIT_MOVELINEUP:
-            EditMoveUp(hwndEdit);
+            EditMoveUp(gDoc->hwndEdit);
             break;
 
         case IDM_EDIT_MOVELINEDOWN:
-            EditMoveDown(hwndEdit);
+            EditMoveDown(gDoc->hwndEdit);
             break;
 
         case IDM_EDIT_DUPLICATELINE:
-            SendMessage(hwndEdit, SCI_LINEDUPLICATE, 0, 0);
+            SendMessage(gDoc->hwndEdit, SCI_LINEDUPLICATE, 0, 0);
             break;
 
         case IDM_EDIT_CUTLINE:
             if (flagPasteBoard)
                 bLastCopyFromMe = TRUE;
-            SendMessage(hwndEdit, SCI_LINECUT, 0, 0);
+            SendMessage(gDoc->hwndEdit, SCI_LINECUT, 0, 0);
             break;
 
         case IDM_EDIT_COPYLINE:
             if (flagPasteBoard)
                 bLastCopyFromMe = TRUE;
-            SendMessage(hwndEdit, SCI_LINECOPY, 0, 0);
+            SendMessage(gDoc->hwndEdit, SCI_LINECOPY, 0, 0);
             UpdateToolbar();
             break;
 
         case IDM_EDIT_DELETELINE:
-            SendMessage(hwndEdit, SCI_LINEDELETE, 0, 0);
+            SendMessage(gDoc->hwndEdit, SCI_LINEDELETE, 0, 0);
             break;
 
         case IDM_EDIT_DELETELINELEFT:
-            SendMessage(hwndEdit, SCI_DELLINELEFT, 0, 0);
+            SendMessage(gDoc->hwndEdit, SCI_DELLINELEFT, 0, 0);
             break;
 
         case IDM_EDIT_DELETELINERIGHT:
-            SendMessage(hwndEdit, SCI_DELLINERIGHT, 0, 0);
+            SendMessage(gDoc->hwndEdit, SCI_DELLINERIGHT, 0, 0);
             break;
 
         case IDM_EDIT_INDENT: {
             int iLineSelStart = (int)SendMessage(
-                hwndEdit, SCI_LINEFROMPOSITION,
-                (int)SendMessage(hwndEdit, SCI_GETSELECTIONSTART, 0, 0), 0);
+                gDoc->hwndEdit, SCI_LINEFROMPOSITION,
+                (int) SendMessage(gDoc->hwndEdit, SCI_GETSELECTIONSTART, 0, 0), 0);
             int iLineSelEnd = (int)SendMessage(
-                hwndEdit, SCI_LINEFROMPOSITION,
-                (int)SendMessage(hwndEdit, SCI_GETSELECTIONEND, 0, 0), 0);
+                gDoc->hwndEdit, SCI_LINEFROMPOSITION,
+                (int) SendMessage(gDoc->hwndEdit, SCI_GETSELECTIONEND, 0, 0), 0);
 
-            SendMessage(hwndEdit, SCI_SETTABINDENTS, TRUE, 0);
+            SendMessage(gDoc->hwndEdit, SCI_SETTABINDENTS, TRUE, 0);
             if (iLineSelStart == iLineSelEnd) {
-                SendMessage(hwndEdit, SCI_VCHOME, 0, 0);
-                SendMessage(hwndEdit, SCI_TAB, 0, 0);
+                SendMessage(gDoc->hwndEdit, SCI_VCHOME, 0, 0);
+                SendMessage(gDoc->hwndEdit, SCI_TAB, 0, 0);
             } else
-                SendMessage(hwndEdit, SCI_TAB, 0, 0);
-            SendMessage(hwndEdit, SCI_SETTABINDENTS, bTabIndents, 0);
+                SendMessage(gDoc->hwndEdit, SCI_TAB, 0, 0);
+            SendMessage(gDoc->hwndEdit, SCI_SETTABINDENTS, bTabIndents, 0);
         } break;
 
         case IDM_EDIT_UNINDENT: {
             int iLineSelStart = (int)SendMessage(
-                hwndEdit, SCI_LINEFROMPOSITION,
-                (int)SendMessage(hwndEdit, SCI_GETSELECTIONSTART, 0, 0), 0);
+                gDoc->hwndEdit, SCI_LINEFROMPOSITION,
+                (int) SendMessage(gDoc->hwndEdit, SCI_GETSELECTIONSTART, 0, 0), 0);
             int iLineSelEnd = (int)SendMessage(
-                hwndEdit, SCI_LINEFROMPOSITION,
-                (int)SendMessage(hwndEdit, SCI_GETSELECTIONEND, 0, 0), 0);
+                gDoc->hwndEdit, SCI_LINEFROMPOSITION,
+                (int) SendMessage(gDoc->hwndEdit, SCI_GETSELECTIONEND, 0, 0), 0);
 
-            SendMessage(hwndEdit, SCI_SETTABINDENTS, TRUE, 0);
+            SendMessage(gDoc->hwndEdit, SCI_SETTABINDENTS, TRUE, 0);
             if (iLineSelStart == iLineSelEnd) {
-                SendMessage(hwndEdit, SCI_VCHOME, 0, 0);
-                SendMessage(hwndEdit, SCI_BACKTAB, 0, 0);
+                SendMessage(gDoc->hwndEdit, SCI_VCHOME, 0, 0);
+                SendMessage(gDoc->hwndEdit, SCI_BACKTAB, 0, 0);
             } else
-                SendMessage(hwndEdit, SCI_BACKTAB, 0, 0);
-            SendMessage(hwndEdit, SCI_SETTABINDENTS, bTabIndents, 0);
+                SendMessage(gDoc->hwndEdit, SCI_BACKTAB, 0, 0);
+            SendMessage(gDoc->hwndEdit, SCI_SETTABINDENTS, bTabIndents, 0);
         } break;
 
         case IDM_EDIT_ENCLOSESELECTION:
             if (EditEncloseSelectionDlg(hwnd, wchPrefixSelection,
                                         wchAppendSelection)) {
                 BeginWaitCursor();
-                EditEncloseSelection(hwndEdit, wchPrefixSelection,
+                EditEncloseSelection(gDoc->hwndEdit, wchPrefixSelection,
                                      wchAppendSelection);
                 EndWaitCursor();
             }
             break;
 
         case IDM_EDIT_SELECTIONDUPLICATE:
-            SendMessage(hwndEdit, SCI_BEGINUNDOACTION, 0, 0);
-            SendMessage(hwndEdit, SCI_SELECTIONDUPLICATE, 0, 0);
-            SendMessage(hwndEdit, SCI_ENDUNDOACTION, 0, 0);
+            SendMessage(gDoc->hwndEdit, SCI_BEGINUNDOACTION, 0, 0);
+            SendMessage(gDoc->hwndEdit, SCI_SELECTIONDUPLICATE, 0, 0);
+            SendMessage(gDoc->hwndEdit, SCI_ENDUNDOACTION, 0, 0);
             break;
 
         case IDM_EDIT_PADWITHSPACES:
             BeginWaitCursor();
-            EditPadWithSpaces(hwndEdit, FALSE, FALSE);
+            EditPadWithSpaces(gDoc->hwndEdit, FALSE, FALSE);
             EndWaitCursor();
             break;
 
         case IDM_EDIT_STRIP1STCHAR:
             BeginWaitCursor();
-            EditStripFirstCharacter(hwndEdit);
+            EditStripFirstCharacter(gDoc->hwndEdit);
             EndWaitCursor();
             break;
 
         case IDM_EDIT_STRIPLASTCHAR:
             BeginWaitCursor();
-            EditStripLastCharacter(hwndEdit);
+            EditStripLastCharacter(gDoc->hwndEdit);
             EndWaitCursor();
             break;
 
         case IDM_EDIT_TRIMLINES:
             BeginWaitCursor();
-            EditStripTrailingBlanks(hwndEdit, FALSE);
+            EditStripTrailingBlanks(gDoc->hwndEdit, FALSE);
             EndWaitCursor();
             break;
 
         case IDM_EDIT_COMPRESSWS:
             BeginWaitCursor();
-            EditCompressSpaces(hwndEdit);
+            EditCompressSpaces(gDoc->hwndEdit);
             EndWaitCursor();
             break;
 
         case IDM_EDIT_MERGEBLANKLINES:
             BeginWaitCursor();
-            EditRemoveBlankLines(hwndEdit, TRUE);
+            EditRemoveBlankLines(gDoc->hwndEdit, TRUE);
             EndWaitCursor();
             break;
 
         case IDM_EDIT_REMOVEBLANKLINES:
             BeginWaitCursor();
-            EditRemoveBlankLines(hwndEdit, FALSE);
+            EditRemoveBlankLines(gDoc->hwndEdit, FALSE);
             EndWaitCursor();
             break;
 
         case IDM_EDIT_MODIFYLINES:
             if (EditModifyLinesDlg(hwnd, wchPrefixLines, wchAppendLines)) {
                 BeginWaitCursor();
-                EditModifyLines(hwndEdit, wchPrefixLines, wchAppendLines);
+                EditModifyLines(gDoc->hwndEdit, wchPrefixLines, wchAppendLines);
                 EndWaitCursor();
             }
             break;
@@ -2963,7 +2966,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
         case IDM_EDIT_ALIGN:
             if (EditAlignDlg(hwnd, &iAlignMode)) {
                 BeginWaitCursor();
-                EditAlignText(hwndEdit, iAlignMode);
+                EditAlignText(gDoc->hwndEdit, iAlignMode);
                 EndWaitCursor();
             }
             break;
@@ -2975,7 +2978,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
                 StatusSetSimple(hwndStatus, TRUE);
                 InvalidateRect(hwndStatus, NULL, TRUE);
                 UpdateWindow(hwndStatus);
-                EditSortLines(hwndEdit, iSortOptions);
+                EditSortLines(gDoc->hwndEdit, iSortOptions);
                 StatusSetSimple(hwndStatus, FALSE);
                 EndWaitCursor();
             }
@@ -2988,83 +2991,83 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
             if (ColumnWrapDlg(hwnd, IDD_COLUMNWRAP, &iWrapCol)) {
                 iWrapCol = max(min(iWrapCol, 512), 1);
                 BeginWaitCursor();
-                EditWrapToColumn(hwndEdit, iWrapCol);
+                EditWrapToColumn(gDoc->hwndEdit, iWrapCol);
                 EndWaitCursor();
             }
         } break;
 
         case IDM_EDIT_SPLITLINES:
             BeginWaitCursor();
-            SendMessage(hwndEdit, SCI_TARGETFROMSELECTION, 0, 0);
-            SendMessage(hwndEdit, SCI_LINESSPLIT, 0, 0);
+            SendMessage(gDoc->hwndEdit, SCI_TARGETFROMSELECTION, 0, 0);
+            SendMessage(gDoc->hwndEdit, SCI_LINESSPLIT, 0, 0);
             EndWaitCursor();
             break;
 
         case IDM_EDIT_JOINLINES:
             BeginWaitCursor();
-            SendMessage(hwndEdit, SCI_TARGETFROMSELECTION, 0, 0);
-            SendMessage(hwndEdit, SCI_LINESJOIN, 0, 0);
-            EditJoinLinesEx(hwndEdit);
+            SendMessage(gDoc->hwndEdit, SCI_TARGETFROMSELECTION, 0, 0);
+            SendMessage(gDoc->hwndEdit, SCI_LINESJOIN, 0, 0);
+            EditJoinLinesEx(gDoc->hwndEdit);
             EndWaitCursor();
             break;
 
         case IDM_EDIT_JOINLINESEX:
             BeginWaitCursor();
-            EditJoinLinesEx(hwndEdit);
+            EditJoinLinesEx(gDoc->hwndEdit);
             EndWaitCursor();
             break;
 
         case IDM_EDIT_CONVERTUPPERCASE:
             BeginWaitCursor();
-            SendMessage(hwndEdit, SCI_UPPERCASE, 0, 0);
+            SendMessage(gDoc->hwndEdit, SCI_UPPERCASE, 0, 0);
             EndWaitCursor();
             break;
 
         case IDM_EDIT_CONVERTLOWERCASE:
             BeginWaitCursor();
-            SendMessage(hwndEdit, SCI_LOWERCASE, 0, 0);
+            SendMessage(gDoc->hwndEdit, SCI_LOWERCASE, 0, 0);
             EndWaitCursor();
             break;
 
         case IDM_EDIT_INVERTCASE:
             BeginWaitCursor();
-            EditInvertCase(hwndEdit);
+            EditInvertCase(gDoc->hwndEdit);
             EndWaitCursor();
             break;
 
         case IDM_EDIT_TITLECASE:
             BeginWaitCursor();
-            EditTitleCase(hwndEdit);
+            EditTitleCase(gDoc->hwndEdit);
             EndWaitCursor();
             break;
 
         case IDM_EDIT_SENTENCECASE:
             BeginWaitCursor();
-            EditSentenceCase(hwndEdit);
+            EditSentenceCase(gDoc->hwndEdit);
             EndWaitCursor();
             break;
 
         case IDM_EDIT_CONVERTTABS:
             BeginWaitCursor();
-            EditTabsToSpaces(hwndEdit, iTabWidth, FALSE);
+            EditTabsToSpaces(gDoc->hwndEdit, iTabWidth, FALSE);
             EndWaitCursor();
             break;
 
         case IDM_EDIT_CONVERTSPACES:
             BeginWaitCursor();
-            EditSpacesToTabs(hwndEdit, iTabWidth, FALSE);
+            EditSpacesToTabs(gDoc->hwndEdit, iTabWidth, FALSE);
             EndWaitCursor();
             break;
 
         case IDM_EDIT_CONVERTTABS2:
             BeginWaitCursor();
-            EditTabsToSpaces(hwndEdit, iTabWidth, TRUE);
+            EditTabsToSpaces(gDoc->hwndEdit, iTabWidth, TRUE);
             EndWaitCursor();
             break;
 
         case IDM_EDIT_CONVERTSPACES2:
             BeginWaitCursor();
-            EditSpacesToTabs(hwndEdit, iTabWidth, TRUE);
+            EditSpacesToTabs(gDoc->hwndEdit, iTabWidth, TRUE);
             EndWaitCursor();
             break;
 
@@ -3072,7 +3075,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
             WCHAR wszOpen[256] = L"";
             WCHAR wszClose[256] = L"";
             if (EditInsertTagDlg(hwnd, wszOpen, wszClose))
-                EditEncloseSelection(hwndEdit, wszOpen, wszClose);
+                EditEncloseSelection(gDoc->hwndEdit, wszOpen, wszClose);
         } break;
 
         case IDM_EDIT_INSERT_ENCODING: {
@@ -3084,9 +3087,9 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
                           COUNTOF(msz));
                 if (p = StrChrA(msz, ','))
                     *p = 0;
-                // iSelStart = SendMessage(hwndEdit,SCI_GETSELECTIONSTART,0,0);
-                SendMessage(hwndEdit, SCI_REPLACESEL, 0, (LPARAM)msz);
-                // SendMessage(hwndEdit,SCI_SETANCHOR,(WPARAM)iSelStart,0);
+                // iSelStart = SendMessage(gDoc->hwndEdit,SCI_GETSELECTIONSTART,0,0);
+                SendMessage(gDoc->hwndEdit, SCI_REPLACESEL, 0, (LPARAM) msz);
+                // SendMessage(gDoc->hwndEdit,SCI_SETANCHOR,(WPARAM)iSelStart,0);
             }
         } break;
 
@@ -3131,14 +3134,14 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
                 wsprintf(tchDateTime, L"%s %s", tchTime, tchDate);
             }
 
-            uCP = (SendMessage(hwndEdit, SCI_GETCODEPAGE, 0, 0) == SC_CP_UTF8)
+            uCP = (SendMessage(gDoc->hwndEdit, SCI_GETCODEPAGE, 0, 0) == SC_CP_UTF8)
                       ? CP_UTF8
                       : CP_ACP;
             WideCharToMultiByte(uCP, 0, tchDateTime, -1, mszBuf,
                                 COUNTOF(mszBuf), NULL, NULL);
-            // iSelStart = SendMessage(hwndEdit,SCI_GETSELECTIONSTART,0,0);
-            SendMessage(hwndEdit, SCI_REPLACESEL, 0, (LPARAM)mszBuf);
-            // SendMessage(hwndEdit,SCI_SETANCHOR,(WPARAM)iSelStart,0);
+            // iSelStart = SendMessage(gDoc->hwndEdit,SCI_GETSELECTIONSTART,0,0);
+            SendMessage(gDoc->hwndEdit, SCI_REPLACESEL, 0, (LPARAM) mszBuf);
+            // SendMessage(gDoc->hwndEdit,SCI_SETANCHOR,(WPARAM)iSelStart,0);
         } break;
 
         case IDM_EDIT_INSERT_FILENAME:
@@ -3162,18 +3165,18 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
                 pszInsert = tchUntitled;
             }
 
-            uCP = (SendMessage(hwndEdit, SCI_GETCODEPAGE, 0, 0) == SC_CP_UTF8)
+            uCP = (SendMessage(gDoc->hwndEdit, SCI_GETCODEPAGE, 0, 0) == SC_CP_UTF8)
                       ? CP_UTF8
                       : CP_ACP;
             WideCharToMultiByte(uCP, 0, pszInsert, -1, mszBuf, COUNTOF(mszBuf),
                                 NULL, NULL);
-            // iSelStart = SendMessage(hwndEdit,SCI_GETSELECTIONSTART,0,0);
-            SendMessage(hwndEdit, SCI_REPLACESEL, 0, (LPARAM)mszBuf);
-            // SendMessage(hwndEdit,SCI_SETANCHOR,(WPARAM)iSelStart,0);
+            // iSelStart = SendMessage(gDoc->hwndEdit,SCI_GETSELECTIONSTART,0,0);
+            SendMessage(gDoc->hwndEdit, SCI_REPLACESEL, 0, (LPARAM) mszBuf);
+            // SendMessage(gDoc->hwndEdit,SCI_SETANCHOR,(WPARAM)iSelStart,0);
         } break;
 
         case IDM_EDIT_LINECOMMENT:
-            switch (SendMessage(hwndEdit, SCI_GETLEXER, 0, 0)) {
+            switch (SendMessage(gDoc->hwndEdit, SCI_GETLEXER, 0, 0)) {
                 case SCLEX_NULL:
                 case SCLEX_CSS:
                 case SCLEX_DIFF:
@@ -3184,13 +3187,13 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
                 case SCLEX_CPP:
                 case SCLEX_PASCAL:
                     BeginWaitCursor();
-                    EditToggleLineComments(hwndEdit, L"//", FALSE);
+                    EditToggleLineComments(gDoc->hwndEdit, L"//", FALSE);
                     EndWaitCursor();
                     break;
                 case SCLEX_VBSCRIPT:
                 case SCLEX_VB:
                     BeginWaitCursor();
-                    EditToggleLineComments(hwndEdit, L"'", FALSE);
+                    EditToggleLineComments(gDoc->hwndEdit, L"'", FALSE);
                     EndWaitCursor();
                     break;
                 case SCLEX_MAKEFILE:
@@ -3205,7 +3208,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
                 case SCLEX_AVS:
                 case SCLEX_YAML:
                     BeginWaitCursor();
-                    EditToggleLineComments(hwndEdit, L"#", TRUE);
+                    EditToggleLineComments(gDoc->hwndEdit, L"#", TRUE);
                     EndWaitCursor();
                     break;
                 case SCLEX_ASM:
@@ -3215,31 +3218,31 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
                 case SCLEX_NSIS: // # could also be used instead
                 case SCLEX_INNOSETUP:
                     BeginWaitCursor();
-                    EditToggleLineComments(hwndEdit, L";", TRUE);
+                    EditToggleLineComments(gDoc->hwndEdit, L";", TRUE);
                     EndWaitCursor();
                     break;
                 case SCLEX_SQL:
                 case SCLEX_LUA:
                 case SCLEX_VHDL:
                     BeginWaitCursor();
-                    EditToggleLineComments(hwndEdit, L"--", TRUE);
+                    EditToggleLineComments(gDoc->hwndEdit, L"--", TRUE);
                     EndWaitCursor();
                     break;
                 case SCLEX_BATCH:
                     BeginWaitCursor();
-                    EditToggleLineComments(hwndEdit, L"rem ", TRUE);
+                    EditToggleLineComments(gDoc->hwndEdit, L"rem ", TRUE);
                     EndWaitCursor();
                     break;
                 case SCLEX_LATEX:
                     BeginWaitCursor();
-                    EditToggleLineComments(hwndEdit, L"%", TRUE);
+                    EditToggleLineComments(gDoc->hwndEdit, L"%", TRUE);
                     EndWaitCursor();
                     break;
             }
             break;
 
         case IDM_EDIT_STREAMCOMMENT:
-            switch (SendMessage(hwndEdit, SCI_GETLEXER, 0, 0)) {
+            switch (SendMessage(gDoc->hwndEdit, SCI_GETLEXER, 0, 0)) {
                 case SCLEX_NULL:
                 case SCLEX_VBSCRIPT:
                 case SCLEX_MAKEFILE:
@@ -3270,105 +3273,105 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
                 case SCLEX_NSIS:
                 case SCLEX_AVS:
                 case SCLEX_VHDL:
-                    EditEncloseSelection(hwndEdit, L"/*", L"*/");
+                    EditEncloseSelection(gDoc->hwndEdit, L"/*", L"*/");
                     break;
                 case SCLEX_PASCAL:
                 case SCLEX_INNOSETUP:
-                    EditEncloseSelection(hwndEdit, L"{", L"}");
+                    EditEncloseSelection(gDoc->hwndEdit, L"{", L"}");
                     break;
                 case SCLEX_LUA:
-                    EditEncloseSelection(hwndEdit, L"--[[", L"]]");
+                    EditEncloseSelection(gDoc->hwndEdit, L"--[[", L"]]");
             }
             break;
 
         case IDM_EDIT_URLENCODE:
             BeginWaitCursor();
-            EditURLEncode(hwndEdit);
+            EditURLEncode(gDoc->hwndEdit);
             EndWaitCursor();
             break;
 
         case IDM_EDIT_URLDECODE:
             BeginWaitCursor();
-            EditURLDecode(hwndEdit);
+            EditURLDecode(gDoc->hwndEdit);
             EndWaitCursor();
             break;
 
         case IDM_EDIT_ESCAPECCHARS:
             BeginWaitCursor();
-            EditEscapeCChars(hwndEdit);
+            EditEscapeCChars(gDoc->hwndEdit);
             EndWaitCursor();
             break;
 
         case IDM_EDIT_UNESCAPECCHARS:
             BeginWaitCursor();
-            EditUnescapeCChars(hwndEdit);
+            EditUnescapeCChars(gDoc->hwndEdit);
             EndWaitCursor();
             break;
 
         case IDM_EDIT_CHAR2HEX:
             BeginWaitCursor();
-            EditChar2Hex(hwndEdit);
+            EditChar2Hex(gDoc->hwndEdit);
             EndWaitCursor();
             break;
 
         case IDM_EDIT_HEX2CHAR:
             BeginWaitCursor();
-            EditHex2Char(hwndEdit);
+            EditHex2Char(gDoc->hwndEdit);
             EndWaitCursor();
             break;
 
         case IDM_EDIT_FINDMATCHINGBRACE: {
             int iBrace2 = -1;
-            int iPos = (int)SendMessage(hwndEdit, SCI_GETCURRENTPOS, 0, 0);
-            char c = (char)SendMessage(hwndEdit, SCI_GETCHARAT, iPos, 0);
+            int iPos = (int) SendMessage(gDoc->hwndEdit, SCI_GETCURRENTPOS, 0, 0);
+            char c = (char) SendMessage(gDoc->hwndEdit, SCI_GETCHARAT, iPos, 0);
             if (StrChrA("()[]{}", c))
-                iBrace2 = (int)SendMessage(hwndEdit, SCI_BRACEMATCH, iPos, 0);
+                iBrace2 = (int) SendMessage(gDoc->hwndEdit, SCI_BRACEMATCH, iPos, 0);
             // Try one before
             else {
-                iPos = (int)SendMessage(hwndEdit, SCI_POSITIONBEFORE, iPos, 0);
-                c = (char)SendMessage(hwndEdit, SCI_GETCHARAT, iPos, 0);
+                iPos = (int) SendMessage(gDoc->hwndEdit, SCI_POSITIONBEFORE, iPos, 0);
+                c = (char) SendMessage(gDoc->hwndEdit, SCI_GETCHARAT, iPos, 0);
                 if (StrChrA("()[]{}", c))
                     iBrace2 =
-                        (int)SendMessage(hwndEdit, SCI_BRACEMATCH, iPos, 0);
+                    (int) SendMessage(gDoc->hwndEdit, SCI_BRACEMATCH, iPos, 0);
             }
             if (iBrace2 != -1)
-                SendMessage(hwndEdit, SCI_GOTOPOS, (WPARAM)iBrace2, 0);
+                SendMessage(gDoc->hwndEdit, SCI_GOTOPOS, (WPARAM) iBrace2, 0);
         } break;
 
         case IDM_EDIT_SELTOMATCHINGBRACE: {
             int iBrace2 = -1;
-            int iPos = (int)SendMessage(hwndEdit, SCI_GETCURRENTPOS, 0, 0);
-            char c = (char)SendMessage(hwndEdit, SCI_GETCHARAT, iPos, 0);
+            int iPos = (int) SendMessage(gDoc->hwndEdit, SCI_GETCURRENTPOS, 0, 0);
+            char c = (char) SendMessage(gDoc->hwndEdit, SCI_GETCHARAT, iPos, 0);
             if (StrChrA("()[]{}", c))
-                iBrace2 = (int)SendMessage(hwndEdit, SCI_BRACEMATCH, iPos, 0);
+                iBrace2 = (int) SendMessage(gDoc->hwndEdit, SCI_BRACEMATCH, iPos, 0);
             // Try one before
             else {
-                iPos = (int)SendMessage(hwndEdit, SCI_POSITIONBEFORE, iPos, 0);
-                c = (char)SendMessage(hwndEdit, SCI_GETCHARAT, iPos, 0);
+                iPos = (int) SendMessage(gDoc->hwndEdit, SCI_POSITIONBEFORE, iPos, 0);
+                c = (char) SendMessage(gDoc->hwndEdit, SCI_GETCHARAT, iPos, 0);
                 if (StrChrA("()[]{}", c))
                     iBrace2 =
-                        (int)SendMessage(hwndEdit, SCI_BRACEMATCH, iPos, 0);
+                    (int) SendMessage(gDoc->hwndEdit, SCI_BRACEMATCH, iPos, 0);
             }
             if (iBrace2 != -1) {
                 if (iBrace2 > iPos)
-                    SendMessage(hwndEdit, SCI_SETSEL, (WPARAM)iPos,
+                    SendMessage(gDoc->hwndEdit, SCI_SETSEL, (WPARAM) iPos,
                                 (LPARAM)iBrace2 + 1);
                 else
-                    SendMessage(hwndEdit, SCI_SETSEL, (WPARAM)iPos + 1,
+                    SendMessage(gDoc->hwndEdit, SCI_SETSEL, (WPARAM) iPos + 1,
                                 (LPARAM)iBrace2);
             }
         } break;
 
         case IDM_EDIT_FIND:
             if (!IsWindow(hDlgFindReplace))
-                hDlgFindReplace = EditFindReplaceDlg(hwndEdit, &efrData, FALSE);
+                hDlgFindReplace = EditFindReplaceDlg(gDoc->hwndEdit, &efrData, FALSE);
             else {
                 if (GetDlgItem(hDlgFindReplace, IDC_REPLACE)) {
                     SendMessage(hDlgFindReplace, WM_COMMAND,
                                 MAKELONG(IDMSG_SWITCHTOFIND, 1), 0);
                     DestroyWindow(hDlgFindReplace);
                     hDlgFindReplace =
-                        EditFindReplaceDlg(hwndEdit, &efrData, FALSE);
+                        EditFindReplaceDlg(gDoc->hwndEdit, &efrData, FALSE);
                 } else {
                     SetForegroundWindow(hDlgFindReplace);
                     PostMessage(
@@ -3382,21 +3385,21 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
         // Main Bookmark Functions
         // case IDM_EDIT_BOOKMARKNEXT:
         case BME_EDIT_BOOKMARKNEXT: {
-            int iPos = (int)SendMessage(hwndEdit, SCI_GETCURRENTPOS, 0, 0);
+            int iPos = (int) SendMessage(gDoc->hwndEdit, SCI_GETCURRENTPOS, 0, 0);
             int iLine =
-                (int)SendMessage(hwndEdit, SCI_LINEFROMPOSITION, iPos, 0);
+                (int) SendMessage(gDoc->hwndEdit, SCI_LINEFROMPOSITION, iPos, 0);
 
             int bitmask = 1;
             int iNextLine =
-                (int)SendMessage(hwndEdit, SCI_MARKERNEXT, iLine + 1, bitmask);
+                (int) SendMessage(gDoc->hwndEdit, SCI_MARKERNEXT, iLine + 1, bitmask);
             if (iNextLine == -1) {
                 iNextLine =
-                    (int)SendMessage(hwndEdit, SCI_MARKERNEXT, 0, bitmask);
+                    (int) SendMessage(gDoc->hwndEdit, SCI_MARKERNEXT, 0, bitmask);
             }
 
             if (iNextLine != -1) {
                 SciCall_EnsureVisible(iNextLine);
-                SendMessage(hwndEdit, SCI_GOTOLINE, iNextLine, 0);
+                SendMessage(gDoc->hwndEdit, SCI_GOTOLINE, iNextLine, 0);
                 SciCall_SetYCaretPolicy(CARET_SLOP | CARET_STRICT | CARET_EVEN,
                                         10);
                 SciCall_ScrollCaret();
@@ -3407,22 +3410,22 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
         // case IMD_EDIT_BOOKMARKPREV:
         case BME_EDIT_BOOKMARKPREV: {
-            int iPos = (int)SendMessage(hwndEdit, SCI_GETCURRENTPOS, 0, 0);
+            int iPos = (int) SendMessage(gDoc->hwndEdit, SCI_GETCURRENTPOS, 0, 0);
             int iLine =
-                (int)SendMessage(hwndEdit, SCI_LINEFROMPOSITION, iPos, 0);
+                (int) SendMessage(gDoc->hwndEdit, SCI_LINEFROMPOSITION, iPos, 0);
 
             int bitmask = 1;
-            int iNextLine = (int)SendMessage(hwndEdit, SCI_MARKERPREVIOUS,
+            int iNextLine = (int) SendMessage(gDoc->hwndEdit, SCI_MARKERPREVIOUS,
                                              iLine - 1, bitmask);
             if (iNextLine == -1) {
-                int nLines = (int)SendMessage(hwndEdit, SCI_GETLINECOUNT, 0, 0);
-                iNextLine = (int)SendMessage(hwndEdit, SCI_MARKERPREVIOUS,
+                int nLines = (int) SendMessage(gDoc->hwndEdit, SCI_GETLINECOUNT, 0, 0);
+                iNextLine = (int) SendMessage(gDoc->hwndEdit, SCI_MARKERPREVIOUS,
                                              nLines, bitmask);
             }
 
             if (iNextLine != -1) {
                 SciCall_EnsureVisible(iNextLine);
-                SendMessage(hwndEdit, SCI_GOTOLINE, iNextLine, 0);
+                SendMessage(gDoc->hwndEdit, SCI_GOTOLINE, iNextLine, 0);
                 SciCall_SetYCaretPolicy(CARET_SLOP | CARET_STRICT | CARET_EVEN,
                                         10);
                 SciCall_ScrollCaret();
@@ -3434,42 +3437,42 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
         // case IDM_EDIT_BOOKMARKTOGGLE:
         case BME_EDIT_BOOKMARKTOGGLE: {
-            int iPos = (int)SendMessage(hwndEdit, SCI_GETCURRENTPOS, 0, 0);
+            int iPos = (int) SendMessage(gDoc->hwndEdit, SCI_GETCURRENTPOS, 0, 0);
             int iLine =
-                (int)SendMessage(hwndEdit, SCI_LINEFROMPOSITION, iPos, 0);
+                (int) SendMessage(gDoc->hwndEdit, SCI_LINEFROMPOSITION, iPos, 0);
 
-            int bitmask = (int)SendMessage(hwndEdit, SCI_MARKERGET, iLine, 0);
+            int bitmask = (int) SendMessage(gDoc->hwndEdit, SCI_MARKERGET, iLine, 0);
             if (bitmask & 1) {
                 // unset
-                SendMessage(hwndEdit, SCI_MARKERDELETE, iLine, 0);
+                SendMessage(gDoc->hwndEdit, SCI_MARKERDELETE, iLine, 0);
             } else {
                 // define (behöver bara göra detta en gång egentligen)
-                // SendMessage( hwndEdit , SCI_MARKERSETBACK , 0 , 74 | (203 <<
+                // SendMessage( gDoc->hwndEdit , SCI_MARKERSETBACK , 0 , 74 | (203 <<
                 // 8) | (0 << 16) ); //behöver bara göra detta en gång
                 // egentligen
-                // SendMessage( hwndEdit , SCI_MARKERDEFINE , 0 , SC_MARK_ARROWS
+                // SendMessage( gDoc->hwndEdit , SCI_MARKERDEFINE , 0 , SC_MARK_ARROWS
                 // );    //behöver bara göra detta en gång egentligen
 
                 if (bShowSelectionMargin) {
-                    SendMessage(hwndEdit, SCI_MARKERDEFINEPIXMAP, 0,
+                    SendMessage(gDoc->hwndEdit, SCI_MARKERDEFINEPIXMAP, 0,
                                 (LPARAM)bookmark_pixmap);
                 } else {
-                    SendMessage(hwndEdit, SCI_MARKERSETBACK, 0, 0xff << 8);
-                    SendMessage(hwndEdit, SCI_MARKERSETALPHA, 0, 20);
-                    SendMessage(hwndEdit, SCI_MARKERDEFINE, 0,
+                    SendMessage(gDoc->hwndEdit, SCI_MARKERSETBACK, 0, 0xff << 8);
+                    SendMessage(gDoc->hwndEdit, SCI_MARKERSETALPHA, 0, 20);
+                    SendMessage(gDoc->hwndEdit, SCI_MARKERDEFINE, 0,
                                 SC_MARK_BACKGROUND);
                 }
 
-                // SendMessage( hwndEdit , SCI_MARKERSETBACK , 0 , 180 | (255 <<
+                // SendMessage( gDoc->hwndEdit , SCI_MARKERSETBACK , 0 , 180 | (255 <<
                 // 8) | (180 << 16) ); //behöver bara göra detta en gång
                 // egentligen
-                // SendMessage( hwndEdit , SCI_MARKERDEFINE , 0 ,
+                // SendMessage( gDoc->hwndEdit , SCI_MARKERDEFINE , 0 ,
                 // SC_MARK_BACKGROUND );    //behöver bara göra detta en gång
                 // egentligen
 
                 // set
-                SendMessage(hwndEdit, SCI_MARKERADD, iLine, 0);
-                // SendMessage( hwndEdit , SCI_MARKERADD , iLine , 1 );
+                SendMessage(gDoc->hwndEdit, SCI_MARKERADD, iLine, 0);
+                // SendMessage( gDoc->hwndEdit , SCI_MARKERADD , iLine , 1 );
             }
 
             break;
@@ -3477,7 +3480,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
         // case IDM_EDIT_BOOKMARKCLEAR:
         case BME_EDIT_BOOKMARKCLEAR: {
-            SendMessage(hwndEdit, SCI_MARKERDELETEALL, -1, 0);
+            SendMessage(gDoc->hwndEdit, SCI_MARKERDELETEALL, -1, 0);
 
             break;
         }
@@ -3489,7 +3492,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
         case IDM_EDIT_SELTONEXT:
         case IDM_EDIT_SELTOPREV:
 
-            if (SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0) == 0)
+            if (SendMessage(gDoc->hwndEdit, SCI_GETLENGTH, 0, 0) == 0)
                 break;
 
             if (!lstrlenA(efrData.szFind)) {
@@ -3501,7 +3504,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
                                 0);
             } else {
 
-                UINT cp = (UINT)SendMessage(hwndEdit, SCI_GETCODEPAGE, 0, 0);
+                UINT cp = (UINT) SendMessage(gDoc->hwndEdit, SCI_GETCODEPAGE, 0, 0);
                 if (cpLastFind != cp) {
                     if (cp != SC_CP_UTF8) {
 
@@ -3528,46 +3531,46 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
                 switch (LOWORD(wParam)) {
 
                     case IDM_EDIT_FINDNEXT:
-                        EditFindNext(hwndEdit, &efrData, FALSE);
+                        EditFindNext(gDoc->hwndEdit, &efrData, FALSE);
                         break;
 
                     case IDM_EDIT_FINDPREV:
-                        EditFindPrev(hwndEdit, &efrData, FALSE);
+                        EditFindPrev(gDoc->hwndEdit, &efrData, FALSE);
                         break;
 
                     case IDM_EDIT_REPLACENEXT:
                         if (bReplaceInitialized)
-                            EditReplace(hwndEdit, &efrData);
+                            EditReplace(gDoc->hwndEdit, &efrData);
                         else
                             SendMessage(hwnd, WM_COMMAND,
                                         MAKELONG(IDM_EDIT_REPLACE, 1), 0);
                         break;
 
                     case IDM_EDIT_SELTONEXT:
-                        EditFindNext(hwndEdit, &efrData, TRUE);
+                        EditFindNext(gDoc->hwndEdit, &efrData, TRUE);
                         break;
 
                     case IDM_EDIT_SELTOPREV:
-                        EditFindPrev(hwndEdit, &efrData, TRUE);
+                        EditFindPrev(gDoc->hwndEdit, &efrData, TRUE);
                         break;
                 }
             }
             break;
 
         case IDM_EDIT_COMPLETEWORD:
-            CompleteWord(hwndEdit, TRUE);
+            CompleteWord(gDoc->hwndEdit, TRUE);
             break;
 
         case IDM_EDIT_REPLACE:
             if (!IsWindow(hDlgFindReplace))
-                hDlgFindReplace = EditFindReplaceDlg(hwndEdit, &efrData, TRUE);
+                hDlgFindReplace = EditFindReplaceDlg(gDoc->hwndEdit, &efrData, TRUE);
             else {
                 if (!GetDlgItem(hDlgFindReplace, IDC_REPLACE)) {
                     SendMessage(hDlgFindReplace, WM_COMMAND,
                                 MAKELONG(IDMSG_SWITCHTOREPLACE, 1), 0);
                     DestroyWindow(hDlgFindReplace);
                     hDlgFindReplace =
-                        EditFindReplaceDlg(hwndEdit, &efrData, TRUE);
+                        EditFindReplaceDlg(gDoc->hwndEdit, &efrData, TRUE);
                 } else {
                     SetForegroundWindow(hDlgFindReplace);
                     PostMessage(
@@ -3578,29 +3581,29 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
             break;
 
         case IDM_EDIT_GOTOLINE:
-            EditLinenumDlg(hwndEdit);
+            EditLinenumDlg(gDoc->hwndEdit);
             break;
 
         case IDM_VIEW_SCHEME:
-            Style_SelectLexerDlg(hwndEdit);
+            Style_SelectLexerDlg(gDoc->hwndEdit);
             UpdateStatusbar();
             UpdateLineNumberWidth();
             break;
 
         case IDM_VIEW_USE2NDDEFAULT:
-            Style_ToggleUse2ndDefault(hwndEdit);
+            Style_ToggleUse2ndDefault(gDoc->hwndEdit);
             UpdateStatusbar();
             UpdateLineNumberWidth();
             break;
 
         case IDM_VIEW_SCHEMECONFIG:
-            Style_ConfigDlg(hwndEdit);
+            Style_ConfigDlg(gDoc->hwndEdit);
             UpdateStatusbar();
             UpdateLineNumberWidth();
             break;
 
         case IDM_VIEW_FONT:
-            Style_SetDefaultFont(hwndEdit);
+            Style_SetDefaultFont(gDoc->hwndEdit);
             UpdateStatusbar();
             UpdateLineNumberWidth();
             break;
@@ -3608,9 +3611,9 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
         case IDM_VIEW_WORDWRAP:
             fWordWrap = (fWordWrap) ? FALSE : TRUE;
             if (!fWordWrap)
-                SendMessage(hwndEdit, SCI_SETWRAPMODE, SC_WRAP_NONE, 0);
+                SendMessage(gDoc->hwndEdit, SCI_SETWRAPMODE, SC_WRAP_NONE, 0);
             else
-                SendMessage(hwndEdit, SCI_SETWRAPMODE,
+                SendMessage(gDoc->hwndEdit, SCI_SETWRAPMODE,
                             (iWordWrapMode == 0) ? SC_WRAP_WORD : SC_WRAP_CHAR,
                             0);
             fWordWrapG = fWordWrap;
@@ -3621,13 +3624,13 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
             if (WordWrapSettingsDlg(hwnd, IDD_WORDWRAP, &iWordWrapIndent)) {
                 if (fWordWrap)
                     SendMessage(
-                        hwndEdit, SCI_SETWRAPMODE,
+                    gDoc->hwndEdit, SCI_SETWRAPMODE,
                         (iWordWrapMode == 0) ? SC_WRAP_WORD : SC_WRAP_CHAR, 0);
                 if (iWordWrapIndent == 5)
-                    SendMessage(hwndEdit, SCI_SETWRAPINDENTMODE,
+                    SendMessage(gDoc->hwndEdit, SCI_SETWRAPINDENTMODE,
                                 SC_WRAPINDENT_SAME, 0);
                 else if (iWordWrapIndent == 6)
-                    SendMessage(hwndEdit, SCI_SETWRAPINDENTMODE,
+                    SendMessage(gDoc->hwndEdit, SCI_SETWRAPINDENTMODE,
                                 SC_WRAPINDENT_INDENT, 0);
                 else {
                     int i = 0;
@@ -3647,8 +3650,8 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
                                                : 2 * iTabWidth;
                             break;
                     }
-                    SendMessage(hwndEdit, SCI_SETWRAPSTARTINDENT, i, 0);
-                    SendMessage(hwndEdit, SCI_SETWRAPINDENTMODE,
+                    SendMessage(gDoc->hwndEdit, SCI_SETWRAPSTARTINDENT, i, 0);
+                    SendMessage(gDoc->hwndEdit, SCI_SETWRAPINDENTMODE,
                                 SC_WRAPINDENT_FIXED, 0);
                 }
                 if (bShowWordWrapSymbols) {
@@ -3678,12 +3681,12 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
                             wrapVisualFlags |= SC_WRAPVISUALFLAG_START;
                             break;
                     }
-                    SendMessage(hwndEdit, SCI_SETWRAPVISUALFLAGSLOCATION,
+                    SendMessage(gDoc->hwndEdit, SCI_SETWRAPVISUALFLAGSLOCATION,
                                 wrapVisualFlagsLocation, 0);
-                    SendMessage(hwndEdit, SCI_SETWRAPVISUALFLAGS,
+                    SendMessage(gDoc->hwndEdit, SCI_SETWRAPVISUALFLAGS,
                                 wrapVisualFlags, 0);
                 } else {
-                    SendMessage(hwndEdit, SCI_SETWRAPVISUALFLAGS, 0, 0);
+                    SendMessage(gDoc->hwndEdit, SCI_SETWRAPVISUALFLAGS, 0, 0);
                 }
             }
             break;
@@ -3691,26 +3694,26 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
         case IDM_VIEW_LONGLINEMARKER:
             bMarkLongLines = (bMarkLongLines) ? FALSE : TRUE;
             if (bMarkLongLines) {
-                SendMessage(hwndEdit, SCI_SETEDGEMODE,
+                SendMessage(gDoc->hwndEdit, SCI_SETEDGEMODE,
                             (iLongLineMode == EDGE_LINE) ? EDGE_LINE
                                                          : EDGE_BACKGROUND,
                             0);
-                Style_SetLongLineColors(hwndEdit);
+                Style_SetLongLineColors(gDoc->hwndEdit);
             } else
-                SendMessage(hwndEdit, SCI_SETEDGEMODE, EDGE_NONE, 0);
+                SendMessage(gDoc->hwndEdit, SCI_SETEDGEMODE, EDGE_NONE, 0);
             UpdateStatusbar();
             break;
 
         case IDM_VIEW_LONGLINESETTINGS:
             if (LongLineSettingsDlg(hwnd, IDD_LONGLINES, &iLongLinesLimit)) {
                 bMarkLongLines = TRUE;
-                SendMessage(hwndEdit, SCI_SETEDGEMODE,
+                SendMessage(gDoc->hwndEdit, SCI_SETEDGEMODE,
                             (iLongLineMode == EDGE_LINE) ? EDGE_LINE
                                                          : EDGE_BACKGROUND,
                             0);
-                Style_SetLongLineColors(hwndEdit);
+                Style_SetLongLineColors(gDoc->hwndEdit);
                 iLongLinesLimit = max(min(iLongLinesLimit, 4096), 0);
-                SendMessage(hwndEdit, SCI_SETEDGECOLUMN, iLongLinesLimit, 0);
+                SendMessage(gDoc->hwndEdit, SCI_SETEDGECOLUMN, iLongLinesLimit, 0);
                 UpdateStatusbar();
                 iLongLinesLimitG = iLongLinesLimit;
             }
@@ -3718,25 +3721,25 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
         case IDM_VIEW_TABSASSPACES:
             bTabsAsSpaces = (bTabsAsSpaces) ? FALSE : TRUE;
-            SendMessage(hwndEdit, SCI_SETUSETABS, !bTabsAsSpaces, 0);
+            SendMessage(gDoc->hwndEdit, SCI_SETUSETABS, !bTabsAsSpaces, 0);
             bTabsAsSpacesG = bTabsAsSpaces;
             break;
 
         case IDM_VIEW_TABSETTINGS:
             if (TabSettingsDlg(hwnd, IDD_TABSETTINGS, NULL)) {
-                SendMessage(hwndEdit, SCI_SETUSETABS, !bTabsAsSpaces, 0);
-                SendMessage(hwndEdit, SCI_SETTABINDENTS, bTabIndents, 0);
-                SendMessage(hwndEdit, SCI_SETBACKSPACEUNINDENTS,
+                SendMessage(gDoc->hwndEdit, SCI_SETUSETABS, !bTabsAsSpaces, 0);
+                SendMessage(gDoc->hwndEdit, SCI_SETTABINDENTS, bTabIndents, 0);
+                SendMessage(gDoc->hwndEdit, SCI_SETBACKSPACEUNINDENTS,
                             bBackspaceUnindents, 0);
                 iTabWidth = max(min(iTabWidth, 256), 1);
                 iIndentWidth = max(min(iIndentWidth, 256), 0);
-                SendMessage(hwndEdit, SCI_SETTABWIDTH, iTabWidth, 0);
-                SendMessage(hwndEdit, SCI_SETINDENT, iIndentWidth, 0);
+                SendMessage(gDoc->hwndEdit, SCI_SETTABWIDTH, iTabWidth, 0);
+                SendMessage(gDoc->hwndEdit, SCI_SETINDENT, iIndentWidth, 0);
                 bTabsAsSpacesG = bTabsAsSpaces;
                 bTabIndentsG = bTabIndents;
                 iTabWidthG = iTabWidth;
                 iIndentWidthG = iIndentWidth;
-                if (SendMessage(hwndEdit, SCI_GETWRAPINDENTMODE, 0, 0) ==
+                if (SendMessage(gDoc->hwndEdit, SCI_GETWRAPINDENTMODE, 0, 0) ==
                     SC_WRAPINDENT_FIXED) {
                     int i = 0;
                     switch (iWordWrapIndent) {
@@ -3755,14 +3758,14 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
                                                : 2 * iTabWidth;
                             break;
                     }
-                    SendMessage(hwndEdit, SCI_SETWRAPSTARTINDENT, i, 0);
+                    SendMessage(gDoc->hwndEdit, SCI_SETWRAPSTARTINDENT, i, 0);
                 }
             }
             break;
 
         case IDM_VIEW_SHOWINDENTGUIDES:
             bShowIndentGuides = (bShowIndentGuides) ? FALSE : TRUE;
-            Style_SetIndentGuides(hwndEdit, bShowIndentGuides);
+            Style_SetIndentGuides(gDoc->hwndEdit, bShowIndentGuides);
             break;
 
         case IDM_VIEW_AUTOINDENTTEXT:
@@ -3772,25 +3775,25 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
         case IDM_VIEW_LINENUMBERS:
             bShowLineNumbers = (bShowLineNumbers) ? FALSE : TRUE;
             UpdateLineNumberWidth();
-            // SendMessage(hwndEdit,SCI_SETMARGINWIDTHN,0,
-            //  (bShowLineNumbers)?SendMessage(hwndEdit,SCI_TEXTWIDTH,STYLE_LINENUMBER,(LPARAM)"_999999_"):0);
+            // SendMessage(gDoc->hwndEdit,SCI_SETMARGINWIDTHN,0,
+            //  (bShowLineNumbers)?SendMessage(gDoc->hwndEdit,SCI_TEXTWIDTH,STYLE_LINENUMBER,(LPARAM)"_999999_"):0);
             break;
 
         case IDM_VIEW_MARGIN:
             bShowSelectionMargin = (bShowSelectionMargin) ? FALSE : TRUE;
-            SendMessage(hwndEdit, SCI_SETMARGINWIDTHN, 1,
+            SendMessage(gDoc->hwndEdit, SCI_SETMARGINWIDTHN, 1,
                         (bShowSelectionMargin) ? 16 : 0);
 
 #ifdef BOOKMARK_EDITION
             // Depending on if the margin is visible or not, choose different
             // bookmark indication
             if (bShowSelectionMargin) {
-                SendMessage(hwndEdit, SCI_MARKERDEFINEPIXMAP, 0,
+                SendMessage(gDoc->hwndEdit, SCI_MARKERDEFINEPIXMAP, 0,
                             (LPARAM)bookmark_pixmap);
             } else {
-                SendMessage(hwndEdit, SCI_MARKERSETBACK, 0, 0xff << 8);
-                SendMessage(hwndEdit, SCI_MARKERSETALPHA, 0, 20);
-                SendMessage(hwndEdit, SCI_MARKERDEFINE, 0, SC_MARK_BACKGROUND);
+                SendMessage(gDoc->hwndEdit, SCI_MARKERSETBACK, 0, 0xff << 8);
+                SendMessage(gDoc->hwndEdit, SCI_MARKERSETALPHA, 0, 20);
+                SendMessage(gDoc->hwndEdit, SCI_MARKERDEFINE, 0, SC_MARK_BACKGROUND);
             }
 #endif
 
@@ -3799,7 +3802,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
         case IDM_VIEW_AUTOCOMPLETEWORDS:
             if (bAutoCompleteWords) {
                 // close the autocompletion list
-                SendMessage(hwndEdit, SCI_AUTOCCANCEL, 0, 0);
+                SendMessage(gDoc->hwndEdit, SCI_AUTOCCANCEL, 0, 0);
                 bAutoCompleteWords = FALSE;
             } else {
                 bAutoCompleteWords = TRUE;
@@ -3809,40 +3812,40 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
         case IDM_VIEW_MARKOCCURRENCES_OFF:
             iMarkOccurrences = 0;
             // clear all marks
-            SendMessage(hwndEdit, SCI_SETINDICATORCURRENT, 1, 0);
-            SendMessage(hwndEdit, SCI_INDICATORCLEARRANGE, 0,
-                        (int)SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0));
+            SendMessage(gDoc->hwndEdit, SCI_SETINDICATORCURRENT, 1, 0);
+            SendMessage(gDoc->hwndEdit, SCI_INDICATORCLEARRANGE, 0,
+                (int) SendMessage(gDoc->hwndEdit, SCI_GETLENGTH, 0, 0));
             break;
 
         case IDM_VIEW_MARKOCCURRENCES_RED:
             iMarkOccurrences = 1;
-            EditMarkAll(hwndEdit, iMarkOccurrences, bMarkOccurrencesMatchCase,
+            EditMarkAll(gDoc->hwndEdit, iMarkOccurrences, bMarkOccurrencesMatchCase,
                         bMarkOccurrencesMatchWords);
             break;
 
         case IDM_VIEW_MARKOCCURRENCES_GREEN:
             iMarkOccurrences = 2;
-            EditMarkAll(hwndEdit, iMarkOccurrences, bMarkOccurrencesMatchCase,
+            EditMarkAll(gDoc->hwndEdit, iMarkOccurrences, bMarkOccurrencesMatchCase,
                         bMarkOccurrencesMatchWords);
             break;
 
         case IDM_VIEW_MARKOCCURRENCES_BLUE:
             iMarkOccurrences = 3;
-            EditMarkAll(hwndEdit, iMarkOccurrences, bMarkOccurrencesMatchCase,
+            EditMarkAll(gDoc->hwndEdit, iMarkOccurrences, bMarkOccurrencesMatchCase,
                         bMarkOccurrencesMatchWords);
             break;
 
         case IDM_VIEW_MARKOCCURRENCES_CASE:
             bMarkOccurrencesMatchCase =
                 (bMarkOccurrencesMatchCase) ? FALSE : TRUE;
-            EditMarkAll(hwndEdit, iMarkOccurrences, bMarkOccurrencesMatchCase,
+            EditMarkAll(gDoc->hwndEdit, iMarkOccurrences, bMarkOccurrencesMatchCase,
                         bMarkOccurrencesMatchWords);
             break;
 
         case IDM_VIEW_MARKOCCURRENCES_WORD:
             bMarkOccurrencesMatchWords =
                 (bMarkOccurrencesMatchWords) ? FALSE : TRUE;
-            EditMarkAll(hwndEdit, iMarkOccurrences, bMarkOccurrencesMatchCase,
+            EditMarkAll(gDoc->hwndEdit, iMarkOccurrences, bMarkOccurrencesMatchCase,
                         bMarkOccurrencesMatchWords);
             break;
 
@@ -3861,14 +3864,14 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
         case IDM_VIEW_SHOWWHITESPACE:
             bViewWhiteSpace = (bViewWhiteSpace) ? FALSE : TRUE;
-            SendMessage(hwndEdit, SCI_SETVIEWWS,
+            SendMessage(gDoc->hwndEdit, SCI_SETVIEWWS,
                         (bViewWhiteSpace) ? SCWS_VISIBLEALWAYS : SCWS_INVISIBLE,
                         0);
             break;
 
         case IDM_VIEW_SHOWEOLS:
             bViewEOLs = (bViewEOLs) ? FALSE : TRUE;
-            SendMessage(hwndEdit, SCI_SETVIEWEOL, bViewEOLs, 0);
+            SendMessage(gDoc->hwndEdit, SCI_SETVIEWEOL, bViewEOLs, 0);
             break;
 
         case IDM_VIEW_WORDWRAPSYMBOLS:
@@ -3899,12 +3902,12 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
                         wrapVisualFlags |= SC_WRAPVISUALFLAG_START;
                         break;
                 }
-                SendMessage(hwndEdit, SCI_SETWRAPVISUALFLAGSLOCATION,
+                SendMessage(gDoc->hwndEdit, SCI_SETWRAPVISUALFLAGSLOCATION,
                             wrapVisualFlagsLocation, 0);
-                SendMessage(hwndEdit, SCI_SETWRAPVISUALFLAGS, wrapVisualFlags,
+                SendMessage(gDoc->hwndEdit, SCI_SETWRAPVISUALFLAGS, wrapVisualFlags,
                             0);
             } else {
-                SendMessage(hwndEdit, SCI_SETWRAPVISUALFLAGS, 0, 0);
+                SendMessage(gDoc->hwndEdit, SCI_SETWRAPVISUALFLAGS, 0, 0);
             }
             break;
 
@@ -3912,13 +3915,13 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
             bMatchBraces = (bMatchBraces) ? FALSE : TRUE;
             if (bMatchBraces) {
                 struct SCNotification scn;
-                scn.nmhdr.hwndFrom = hwndEdit;
+                scn.nmhdr.hwndFrom = gDoc->hwndEdit;
                 scn.nmhdr.idFrom = IDC_EDIT;
                 scn.nmhdr.code = SCN_UPDATEUI;
                 scn.updated = SC_UPDATE_CONTENT;
                 SendMessage(hwnd, WM_NOTIFY, IDC_EDIT, (LPARAM) & scn);
             } else
-                SendMessage(hwndEdit, SCI_BRACEHIGHLIGHT, (WPARAM) - 1,
+                SendMessage(gDoc->hwndEdit, SCI_BRACEHIGHLIGHT, (WPARAM) -1,
                             (LPARAM) - 1);
             break;
 
@@ -3928,21 +3931,21 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
         case IDM_VIEW_HILITECURRENTLINE:
             bHiliteCurrentLine = (bHiliteCurrentLine) ? FALSE : TRUE;
-            Style_SetCurrentLineBackground(hwndEdit);
+            Style_SetCurrentLineBackground(gDoc->hwndEdit);
             break;
 
         case IDM_VIEW_ZOOMIN:
-            SendMessage(hwndEdit, SCI_ZOOMIN, 0, 0);
+            SendMessage(gDoc->hwndEdit, SCI_ZOOMIN, 0, 0);
             // UpdateLineNumberWidth();
             break;
 
         case IDM_VIEW_ZOOMOUT:
-            SendMessage(hwndEdit, SCI_ZOOMOUT, 0, 0);
+            SendMessage(gDoc->hwndEdit, SCI_ZOOMOUT, 0, 0);
             // UpdateLineNumberWidth();
             break;
 
         case IDM_VIEW_RESETZOOM:
-            SendMessage(hwndEdit, SCI_SETZOOM, 0, 0);
+            SendMessage(gDoc->hwndEdit, SCI_SETZOOM, 0, 0);
             // UpdateLineNumberWidth();
             break;
 
@@ -4086,7 +4089,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
             break;
 
         case IDM_VIEW_SHOWEXCERPT:
-            EditGetExcerpt(hwndEdit, szTitleExcerpt, COUNTOF(szTitleExcerpt));
+            EditGetExcerpt(gDoc->hwndEdit, szTitleExcerpt, COUNTOF(szTitleExcerpt));
             SetWindowTitle(hwnd, uidsAppTitle, fIsElevated, IDS_UNTITLED,
                            szCurFile, iPathNameFormat,
                            bModified || iEncoding != iOriginalEncoding,
@@ -4175,7 +4178,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
         case CMD_ESCAPE:
             // close the autocomplete box
-            SendMessage(hwndEdit, SCI_AUTOCCANCEL, 0, 0);
+            SendMessage(gDoc->hwndEdit, SCI_AUTOCCANCEL, 0, 0);
 
             if (iEscFunction == 1)
                 SendMessage(hwnd, WM_SYSCOMMAND, SC_MINIMIZE, 0);
@@ -4191,58 +4194,58 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
         // Newline with toggled auto indent setting
         case CMD_CTRLENTER:
             bAutoIndent = (bAutoIndent) ? 0 : 1;
-            SendMessage(hwndEdit, SCI_NEWLINE, 0, 0);
+            SendMessage(gDoc->hwndEdit, SCI_NEWLINE, 0, 0);
             bAutoIndent = (bAutoIndent) ? 0 : 1;
             break;
 
         case CMD_CTRLBACK: {
-            int iPos = (int)SendMessage(hwndEdit, SCI_GETCURRENTPOS, 0, 0);
-            int iAnchor = (int)SendMessage(hwndEdit, SCI_GETANCHOR, 0, 0);
-            int iLine = (int)SendMessage(hwndEdit, SCI_LINEFROMPOSITION,
+            int iPos = (int) SendMessage(gDoc->hwndEdit, SCI_GETCURRENTPOS, 0, 0);
+            int iAnchor = (int) SendMessage(gDoc->hwndEdit, SCI_GETANCHOR, 0, 0);
+            int iLine = (int) SendMessage(gDoc->hwndEdit, SCI_LINEFROMPOSITION,
                                          (WPARAM)iPos, 0);
-            int iStartPos = (int)SendMessage(hwndEdit, SCI_POSITIONFROMLINE,
+            int iStartPos = (int) SendMessage(gDoc->hwndEdit, SCI_POSITIONFROMLINE,
                                              (WPARAM)iLine, 0);
             int iIndentPos = (int)SendMessage(
-                hwndEdit, SCI_GETLINEINDENTPOSITION, (WPARAM)iLine, 0);
+                gDoc->hwndEdit, SCI_GETLINEINDENTPOSITION, (WPARAM) iLine, 0);
 
             if (iPos != iAnchor)
-                SendMessage(hwndEdit, SCI_SETSEL, (WPARAM)iPos, (LPARAM)iPos);
+                SendMessage(gDoc->hwndEdit, SCI_SETSEL, (WPARAM) iPos, (LPARAM) iPos);
             else {
                 if (iPos == iStartPos)
-                    SendMessage(hwndEdit, SCI_DELETEBACK, 0, 0);
+                    SendMessage(gDoc->hwndEdit, SCI_DELETEBACK, 0, 0);
                 else if (iPos <= iIndentPos)
-                    SendMessage(hwndEdit, SCI_DELLINELEFT, 0, 0);
+                    SendMessage(gDoc->hwndEdit, SCI_DELLINELEFT, 0, 0);
                 else
-                    SendMessage(hwndEdit, SCI_DELWORDLEFT, 0, 0);
+                    SendMessage(gDoc->hwndEdit, SCI_DELWORDLEFT, 0, 0);
             }
         } break;
 
         case CMD_CTRLDEL: {
-            int iPos = (int)SendMessage(hwndEdit, SCI_GETCURRENTPOS, 0, 0);
-            int iAnchor = (int)SendMessage(hwndEdit, SCI_GETANCHOR, 0, 0);
-            int iLine = (int)SendMessage(hwndEdit, SCI_LINEFROMPOSITION,
+            int iPos = (int) SendMessage(gDoc->hwndEdit, SCI_GETCURRENTPOS, 0, 0);
+            int iAnchor = (int) SendMessage(gDoc->hwndEdit, SCI_GETANCHOR, 0, 0);
+            int iLine = (int) SendMessage(gDoc->hwndEdit, SCI_LINEFROMPOSITION,
                                          (WPARAM)iPos, 0);
-            int iStartPos = (int)SendMessage(hwndEdit, SCI_POSITIONFROMLINE,
+            int iStartPos = (int) SendMessage(gDoc->hwndEdit, SCI_POSITIONFROMLINE,
                                              (WPARAM)iLine, 0);
-            int iEndPos = (int)SendMessage(hwndEdit, SCI_GETLINEENDPOSITION,
+            int iEndPos = (int) SendMessage(gDoc->hwndEdit, SCI_GETLINEENDPOSITION,
                                            (WPARAM)iLine, 0);
 
             if (iPos != iAnchor)
-                SendMessage(hwndEdit, SCI_SETSEL, (WPARAM)iPos, (LPARAM)iPos);
+                SendMessage(gDoc->hwndEdit, SCI_SETSEL, (WPARAM) iPos, (LPARAM) iPos);
             else {
                 if (iStartPos != iEndPos)
-                    SendMessage(hwndEdit, SCI_DELWORDRIGHT, 0, 0);
+                    SendMessage(gDoc->hwndEdit, SCI_DELWORDRIGHT, 0, 0);
                 else // iStartPos == iEndPos
-                    SendMessage(hwndEdit, SCI_LINEDELETE, 0, 0);
+                    SendMessage(gDoc->hwndEdit, SCI_LINEDELETE, 0, 0);
             }
         } break;
 
         case CMD_CTRLTAB:
-            SendMessage(hwndEdit, SCI_SETTABINDENTS, FALSE, 0);
-            SendMessage(hwndEdit, SCI_SETUSETABS, TRUE, 0);
-            SendMessage(hwndEdit, SCI_TAB, 0, 0);
-            SendMessage(hwndEdit, SCI_SETUSETABS, !bTabsAsSpaces, 0);
-            SendMessage(hwndEdit, SCI_SETTABINDENTS, bTabIndents, 0);
+            SendMessage(gDoc->hwndEdit, SCI_SETTABINDENTS, FALSE, 0);
+            SendMessage(gDoc->hwndEdit, SCI_SETUSETABS, TRUE, 0);
+            SendMessage(gDoc->hwndEdit, SCI_TAB, 0, 0);
+            SendMessage(gDoc->hwndEdit, SCI_SETUSETABS, !bTabsAsSpaces, 0);
+            SendMessage(gDoc->hwndEdit, SCI_SETTABINDENTS, bTabIndents, 0);
             break;
 
         case CMD_RECODEDEFAULT: {
@@ -4305,19 +4308,19 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
         } break;
 
         case CMD_LEXDEFAULT:
-            Style_SetDefaultLexer(hwndEdit);
+            Style_SetDefaultLexer(gDoc->hwndEdit);
             UpdateStatusbar();
             UpdateLineNumberWidth();
             break;
 
         case CMD_LEXHTML:
-            Style_SetHTMLLexer(hwndEdit);
+            Style_SetHTMLLexer(gDoc->hwndEdit);
             UpdateStatusbar();
             UpdateLineNumberWidth();
             break;
 
         case CMD_LEXXML:
-            Style_SetXMLLexer(hwndEdit);
+            Style_SetXMLLexer(gDoc->hwndEdit);
             UpdateStatusbar();
             UpdateLineNumberWidth();
             break;
@@ -4333,7 +4336,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
             UINT cp;
             EDITFINDREPLACE efrTS = { "", "", "", "", SCFIND_REGEXP, 0,
-                                      0,  0,  0,  0,  hwndEdit };
+                0, 0, 0, 0, gDoc->hwndEdit };
 
             IniGetString(L"Settings2", L"TimeStamp",
                          L"\\$Date:[^\\$]+\\$ | $Date: %Y/%m/%d %H:%M:%S $",
@@ -4362,17 +4365,17 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
             mktime(&sst);
             wcsftime(wchReplace, COUNTOF(wchReplace), wchTemplate, &sst);
 
-            cp = (UINT)SendMessage(hwndEdit, SCI_GETCODEPAGE, 0, 0);
+            cp = (UINT) SendMessage(gDoc->hwndEdit, SCI_GETCODEPAGE, 0, 0);
             WideCharToMultiByte(cp, 0, wchFind, -1, efrTS.szFind,
                                 COUNTOF(efrTS.szFind), NULL, NULL);
             WideCharToMultiByte(cp, 0, wchReplace, -1, efrTS.szReplace,
                                 COUNTOF(efrTS.szReplace), NULL, NULL);
 
-            if (SendMessage(hwndEdit, SCI_GETSELECTIONSTART, 0, 0) !=
-                SendMessage(hwndEdit, SCI_GETSELECTIONEND, 0, 0))
-                EditReplaceAllInSelection(hwndEdit, &efrTS, TRUE);
+            if (SendMessage(gDoc->hwndEdit, SCI_GETSELECTIONSTART, 0, 0) !=
+                SendMessage(gDoc->hwndEdit, SCI_GETSELECTIONEND, 0, 0))
+                EditReplaceAllInSelection(gDoc->hwndEdit, &efrTS, TRUE);
             else
-                EditReplaceAll(hwndEdit, &efrTS, TRUE);
+                EditReplaceAll(gDoc->hwndEdit, &efrTS, TRUE);
         } break;
 
         case CMD_WEBACTION1:
@@ -4398,13 +4401,13 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
             if (bCmdEnabled) {
 
                 cchSelection =
-                    (int)SendMessage(hwndEdit, SCI_GETSELECTIONEND, 0, 0) -
-                    (int)SendMessage(hwndEdit, SCI_GETSELECTIONSTART, 0, 0);
+                    (int) SendMessage(gDoc->hwndEdit, SCI_GETSELECTIONEND, 0, 0) -
+                    (int) SendMessage(gDoc->hwndEdit, SCI_GETSELECTIONSTART, 0, 0);
 
                 if (cchSelection > 0 && cchSelection <= 500 &&
-                    SendMessage(hwndEdit, SCI_GETSELTEXT, 0, 0) <
+                    SendMessage(gDoc->hwndEdit, SCI_GETSELTEXT, 0, 0) <
                         COUNTOF(mszSelection)) {
-                    SendMessage(hwndEdit, SCI_GETSELTEXT, 0,
+                    SendMessage(gDoc->hwndEdit, SCI_GETSELTEXT, 0,
                                 (LPARAM)mszSelection);
                     mszSelection[cchSelection] = 0; // zero terminate
 
@@ -4424,7 +4427,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
                     if (lstrlenA(mszSelection)) {
 
                         WCHAR wszSelection[512];
-                        UINT uCP = (SendMessage(hwndEdit, SCI_GETCODEPAGE, 0,
+                        UINT uCP = (SendMessage(gDoc->hwndEdit, SCI_GETCODEPAGE, 0,
                                                 0) == SC_CP_UTF8)
                                        ? CP_UTF8
                                        : CP_ACP;
@@ -4475,23 +4478,23 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
         case CMD_FINDPREVSEL:
         case IDM_EDIT_SAVEFIND: {
             int cchSelection =
-                (int)SendMessage(hwndEdit, SCI_GETSELECTIONEND, 0, 0) -
-                (int)SendMessage(hwndEdit, SCI_GETSELECTIONSTART, 0, 0);
+                (int) SendMessage(gDoc->hwndEdit, SCI_GETSELECTIONEND, 0, 0) -
+                (int) SendMessage(gDoc->hwndEdit, SCI_GETSELECTIONSTART, 0, 0);
 
             if (cchSelection == 0) {
                 SendMessage(hwnd, WM_COMMAND, MAKELONG(IDM_EDIT_SELECTWORD, 1),
                             0);
                 cchSelection =
-                    (int)SendMessage(hwndEdit, SCI_GETSELECTIONEND, 0, 0) -
-                    (int)SendMessage(hwndEdit, SCI_GETSELECTIONSTART, 0, 0);
+                    (int) SendMessage(gDoc->hwndEdit, SCI_GETSELECTIONEND, 0, 0) -
+                    (int) SendMessage(gDoc->hwndEdit, SCI_GETSELECTIONSTART, 0, 0);
             }
 
             if (cchSelection > 0 && cchSelection <= 500 &&
-                SendMessage(hwndEdit, SCI_GETSELTEXT, 0, 0) < 512) {
+                SendMessage(gDoc->hwndEdit, SCI_GETSELTEXT, 0, 0) < 512) {
                 char mszSelection[512];
                 char *lpsz;
 
-                SendMessage(hwndEdit, SCI_GETSELTEXT, 0, (LPARAM)mszSelection);
+                SendMessage(gDoc->hwndEdit, SCI_GETSELTEXT, 0, (LPARAM) mszSelection);
                 mszSelection[cchSelection] = 0; // zero terminate
 
                 // Check lpszSelection and truncate newlines
@@ -4503,7 +4506,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
                 if (lpsz)
                     *lpsz = '\0';
 
-                cpLastFind = (UINT)SendMessage(hwndEdit, SCI_GETCODEPAGE, 0, 0);
+                cpLastFind = (UINT) SendMessage(gDoc->hwndEdit, SCI_GETCODEPAGE, 0, 0);
                 lstrcpyA(efrData.szFind, mszSelection);
 
                 if (cpLastFind != SC_CP_UTF8) {
@@ -4526,11 +4529,11 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
                         break;
 
                     case CMD_FINDNEXTSEL:
-                        EditFindNext(hwndEdit, &efrData, FALSE);
+                        EditFindNext(gDoc->hwndEdit, &efrData, FALSE);
                         break;
 
                     case CMD_FINDPREVSEL:
-                        EditFindPrev(hwndEdit, &efrData, FALSE);
+                        EditFindPrev(gDoc->hwndEdit, &efrData, FALSE);
                         break;
                 }
             }
@@ -4547,46 +4550,46 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
                 else
                     iLongLinesLimit--;
                 iLongLinesLimit = max(min(iLongLinesLimit, 4096), 0);
-                SendMessage(hwndEdit, SCI_SETEDGECOLUMN, iLongLinesLimit, 0);
+                SendMessage(gDoc->hwndEdit, SCI_SETEDGECOLUMN, iLongLinesLimit, 0);
                 UpdateStatusbar();
                 iLongLinesLimitG = iLongLinesLimit;
             }
             break;
 
         case CMD_STRINGIFY:
-            EditEncloseSelection(hwndEdit, L"'", L"'");
+            EditEncloseSelection(gDoc->hwndEdit, L"'", L"'");
             break;
 
         case CMD_STRINGIFY2:
-            EditEncloseSelection(hwndEdit, L"\"", L"\"");
+            EditEncloseSelection(gDoc->hwndEdit, L"\"", L"\"");
             break;
 
         case CMD_EMBRACE:
-            EditEncloseSelection(hwndEdit, L"(", L")");
+            EditEncloseSelection(gDoc->hwndEdit, L"(", L")");
             break;
 
         case CMD_EMBRACE2:
-            EditEncloseSelection(hwndEdit, L"[", L"]");
+            EditEncloseSelection(gDoc->hwndEdit, L"[", L"]");
             break;
 
         case CMD_EMBRACE3:
-            EditEncloseSelection(hwndEdit, L"{", L"}");
+            EditEncloseSelection(gDoc->hwndEdit, L"{", L"}");
             break;
 
         case CMD_EMBRACE4:
-            EditEncloseSelection(hwndEdit, L"`", L"`");
+            EditEncloseSelection(gDoc->hwndEdit, L"`", L"`");
             break;
 
         case CMD_INCREASENUM:
-            EditModifyNumber(hwndEdit, TRUE);
+            EditModifyNumber(gDoc->hwndEdit, TRUE);
             break;
 
         case CMD_DECREASENUM:
-            EditModifyNumber(hwndEdit, FALSE);
+            EditModifyNumber(gDoc->hwndEdit, FALSE);
             break;
 
         case CMD_TOGGLETITLE:
-            EditGetExcerpt(hwndEdit, szTitleExcerpt, COUNTOF(szTitleExcerpt));
+            EditGetExcerpt(gDoc->hwndEdit, szTitleExcerpt, COUNTOF(szTitleExcerpt));
             SetWindowTitle(hwnd, uidsAppTitle, fIsElevated, IDS_UNTITLED,
                            szCurFile, iPathNameFormat,
                            bModified || iEncoding != iOriginalEncoding,
@@ -4597,12 +4600,12 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
             if (SC_SEL_RECTANGLE !=
                 SendMessage(hwnd, SCI_GETSELECTIONMODE, 0, 0)) {
                 int iAnchorPos =
-                    (int)SendMessage(hwndEdit, SCI_GETANCHOR, 0, 0);
+                    (int) SendMessage(gDoc->hwndEdit, SCI_GETANCHOR, 0, 0);
                 int iCursorPos =
-                    (int)SendMessage(hwndEdit, SCI_GETCURRENTPOS, 0, 0);
+                    (int) SendMessage(gDoc->hwndEdit, SCI_GETCURRENTPOS, 0, 0);
                 if (iCursorPos > iAnchorPos) {
-                    SendMessage(hwndEdit, SCI_SETSEL, iCursorPos, iAnchorPos);
-                    SendMessage(hwndEdit, SCI_CHOOSECARETX, 0, 0);
+                    SendMessage(gDoc->hwndEdit, SCI_SETSEL, iCursorPos, iAnchorPos);
+                    SendMessage(gDoc->hwndEdit, SCI_CHOOSECARETX, 0, 0);
                 }
             }
             break;
@@ -4611,12 +4614,12 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
             if (SC_SEL_RECTANGLE !=
                 SendMessage(hwnd, SCI_GETSELECTIONMODE, 0, 0)) {
                 int iAnchorPos =
-                    (int)SendMessage(hwndEdit, SCI_GETANCHOR, 0, 0);
+                    (int) SendMessage(gDoc->hwndEdit, SCI_GETANCHOR, 0, 0);
                 int iCursorPos =
-                    (int)SendMessage(hwndEdit, SCI_GETCURRENTPOS, 0, 0);
+                    (int) SendMessage(gDoc->hwndEdit, SCI_GETCURRENTPOS, 0, 0);
                 if (iCursorPos < iAnchorPos) {
-                    SendMessage(hwndEdit, SCI_SETSEL, iCursorPos, iAnchorPos);
-                    SendMessage(hwndEdit, SCI_CHOOSECARETX, 0, 0);
+                    SendMessage(gDoc->hwndEdit, SCI_SETSEL, iCursorPos, iAnchorPos);
+                    SendMessage(gDoc->hwndEdit, SCI_CHOOSECARETX, 0, 0);
                 }
             }
             break;
@@ -4829,7 +4832,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
             if (IsCmdEnabled(hwnd, IDM_EDIT_CLEAR))
                 SendMessage(hwnd, WM_COMMAND, MAKELONG(IDM_EDIT_CLEAR, 1), 0);
             else
-                SendMessage(hwndEdit, SCI_CLEARALL, 0, 0);
+                SendMessage(gDoc->hwndEdit, SCI_CLEARALL, 0, 0);
             break;
 
         case IDT_FILE_PRINT:
@@ -4894,20 +4897,20 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
                         // Invalidate invalid selections
                         // #pragma message("TODO: Remove check for invalid
                         // selections once fixed in Scintilla")
-                        if (SendMessage(hwndEdit, SCI_GETSELECTIONS, 0, 0) >
+                        if (SendMessage(gDoc->hwndEdit, SCI_GETSELECTIONS, 0, 0) >
                                 1 &&
-                            SendMessage(hwndEdit, SCI_GETSELECTIONMODE, 0, 0) !=
+                                SendMessage(gDoc->hwndEdit, SCI_GETSELECTIONMODE, 0, 0) !=
                                 SC_SEL_RECTANGLE) {
                             int iCurPos = (int)SendMessage(
-                                hwndEdit, SCI_GETCURRENTPOS, 0, 0);
-                            SendMessage(hwndEdit, WM_CANCELMODE, 0, 0);
-                            SendMessage(hwndEdit, SCI_CLEARSELECTIONS, 0, 0);
-                            SendMessage(hwndEdit, SCI_SETSELECTION,
+                                gDoc->hwndEdit, SCI_GETCURRENTPOS, 0, 0);
+                            SendMessage(gDoc->hwndEdit, WM_CANCELMODE, 0, 0);
+                            SendMessage(gDoc->hwndEdit, SCI_CLEARSELECTIONS, 0, 0);
+                            SendMessage(gDoc->hwndEdit, SCI_SETSELECTION,
                                         (WPARAM)iCurPos, (LPARAM)iCurPos);
                         }
 
                         // mark occurrences of text currently selected
-                        EditMarkAll(hwndEdit, iMarkOccurrences,
+                        EditMarkAll(gDoc->hwndEdit, iMarkOccurrences,
                                     bMarkOccurrencesMatchCase,
                                     bMarkOccurrencesMatchWords);
 
@@ -4917,74 +4920,74 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
                             char c;
 
                             int iEndStyled = (int)SendMessage(
-                                hwndEdit, SCI_GETENDSTYLED, 0, 0);
-                            if (iEndStyled < (int)SendMessage(hwndEdit,
+                                gDoc->hwndEdit, SCI_GETENDSTYLED, 0, 0);
+                            if (iEndStyled < (int) SendMessage(gDoc->hwndEdit,
                                                               SCI_GETLENGTH, 0,
                                                               0)) {
                                 int iLine = (int)SendMessage(
-                                    hwndEdit, SCI_LINEFROMPOSITION, iEndStyled,
+                                    gDoc->hwndEdit, SCI_LINEFROMPOSITION, iEndStyled,
                                     0);
                                 int iEndStyled = (int)SendMessage(
-                                    hwndEdit, SCI_POSITIONFROMLINE, iLine, 0);
-                                SendMessage(hwndEdit, SCI_COLOURISE, iEndStyled,
+                                    gDoc->hwndEdit, SCI_POSITIONFROMLINE, iLine, 0);
+                                SendMessage(gDoc->hwndEdit, SCI_COLOURISE, iEndStyled,
                                             -1);
                             }
 
-                            iPos = (int)SendMessage(hwndEdit, SCI_GETCURRENTPOS,
+                            iPos = (int) SendMessage(gDoc->hwndEdit, SCI_GETCURRENTPOS,
                                                     0, 0);
-                            c = (char)SendMessage(hwndEdit, SCI_GETCHARAT, iPos,
+                            c = (char) SendMessage(gDoc->hwndEdit, SCI_GETCHARAT, iPos,
                                                   0);
                             if (StrChrA("()[]{}", c)) {
                                 int iBrace2 = (int)SendMessage(
-                                    hwndEdit, SCI_BRACEMATCH, iPos, 0);
+                                    gDoc->hwndEdit, SCI_BRACEMATCH, iPos, 0);
                                 if (iBrace2 != -1) {
                                     int col1 = (int)SendMessage(
-                                        hwndEdit, SCI_GETCOLUMN, iPos, 0);
+                                        gDoc->hwndEdit, SCI_GETCOLUMN, iPos, 0);
                                     int col2 = (int)SendMessage(
-                                        hwndEdit, SCI_GETCOLUMN, iBrace2, 0);
-                                    SendMessage(hwndEdit, SCI_BRACEHIGHLIGHT,
+                                        gDoc->hwndEdit, SCI_GETCOLUMN, iBrace2, 0);
+                                    SendMessage(gDoc->hwndEdit, SCI_BRACEHIGHLIGHT,
                                                 iPos, iBrace2);
-                                    SendMessage(hwndEdit, SCI_SETHIGHLIGHTGUIDE,
+                                    SendMessage(gDoc->hwndEdit, SCI_SETHIGHLIGHTGUIDE,
                                                 min(col1, col2), 0);
                                 } else {
-                                    SendMessage(hwndEdit, SCI_BRACEBADLIGHT,
+                                    SendMessage(gDoc->hwndEdit, SCI_BRACEBADLIGHT,
                                                 iPos, 0);
-                                    SendMessage(hwndEdit, SCI_SETHIGHLIGHTGUIDE,
+                                    SendMessage(gDoc->hwndEdit, SCI_SETHIGHLIGHTGUIDE,
                                                 0, 0);
                                 }
                             }
                             // Try one before
                             else {
                                 iPos = (int)SendMessage(
-                                    hwndEdit, SCI_POSITIONBEFORE, iPos, 0);
-                                c = (char)SendMessage(hwndEdit, SCI_GETCHARAT,
+                                    gDoc->hwndEdit, SCI_POSITIONBEFORE, iPos, 0);
+                                c = (char) SendMessage(gDoc->hwndEdit, SCI_GETCHARAT,
                                                       iPos, 0);
                                 if (StrChrA("()[]{}", c)) {
                                     int iBrace2 = (int)SendMessage(
-                                        hwndEdit, SCI_BRACEMATCH, iPos, 0);
+                                        gDoc->hwndEdit, SCI_BRACEMATCH, iPos, 0);
                                     if (iBrace2 != -1) {
                                         int col1 = (int)SendMessage(
-                                            hwndEdit, SCI_GETCOLUMN, iPos, 0);
+                                            gDoc->hwndEdit, SCI_GETCOLUMN, iPos, 0);
                                         int col2 = (int)SendMessage(
-                                            hwndEdit, SCI_GETCOLUMN, iBrace2,
+                                            gDoc->hwndEdit, SCI_GETCOLUMN, iBrace2,
                                             0);
-                                        SendMessage(hwndEdit,
+                                        SendMessage(gDoc->hwndEdit,
                                                     SCI_BRACEHIGHLIGHT, iPos,
                                                     iBrace2);
-                                        SendMessage(hwndEdit,
+                                        SendMessage(gDoc->hwndEdit,
                                                     SCI_SETHIGHLIGHTGUIDE,
                                                     min(col1, col2), 0);
                                     } else {
-                                        SendMessage(hwndEdit, SCI_BRACEBADLIGHT,
+                                        SendMessage(gDoc->hwndEdit, SCI_BRACEBADLIGHT,
                                                     iPos, 0);
-                                        SendMessage(hwndEdit,
+                                        SendMessage(gDoc->hwndEdit,
                                                     SCI_SETHIGHLIGHTGUIDE, 0,
                                                     0);
                                     }
                                 } else {
-                                    SendMessage(hwndEdit, SCI_BRACEHIGHLIGHT,
+                                    SendMessage(gDoc->hwndEdit, SCI_BRACEHIGHLIGHT,
                                                 (WPARAM) - 1, (LPARAM) - 1);
-                                    SendMessage(hwndEdit, SCI_SETHIGHLIGHTGUIDE,
+                                    SendMessage(gDoc->hwndEdit, SCI_SETHIGHLIGHTGUIDE,
                                                 0, 0);
                                 }
                             }
@@ -5004,15 +5007,15 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
                             // int  iIndentLen;
 
                             int iCurPos = (int)SendMessage(
-                                hwndEdit, SCI_GETCURRENTPOS, 0, 0);
+                                gDoc->hwndEdit, SCI_GETCURRENTPOS, 0, 0);
                             // int iAnchorPos =
-                            // (int)SendMessage(hwndEdit,SCI_GETANCHOR,0,0);
+                            // (int)SendMessage(gDoc->hwndEdit,SCI_GETANCHOR,0,0);
                             int iCurLine =
-                                (int)SendMessage(hwndEdit, SCI_LINEFROMPOSITION,
+                                (int) SendMessage(gDoc->hwndEdit, SCI_LINEFROMPOSITION,
                                                  (WPARAM)iCurPos, 0);
-// int iLineLength = (int)SendMessage(hwndEdit,SCI_LINELENGTH,iCurLine,0);
+// int iLineLength = (int)SendMessage(gDoc->hwndEdit,SCI_LINELENGTH,iCurLine,0);
 // int iIndentBefore =
-// (int)SendMessage(hwndEdit,SCI_GETLINEINDENTATION,(WPARAM)iCurLine-1,0);
+// (int)SendMessage(gDoc->hwndEdit,SCI_GETLINEINDENTATION,(WPARAM)iCurLine-1,0);
 
 #ifdef BOOKMARK_EDITION
                             // Move bookmark along with line if inserting lines
@@ -5020,20 +5023,20 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
                             // Scintilla does not do this for us
                             if (iCurLine > 0) {
                                 int iPrevLineLength =
-                                    (int)SendMessage(hwndEdit,
+                                    (int) SendMessage(gDoc->hwndEdit,
                                                      SCI_GETLINEENDPOSITION,
                                                      iCurLine - 1, 0) -
-                                    (int)SendMessage(hwndEdit,
+                                                     (int) SendMessage(gDoc->hwndEdit,
                                                      SCI_POSITIONFROMLINE,
                                                      iCurLine - 1, 0);
                                 if (iPrevLineLength == 0) {
                                     int bitmask = (int)SendMessage(
-                                        hwndEdit, SCI_MARKERGET, iCurLine - 1,
+                                        gDoc->hwndEdit, SCI_MARKERGET, iCurLine - 1,
                                         0);
                                     if (bitmask & 1) {
-                                        SendMessage(hwndEdit, SCI_MARKERDELETE,
+                                        SendMessage(gDoc->hwndEdit, SCI_MARKERDELETE,
                                                     iCurLine - 1, 0);
-                                        SendMessage(hwndEdit, SCI_MARKERADD,
+                                        SendMessage(gDoc->hwndEdit, SCI_MARKERADD,
                                                     iCurLine, 0);
                                     }
                                 }
@@ -5042,10 +5045,10 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
                             if (iCurLine > 0 /* && iLineLength <= 2*/) {
                                 int iPrevLineLength = (int)SendMessage(
-                                    hwndEdit, SCI_LINELENGTH, iCurLine - 1, 0);
+                                    gDoc->hwndEdit, SCI_LINELENGTH, iCurLine - 1, 0);
                                 if (pLineBuf = (char *)GlobalAlloc(
                                         GPTR, iPrevLineLength + 1)) {
-                                    SendMessage(hwndEdit, SCI_GETLINE,
+                                    SendMessage(gDoc->hwndEdit, SCI_GETLINE,
                                                 iCurLine - 1, (LPARAM)pLineBuf);
                                     *(pLineBuf + iPrevLineLength) = '\0';
                                     for (pPos = pLineBuf; *pPos; pPos++) {
@@ -5057,38 +5060,38 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
                                         // int iPrevLineEndPos;
                                         // int iPrevLineIndentPos;
 
-                                        SendMessage(hwndEdit,
+                                        SendMessage(gDoc->hwndEdit,
                                                     SCI_BEGINUNDOACTION, 0, 0);
-                                        SendMessage(hwndEdit, SCI_ADDTEXT,
+                                        SendMessage(gDoc->hwndEdit, SCI_ADDTEXT,
                                                     lstrlenA(pLineBuf),
                                                     (LPARAM)pLineBuf);
-                                        SendMessage(hwndEdit, SCI_ENDUNDOACTION,
+                                        SendMessage(gDoc->hwndEdit, SCI_ENDUNDOACTION,
                                                     0, 0);
 
                                         // iPrevLineStartPos  =
-                                        // (int)SendMessage(hwndEdit,SCI_POSITIONFROMLINE,(WPARAM)iCurLine-1,0);
+                                        // (int)SendMessage(gDoc->hwndEdit,SCI_POSITIONFROMLINE,(WPARAM)iCurLine-1,0);
                                         // iPrevLineEndPos    =
-                                        // (int)SendMessage(hwndEdit,SCI_GETLINEENDPOSITION,(WPARAM)iCurLine-1,0);
+                                        // (int)SendMessage(gDoc->hwndEdit,SCI_GETLINEENDPOSITION,(WPARAM)iCurLine-1,0);
                                         // iPrevLineIndentPos =
-                                        // (int)SendMessage(hwndEdit,SCI_GETLINEINDENTPOSITION,(WPARAM)iCurLine-1,0);
+                                        // (int)SendMessage(gDoc->hwndEdit,SCI_GETLINEINDENTPOSITION,(WPARAM)iCurLine-1,0);
 
                                         // if (iPrevLineEndPos ==
                                         // iPrevLineIndentPos) {
-                                        //  SendMessage(hwndEdit,SCI_BEGINUNDOACTION,0,0);
-                                        //  SendMessage(hwndEdit,SCI_SETTARGETSTART,(WPARAM)iPrevLineStartPos,0);
-                                        //  SendMessage(hwndEdit,SCI_SETTARGETEND,(WPARAM)iPrevLineEndPos,0);
-                                        //  SendMessage(hwndEdit,SCI_REPLACETARGET,0,(LPARAM)"");
-                                        //  SendMessage(hwndEdit,SCI_ENDUNDOACTION,0,0);
+                                        //  SendMessage(gDoc->hwndEdit,SCI_BEGINUNDOACTION,0,0);
+                                        //  SendMessage(gDoc->hwndEdit,SCI_SETTARGETSTART,(WPARAM)iPrevLineStartPos,0);
+                                        //  SendMessage(gDoc->hwndEdit,SCI_SETTARGETEND,(WPARAM)iPrevLineEndPos,0);
+                                        //  SendMessage(gDoc->hwndEdit,SCI_REPLACETARGET,0,(LPARAM)"");
+                                        //  SendMessage(gDoc->hwndEdit,SCI_ENDUNDOACTION,0,0);
                                         //}
                                     }
                                     GlobalFree(pLineBuf);
                                     // int iIndent =
-                                    // (int)SendMessage(hwndEdit,SCI_GETLINEINDENTATION,(WPARAM)iCurLine,0);
-                                    // SendMessage(hwndEdit,SCI_SETLINEINDENTATION,(WPARAM)iCurLine,(LPARAM)iIndentBefore);
+                                    // (int)SendMessage(gDoc->hwndEdit,SCI_GETLINEINDENTATION,(WPARAM)iCurLine,0);
+                                    // SendMessage(gDoc->hwndEdit,SCI_SETLINEINDENTATION,(WPARAM)iCurLine,(LPARAM)iIndentBefore);
                                     // iIndentLen = /*- iIndent +*/
-                                    // SendMessage(hwndEdit,SCI_GETLINEINDENTATION,(WPARAM)iCurLine,0);
+                                    // SendMessage(gDoc->hwndEdit,SCI_GETLINEINDENTATION,(WPARAM)iCurLine,0);
                                     // if (iIndentLen > 0)
-                                    //  SendMessage(hwndEdit,SCI_SETSEL,(WPARAM)iAnchorPos+iIndentLen,(LPARAM)iCurPos+iIndentLen);
+                                    //  SendMessage(gDoc->hwndEdit,SCI_SETSEL,(WPARAM)iAnchorPos+iIndentLen,(LPARAM)iCurPos+iIndentLen);
                                 }
                             }
                         }
@@ -5096,13 +5099,13 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
                     // Auto close tags
                     else if (bAutoCloseTags && scn->ch == '>') {
                         // int iLexer =
-                        // (int)SendMessage(hwndEdit,SCI_GETLEXER,0,0);
+                        // (int)SendMessage(gDoc->hwndEdit,SCI_GETLEXER,0,0);
                         if (/*iLexer == SCLEX_HTML || iLexer == SCLEX_XML*/ 1) {
                             char tchBuf[512] = { 0 };
                             char tchIns[516] = "</";
                             int cchIns = 2;
                             int iCurPos = (int)SendMessage(
-                                hwndEdit, SCI_GETCURRENTPOS, 0, 0);
+                                gDoc->hwndEdit, SCI_GETCURRENTPOS, 0, 0);
                             int iHelper = iCurPos - (COUNTOF(tchBuf) - 1);
                             int iStartPos = max(0, iHelper);
                             int iSize = iCurPos - iStartPos;
@@ -5111,7 +5114,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
                                 struct TextRange tr = { { iStartPos, iCurPos },
                                                         tchBuf };
-                                SendMessage(hwndEdit, SCI_GETTEXTRANGE, 0,
+                                SendMessage(gDoc->hwndEdit, SCI_GETTEXTRANGE, 0,
                                             (LPARAM) & tr);
 
                                 if (tchBuf[iSize - 2] != '/') {
@@ -5145,21 +5148,21 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
                                         lstrcmpiA(tchIns, "</input>") &&
                                         lstrcmpiA(tchIns, "</link>") &&
                                         lstrcmpiA(tchIns, "</meta>")) {
-                                        SendMessage(hwndEdit,
+                                        SendMessage(gDoc->hwndEdit,
                                                     SCI_BEGINUNDOACTION, 0, 0);
-                                        SendMessage(hwndEdit, SCI_REPLACESEL, 0,
+                                        SendMessage(gDoc->hwndEdit, SCI_REPLACESEL, 0,
                                                     (LPARAM)tchIns);
-                                        SendMessage(hwndEdit, SCI_SETSEL,
+                                        SendMessage(gDoc->hwndEdit, SCI_SETSEL,
                                                     iCurPos, iCurPos);
-                                        SendMessage(hwndEdit, SCI_ENDUNDOACTION,
+                                        SendMessage(gDoc->hwndEdit, SCI_ENDUNDOACTION,
                                                     0, 0);
                                     }
                                 }
                             }
                         }
                     } else if (bAutoCompleteWords &&
-                               !SendMessage(hwndEdit, SCI_AUTOCACTIVE, 0, 0))
-                        CompleteWord(hwndEdit, FALSE);
+                        !SendMessage(gDoc->hwndEdit, SCI_AUTOCACTIVE, 0, 0))
+                        CompleteWord(gDoc->hwndEdit, FALSE);
                     break;
 
                 case SCN_MODIFIED:
@@ -5248,9 +5251,9 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
                     switch (pnmm->dwItemSpec) {
                         case STATUS_EOLMODE:
                             SendMessage(
-                                hwndEdit, SCI_CONVERTEOLS,
-                                SendMessage(hwndEdit, SCI_GETEOLMODE, 0, 0), 0);
-                            EditFixPositions(hwndEdit);
+                                gDoc->hwndEdit, SCI_CONVERTEOLS,
+                                SendMessage(gDoc->hwndEdit, SCI_GETEOLMODE, 0, 0), 0);
+                            EditFixPositions(gDoc->hwndEdit);
                             return TRUE;
 
                         default:
@@ -5287,7 +5290,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
                             return TRUE;
 
                         case STATUS_OVRMODE:
-                            SendMessage(hwndEdit, SCI_EDITTOGGLEOVERTYPE, 0, 0);
+                            SendMessage(gDoc->hwndEdit, SCI_EDITTOGGLEOVERTYPE, 0, 0);
                             return TRUE;
 
                         default:
@@ -6468,18 +6471,18 @@ void UpdateToolbar() {
     EnableTool(IDT_FILE_ADDTOFAV, lstrlen(szCurFile));
 
     EnableTool(IDT_EDIT_UNDO,
-               SendMessage(hwndEdit, SCI_CANUNDO, 0, 0) /*&& !bReadOnly*/);
+        SendMessage(gDoc->hwndEdit, SCI_CANUNDO, 0, 0) /*&& !bReadOnly*/);
     EnableTool(IDT_EDIT_REDO,
-               SendMessage(hwndEdit, SCI_CANREDO, 0, 0) /*&& !bReadOnly*/);
+        SendMessage(gDoc->hwndEdit, SCI_CANREDO, 0, 0) /*&& !bReadOnly*/);
 
-    i = (int)SendMessage(hwndEdit, SCI_GETSELECTIONEND, 0, 0) -
-        (int)SendMessage(hwndEdit, SCI_GETSELECTIONSTART, 0, 0);
+    i = (int) SendMessage(gDoc->hwndEdit, SCI_GETSELECTIONEND, 0, 0) -
+        (int) SendMessage(gDoc->hwndEdit, SCI_GETSELECTIONSTART, 0, 0);
     EnableTool(IDT_EDIT_CUT, i /*&& !bReadOnly*/);
-    EnableTool(IDT_EDIT_COPY, SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0));
+    EnableTool(IDT_EDIT_COPY, SendMessage(gDoc->hwndEdit, SCI_GETLENGTH, 0, 0));
     EnableTool(IDT_EDIT_PASTE,
-               SendMessage(hwndEdit, SCI_CANPASTE, 0, 0) /*&& !bReadOnly*/);
+        SendMessage(gDoc->hwndEdit, SCI_CANPASTE, 0, 0) /*&& !bReadOnly*/);
 
-    i = (int)SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0);
+    i = (int) SendMessage(gDoc->hwndEdit, SCI_GETLENGTH, 0, 0);
     EnableTool(IDT_EDIT_FIND, i);
     // EnableTool(IDT_EDIT_FINDNEXT,i);
     // EnableTool(IDT_EDIT_FINDPREV,i && lstrlen(efrData.szFind));
@@ -6526,17 +6529,17 @@ void UpdateStatusbar() {
     if (!bShowStatusbar)
         return;
 
-    iPos = (int)SendMessage(hwndEdit, SCI_GETCURRENTPOS, 0, 0);
+    iPos = (int) SendMessage(gDoc->hwndEdit, SCI_GETCURRENTPOS, 0, 0);
 
-    iLn = (int)SendMessage(hwndEdit, SCI_LINEFROMPOSITION, iPos, 0) + 1;
+    iLn = (int) SendMessage(gDoc->hwndEdit, SCI_LINEFROMPOSITION, iPos, 0) + 1;
     wsprintf(tchLn, L"%i", iLn);
     FormatNumberStr(tchLn);
 
-    iLines = (int)SendMessage(hwndEdit, SCI_GETLINECOUNT, 0, 0);
+    iLines = (int) SendMessage(gDoc->hwndEdit, SCI_GETLINECOUNT, 0, 0);
     wsprintf(tchLines, L"%i", iLines);
     FormatNumberStr(tchLines);
 
-    iCol = (int)SendMessage(hwndEdit, SCI_GETCOLUMN, iPos, 0) + 1;
+    iCol = (int) SendMessage(gDoc->hwndEdit, SCI_GETCOLUMN, iPos, 0) + 1;
     wsprintf(tchCol, L"%i", iCol);
     FormatNumberStr(tchCol);
 
@@ -6545,9 +6548,9 @@ void UpdateStatusbar() {
         FormatNumberStr(tchCols);
     }
 
-    if (SC_SEL_RECTANGLE != SendMessage(hwndEdit, SCI_GETSELECTIONMODE, 0, 0)) {
-        iSel = (int)SendMessage(hwndEdit, SCI_GETSELECTIONEND, 0, 0) -
-               (int)SendMessage(hwndEdit, SCI_GETSELECTIONSTART, 0, 0);
+    if (SC_SEL_RECTANGLE != SendMessage(gDoc->hwndEdit, SCI_GETSELECTIONMODE, 0, 0)) {
+        iSel = (int) SendMessage(gDoc->hwndEdit, SCI_GETSELECTIONEND, 0, 0) -
+            (int) SendMessage(gDoc->hwndEdit, SCI_GETSELECTIONSTART, 0, 0);
         wsprintf(tchSel, L"%i", iSel);
         FormatNumberStr(tchSel);
     } else
@@ -6555,12 +6558,12 @@ void UpdateStatusbar() {
 
 #ifdef BOOKMARK_EDITION
     // Print number of lines selected lines in statusbar
-    iSelStart = (int)SendMessage(hwndEdit, SCI_GETSELECTIONSTART, 0, 0);
-    iSelEnd = (int)SendMessage(hwndEdit, SCI_GETSELECTIONEND, 0, 0);
-    iLineStart = (int)SendMessage(hwndEdit, SCI_LINEFROMPOSITION, iSelStart, 0);
-    iLineEnd = (int)SendMessage(hwndEdit, SCI_LINEFROMPOSITION, iSelEnd, 0);
+    iSelStart = (int) SendMessage(gDoc->hwndEdit, SCI_GETSELECTIONSTART, 0, 0);
+    iSelEnd = (int) SendMessage(gDoc->hwndEdit, SCI_GETSELECTIONEND, 0, 0);
+    iLineStart = (int) SendMessage(gDoc->hwndEdit, SCI_LINEFROMPOSITION, iSelStart, 0);
+    iLineEnd = (int) SendMessage(gDoc->hwndEdit, SCI_LINEFROMPOSITION, iSelEnd, 0);
     iStartOfLinePos =
-        (int)SendMessage(hwndEdit, SCI_POSITIONFROMLINE, iLineEnd, 0);
+        (int) SendMessage(gDoc->hwndEdit, SCI_POSITIONFROMLINE, iLineEnd, 0);
     iLinesSelected = iLineEnd - iLineStart;
     if (iSelStart != iSelEnd && iStartOfLinePos != iSelEnd)
         iLinesSelected += 1;
@@ -6584,7 +6587,7 @@ void UpdateStatusbar() {
                      tchLines, tchCol, tchCols, tchSel);
 #endif
 
-    iBytes = (int)SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0);
+    iBytes = (int) SendMessage(gDoc->hwndEdit, SCI_GETLENGTH, 0, 0);
     StrFormatByteSize(iBytes, tchBytes, COUNTOF(tchBytes));
 
     FormatString(tchDocSize, COUNTOF(tchDocSize), IDS_DOCSIZE, tchBytes);
@@ -6598,7 +6601,7 @@ void UpdateStatusbar() {
     else
         lstrcpy(tchEOLMode, L"CR+LF");
 
-    if (SendMessage(hwndEdit, SCI_GETOVERTYPE, 0, 0))
+    if (SendMessage(gDoc->hwndEdit, SCI_GETOVERTYPE, 0, 0))
         lstrcpy(tchOvrMode, L"OVR");
     else
         lstrcpy(tchOvrMode, L"INS");
@@ -6623,19 +6626,19 @@ void UpdateLineNumberWidth() {
     if (bShowLineNumbers) {
 
         wsprintfA(tchLines, "_%i_",
-                  SendMessage(hwndEdit, SCI_GETLINECOUNT, 0, 0));
+            SendMessage(gDoc->hwndEdit, SCI_GETLINECOUNT, 0, 0));
 
         iLineMarginWidthNow =
-            (int)SendMessage(hwndEdit, SCI_GETMARGINWIDTHN, 0, 0);
+            (int) SendMessage(gDoc->hwndEdit, SCI_GETMARGINWIDTHN, 0, 0);
         iLineMarginWidthFit = (int)SendMessage(
-            hwndEdit, SCI_TEXTWIDTH, STYLE_LINENUMBER, (LPARAM)tchLines);
+            gDoc->hwndEdit, SCI_TEXTWIDTH, STYLE_LINENUMBER, (LPARAM) tchLines);
 
         if (iLineMarginWidthNow != iLineMarginWidthFit) {
-            // SendMessage(hwndEdit,SCI_SETMARGINWIDTHN,0,0);
-            SendMessage(hwndEdit, SCI_SETMARGINWIDTHN, 0, iLineMarginWidthFit);
+            // SendMessage(gDoc->hwndEdit,SCI_SETMARGINWIDTHN,0,0);
+            SendMessage(gDoc->hwndEdit, SCI_SETMARGINWIDTHN, 0, iLineMarginWidthFit);
         }
     } else
-        SendMessage(hwndEdit, SCI_SETMARGINWIDTHN, 0, 0);
+        SendMessage(gDoc->hwndEdit, SCI_SETMARGINWIDTHN, 0, 0);
 }
 
 BOOL FileIO(BOOL fLoad, LPCWSTR psz, BOOL bNoEncDetect, int *ienc, int *ieol,
@@ -6657,11 +6660,11 @@ BOOL FileIO(BOOL fLoad, LPCWSTR psz, BOOL bNoEncDetect, int *ienc, int *ieol,
     UpdateWindow(hwndStatus);
 
     if (fLoad)
-        fSuccess = EditLoadFile(hwndEdit, psz, bNoEncDetect, ienc, ieol,
+        fSuccess = EditLoadFile(gDoc->hwndEdit, psz, bNoEncDetect, ienc, ieol,
                                 pbUnicodeErr, pbFileTooBig);
     else
         fSuccess =
-            EditSaveFile(hwndEdit, psz, *ienc, pbCancelDataLoss, bSaveCopy);
+        EditSaveFile(gDoc->hwndEdit, psz, *ienc, pbCancelDataLoss, bSaveCopy);
 
     dwFileAttributes = GetFileAttributes(psz);
     bReadOnly = (dwFileAttributes != INVALID_FILE_ATTRIBUTES &&
@@ -6694,20 +6697,20 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect,
         if (!fKeepTitleExcerpt)
             lstrcpy(szTitleExcerpt, L"");
         FileVars_Init(NULL, 0, &fvCurFile);
-        EditSetNewText(hwndEdit, "", 0);
-        Style_SetLexer(hwndEdit, NULL);
+        EditSetNewText(gDoc->hwndEdit, "", 0);
+        Style_SetLexer(gDoc->hwndEdit, NULL);
         UpdateLineNumberWidth();
         bModified = FALSE;
         bReadOnly = FALSE;
         iEOLMode = iLineEndings[iDefaultEOLMode];
-        SendMessage(hwndEdit, SCI_SETEOLMODE, iLineEndings[iDefaultEOLMode], 0);
+        SendMessage(gDoc->hwndEdit, SCI_SETEOLMODE, iLineEndings[iDefaultEOLMode], 0);
         iEncoding = iDefaultEncoding;
         iOriginalEncoding = iDefaultEncoding;
-        SendMessage(hwndEdit, SCI_SETCODEPAGE,
+        SendMessage(gDoc->hwndEdit, SCI_SETCODEPAGE,
                     (iDefaultEncoding == CPI_DEFAULT) ? iDefaultCodePage
                                                       : SC_CP_UTF8,
                     0);
-        EditSetNewText(hwndEdit, "", 0);
+        EditSetNewText(gDoc->hwndEdit, "", 0);
         SetWindowTitle(hwndMain, uidsAppTitle, fIsElevated, IDS_UNTITLED,
                        szCurFile, iPathNameFormat,
                        bModified || iEncoding != iOriginalEncoding,
@@ -6759,10 +6762,10 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect,
             if (fSuccess = (hFile != INVALID_HANDLE_VALUE)) {
                 CloseHandle(hFile);
                 FileVars_Init(NULL, 0, &fvCurFile);
-                EditSetNewText(hwndEdit, "", 0);
-                Style_SetLexer(hwndEdit, NULL);
+                EditSetNewText(gDoc->hwndEdit, "", 0);
+                Style_SetLexer(gDoc->hwndEdit, NULL);
                 iEOLMode = iLineEndings[iDefaultEOLMode];
-                SendMessage(hwndEdit, SCI_SETEOLMODE,
+                SendMessage(gDoc->hwndEdit, SCI_SETEOLMODE,
                             iLineEndings[iDefaultEOLMode], 0);
                 if (iSrcEncoding != -1) {
                     iEncoding = iSrcEncoding;
@@ -6771,12 +6774,12 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect,
                     iEncoding = iDefaultEncoding;
                     iOriginalEncoding = iDefaultEncoding;
                 }
-                SendMessage(hwndEdit, SCI_SETCODEPAGE,
+                SendMessage(gDoc->hwndEdit, SCI_SETCODEPAGE,
                             (iEncoding == CPI_DEFAULT) ? iDefaultCodePage
                                                        : SC_CP_UTF8,
                             0);
                 bReadOnly = FALSE;
-                EditSetNewText(hwndEdit, "", 0);
+                EditSetNewText(gDoc->hwndEdit, "", 0);
             }
         } else
             return FALSE;
@@ -6791,12 +6794,12 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect,
         if (!fKeepTitleExcerpt)
             lstrcpy(szTitleExcerpt, L"");
         if (!flagLexerSpecified) // flag will be cleared
-            Style_SetLexerFromFile(hwndEdit, szCurFile);
+            Style_SetLexerFromFile(gDoc->hwndEdit, szCurFile);
         UpdateLineNumberWidth();
         iOriginalEncoding = iEncoding;
         bModified = FALSE;
         // bReadOnly = FALSE;
-        SendMessage(hwndEdit, SCI_SETEOLMODE, iEOLMode, 0);
+        SendMessage(gDoc->hwndEdit, SCI_SETEOLMODE, iEOLMode, 0);
         MRU_AddFile(pFileMRU, szFileName, flagRelativeFileMRU,
                     flagPortableMyDocs);
         if (flagUseSystemMRU == 2)
@@ -6812,20 +6815,20 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect,
         InstallFileWatching(szCurFile);
 
         // the .LOG feature ...
-        if (SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0) >= 4) {
+        if (SendMessage(gDoc->hwndEdit, SCI_GETLENGTH, 0, 0) >= 4) {
             char tchLog[5] = "";
-            SendMessage(hwndEdit, SCI_GETTEXT, 5, (LPARAM)tchLog);
+            SendMessage(gDoc->hwndEdit, SCI_GETTEXT, 5, (LPARAM) tchLog);
             if (lstrcmpiA(tchLog, ".LOG") == 0) {
-                EditJumpTo(hwndEdit, -1, 0);
-                SendMessage(hwndEdit, SCI_BEGINUNDOACTION, 0, 0);
-                SendMessage(hwndEdit, SCI_NEWLINE, 0, 0);
+                EditJumpTo(gDoc->hwndEdit, -1, 0);
+                SendMessage(gDoc->hwndEdit, SCI_BEGINUNDOACTION, 0, 0);
+                SendMessage(gDoc->hwndEdit, SCI_NEWLINE, 0, 0);
                 SendMessage(hwndMain, WM_COMMAND,
                             MAKELONG(IDM_EDIT_INSERT_SHORTDATE, 1), 0);
-                EditJumpTo(hwndEdit, -1, 0);
-                SendMessage(hwndEdit, SCI_NEWLINE, 0, 0);
-                SendMessage(hwndEdit, SCI_ENDUNDOACTION, 0, 0);
-                EditJumpTo(hwndEdit, -1, 0);
-                EditEnsureSelectionVisible(hwndEdit);
+                EditJumpTo(gDoc->hwndEdit, -1, 0);
+                SendMessage(gDoc->hwndEdit, SCI_NEWLINE, 0, 0);
+                SendMessage(gDoc->hwndEdit, SCI_ENDUNDOACTION, 0, 0);
+                EditJumpTo(gDoc->hwndEdit, -1, 0);
+                EditEnsureSelectionVisible(gDoc->hwndEdit);
             }
         }
 
@@ -6845,12 +6848,12 @@ BOOL FileSave(BOOL bSaveAlways, BOOL bAsk, BOOL bSaveAs, BOOL bSaveCopy) {
 
     BOOL bIsEmptyNewFile = FALSE;
     if (lstrlen(szCurFile) == 0) {
-        int cchText = (int)SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0);
+        int cchText = (int) SendMessage(gDoc->hwndEdit, SCI_GETLENGTH, 0, 0);
         if (cchText == 0)
             bIsEmptyNewFile = TRUE;
         else if (cchText < 1023) {
             char tchText[2048];
-            SendMessage(hwndEdit, SCI_GETTEXT, (WPARAM)2047, (LPARAM)tchText);
+            SendMessage(gDoc->hwndEdit, SCI_GETTEXT, (WPARAM) 2047, (LPARAM) tchText);
             StrTrimA(tchText, " \t\n\r");
             if (lstrlenA(tchText) == 0)
                 bIsEmptyNewFile = TRUE;
@@ -6915,7 +6918,7 @@ BOOL FileSave(BOOL bSaveAlways, BOOL bAsk, BOOL bSaveAs, BOOL bSaveCopy) {
                                   FALSE);
                     if (!fKeepTitleExcerpt)
                         lstrcpy(szTitleExcerpt, L"");
-                    Style_SetLexerFromFile(hwndEdit, szCurFile);
+                    Style_SetLexerFromFile(gDoc->hwndEdit, szCurFile);
                     UpdateStatusbar();
                     UpdateLineNumberWidth();
                 } else {
@@ -7618,18 +7621,18 @@ void CALLBACK
 PasteBoardTimer(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime) {
     if (dwLastCopyTime > 0 && GetTickCount() - dwLastCopyTime > 200) {
 
-        if (SendMessage(hwndEdit, SCI_CANPASTE, 0, 0)) {
+        if (SendMessage(gDoc->hwndEdit, SCI_CANPASTE, 0, 0)) {
 
             BOOL bAutoIndent2 = bAutoIndent;
             bAutoIndent = 0;
-            EditJumpTo(hwndEdit, -1, 0);
-            SendMessage(hwndEdit, SCI_BEGINUNDOACTION, 0, 0);
-            if (SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0) > 0)
-                SendMessage(hwndEdit, SCI_NEWLINE, 0, 0);
-            SendMessage(hwndEdit, SCI_PASTE, 0, 0);
-            SendMessage(hwndEdit, SCI_NEWLINE, 0, 0);
-            SendMessage(hwndEdit, SCI_ENDUNDOACTION, 0, 0);
-            EditEnsureSelectionVisible(hwndEdit);
+            EditJumpTo(gDoc->hwndEdit, -1, 0);
+            SendMessage(gDoc->hwndEdit, SCI_BEGINUNDOACTION, 0, 0);
+            if (SendMessage(gDoc->hwndEdit, SCI_GETLENGTH, 0, 0) > 0)
+                SendMessage(gDoc->hwndEdit, SCI_NEWLINE, 0, 0);
+            SendMessage(gDoc->hwndEdit, SCI_PASTE, 0, 0);
+            SendMessage(gDoc->hwndEdit, SCI_NEWLINE, 0, 0);
+            SendMessage(gDoc->hwndEdit, SCI_ENDUNDOACTION, 0, 0);
+            EditEnsureSelectionVisible(gDoc->hwndEdit);
             bAutoIndent = bAutoIndent2;
         }
 

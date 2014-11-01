@@ -17,7 +17,6 @@ See License.txt for details about distribution and modification.
 #include "SciCall.h"
 
 extern HWND hwndMain;
-extern HWND hwndEdit;
 extern HINSTANCE g_hInstance;
 // extern LPMALLOC  g_lpMalloc;
 extern DWORD dwLastIOError;
@@ -5067,7 +5066,7 @@ EditFindReplaceDlgProcW(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
                     // from clipboard to find box (but only if nothing is
                     // selected in the editor)
                     if (lstrcmpA(lpszSelection, "") == 0 && bFirstTime) {
-                        char *pClip = EditGetClipboardText(hwndEdit);
+                        char *pClip = EditGetClipboardText(gDoc->hwndEdit);
                         if (lstrlenA(pClip) > 0 && lstrlenA(pClip) <= 500) {
                             GlobalFree(lpszSelection);
                             lpszSelection =
@@ -6338,8 +6337,8 @@ EditLinenumDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
         case WM_INITDIALOG: {
 
             int iCurLine =
-                (int)SendMessage(hwndEdit, SCI_LINEFROMPOSITION,
-                                 SendMessage(hwndEdit, SCI_GETCURRENTPOS, 0, 0),
+                (int) SendMessage(gDoc->hwndEdit, SCI_LINEFROMPOSITION,
+                SendMessage(gDoc->hwndEdit, SCI_GETCURRENTPOS, 0, 0),
                                  0) +
                 1;
 
@@ -6366,7 +6365,7 @@ EditLinenumDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
                     int iNewLine = (int)GetDlgItemInt(hwnd, IDC_LINENUM,
                                                       &fTranslated, FALSE);
                     int iMaxLine =
-                        (int)SendMessage(hwndEdit, SCI_GETLINECOUNT, 0, 0);
+                        (int) SendMessage(gDoc->hwndEdit, SCI_GETLINECOUNT, 0, 0);
 
                     if (SendDlgItemMessage(hwnd, IDC_COLNUM, WM_GETTEXTLENGTH,
                                            0, 0) > 0)
@@ -6388,25 +6387,25 @@ EditLinenumDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 
                     if (iNewLine > 0 && iNewLine <= iMaxLine && iNewCol > 0) {
                         // int iNewPos  =
-                        // SendMessage(hwndEdit,SCI_POSITIONFROMLINE,(WPARAM)iNewLine-1,0);
+                        // SendMessage(gDoc->hwndEdit,SCI_POSITIONFROMLINE,(WPARAM)iNewLine-1,0);
                         // int iLineEndPos =
-                        // SendMessage(hwndEdit,SCI_GETLINEENDPOSITION,(WPARAM)iNewLine-1,0);
+                        // SendMessage(gDoc->hwndEdit,SCI_GETLINEENDPOSITION,(WPARAM)iNewLine-1,0);
 
                         // while (iNewCol-1 >
-                        // SendMessage(hwndEdit,SCI_GETCOLUMN,(WPARAM)iNewPos,0))
+                        // SendMessage(gDoc->hwndEdit,SCI_GETCOLUMN,(WPARAM)iNewPos,0))
                         //{
                         //  if (iNewPos >= iLineEndPos)
                         //    break;
 
                         //  iNewPos =
-                        // SendMessage(hwndEdit,SCI_POSITIONAFTER,(WPARAM)iNewPos,0);
+                        // SendMessage(gDoc->hwndEdit,SCI_POSITIONAFTER,(WPARAM)iNewPos,0);
                         //}
 
                         // iNewPos = min(iNewPos,iLineEndPos);
-                        // SendMessage(hwndEdit,SCI_GOTOPOS,(WPARAM)iNewPos,0);
-                        // SendMessage(hwndEdit,SCI_CHOOSECARETX,0,0);
+                        // SendMessage(gDoc->hwndEdit,SCI_GOTOPOS,(WPARAM)iNewPos,0);
+                        // SendMessage(gDoc->hwndEdit,SCI_CHOOSECARETX,0,0);
 
-                        EditJumpTo(hwndEdit, iNewLine, iNewCol);
+                        EditJumpTo(gDoc->hwndEdit, iNewLine, iNewCol);
 
                         EndDialog(hwnd, IDOK);
                     } else
@@ -6859,7 +6858,7 @@ EditSortDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
                 bEnableLogicalSort = FALSE;
             }
             if (SC_SEL_RECTANGLE !=
-                SendMessage(hwndEdit, SCI_GETSELECTIONMODE, 0, 0)) {
+                SendMessage(gDoc->hwndEdit, SCI_GETSELECTIONMODE, 0, 0)) {
                 *piSortFlags &= ~SORT_COLUMN;
                 EnableWindow(GetDlgItem(hwnd, 108), FALSE);
             } else {
@@ -7113,16 +7112,16 @@ BOOL FileVars_Apply(HWND hwnd, LPFILEVARS lpfv) {
         bTabIndents = lpfv->bTabIndents;
     else
         bTabIndents = bTabIndentsG;
-    SendMessage(hwndEdit, SCI_SETTABINDENTS, bTabIndents, 0);
+    SendMessage(gDoc->hwndEdit, SCI_SETTABINDENTS, bTabIndents, 0);
 
     if (lpfv->mask & FV_WORDWRAP)
         fWordWrap = lpfv->fWordWrap;
     else
         fWordWrap = fWordWrapG;
     if (!fWordWrap)
-        SendMessage(hwndEdit, SCI_SETWRAPMODE, SC_WRAP_NONE, 0);
+        SendMessage(gDoc->hwndEdit, SCI_SETWRAPMODE, SC_WRAP_NONE, 0);
     else
-        SendMessage(hwndEdit, SCI_SETWRAPMODE,
+        SendMessage(gDoc->hwndEdit, SCI_SETWRAPMODE,
                     (iWordWrapMode == 0) ? SC_WRAP_WORD : SC_WRAP_CHAR, 0);
 
     if (lpfv->mask & FV_LONGLINESLIMIT)

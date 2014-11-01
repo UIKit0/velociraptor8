@@ -29,20 +29,21 @@ __inline BOOL IniSetInt(LPCWSTR lpSection, LPCWSTR lpName, int i) {
 int IniSectionGetString(LPCWSTR, LPCWSTR, LPCWSTR, WCHAR *, int);
 int IniSectionGetInt(LPCWSTR, LPCWSTR, int);
 BOOL IniSectionSetString(WCHAR *, LPCWSTR, LPCWSTR);
-__inline BOOL IniSectionSetInt(WCHAR * lpCachedIniSection, LPCWSTR lpName,
+
+inline BOOL IniSectionSetInt(WCHAR * lpCachedIniSection, LPCWSTR lpName,
                                int i) {
     WCHAR tch[32];
     wsprintf(tch, L"%i", i);
     return IniSectionSetString(lpCachedIniSection, lpName, tch);
 }
 
-extern HWND hwndEdit;
-__inline void BeginWaitCursor() {
-    SendMessage(hwndEdit, SCI_SETCURSOR, (WPARAM)SC_CURSORWAIT, 0);
+inline void BeginWaitCursor() {
+    SendMessage(gDoc->hwndEdit, SCI_SETCURSOR, (WPARAM)SC_CURSORWAIT, 0);
 }
-__inline void EndWaitCursor() {
+
+inline void EndWaitCursor() {
     POINT pt;
-    SendMessage(hwndEdit, SCI_SETCURSOR, (WPARAM)SC_CURSORNORMAL, 0);
+    SendMessage(gDoc->hwndEdit, SCI_SETCURSOR, (WPARAM)SC_CURSORNORMAL, 0);
     GetCursorPos(&pt);
     SetCursorPos(pt.x, pt.y);
 }

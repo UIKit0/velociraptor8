@@ -15,7 +15,6 @@ See License.txt for details about distribution and modification.
 #include "version.h"
 
 extern HWND hwndMain;
-extern HWND hwndEdit;
 extern HINSTANCE g_hInstance;
 extern DWORD dwLastIOError;
 extern BOOL bSkipUnicodeDetection;

@@ -25,6 +25,12 @@ struct VeParams {
     WCHAR wchData;
 };
 
+struct Document {
+    HWND hwndEdit;
+};
+
+extern Document *gDoc;
+
 //==== Toolbar Style ==========================================================
 #define WS_TOOLBAR                                                             \
     (WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | TBSTYLE_TOOLTIPS |              \

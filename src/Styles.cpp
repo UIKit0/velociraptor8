@@ -6512,7 +6512,6 @@ Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 
                 case IDC_PREVIEW: {
                     // Hack from outside
-                    extern HWND hwndEdit;
                     extern void UpdateLineNumerWidth();
 
                     if (pCurrentStyle)
@@ -6528,7 +6527,7 @@ Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
                                     pCurrentLexer->pszDefExt);
                     }
 
-                    Style_SetLexer(hwndEdit, pLexCurrent);
+                    Style_SetLexer(gDoc->hwndEdit, pLexCurrent);
                     UpdateLineNumberWidth();
                 } break;
 
