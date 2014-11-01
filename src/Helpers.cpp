@@ -770,10 +770,10 @@ void PathRelativeToApp(WCHAR * lpszSrc, WCHAR * lpszDest, int cchDest,
     WCHAR wchResult[MAX_PATH];
     DWORD dwAttrTo = (bSrcIsFile) ? 0 : FILE_ATTRIBUTE_DIRECTORY;
 
-    GetModuleFileName(NULL, wchAppPath, dimof(wchAppPath));
+    GetModuleFileNameW(NULL, wchAppPath, dimof(wchAppPath));
     PathRemoveFileSpec(wchAppPath);
     GetWindowsDirectory(wchWinDir, dimof(wchWinDir));
-    SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT,
+    SHGetFolderPathW(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT,
                     wchUserFiles);
 
     if (bUnexpandMyDocs && !PathIsRelative(lpszSrc) &&
@@ -813,7 +813,7 @@ void PathAbsoluteFromApp(WCHAR * lpszSrc, WCHAR * lpszDest, int cchDest,
 
     if (StrCmpNI(lpszSrc, L"%CSIDL:MYDOCUMENTS%",
                  CSTRLEN("%CSIDL:MYDOCUMENTS%")) == 0) {
-        SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT,
+        SHGetFolderPathW(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT,
                         wchPath);
         PathAppend(wchPath, lpszSrc + CSTRLEN("%CSIDL:MYDOCUMENTS%"));
     } else
@@ -1573,24 +1573,24 @@ BOOL GetThemedDialogFont(WCHAR* lpFaceName, WORD *wSize) {
 #endif
 }
 
-__inline BOOL DialogTemplate_IsDialogEx(const DLGTEMPLATE *pTemplate) {
+BOOL DialogTemplate_IsDialogEx(const DLGTEMPLATE *pTemplate) {
 
     return ((DLGTEMPLATEEX *)pTemplate)->signature == 0xFFFF;
 }
 
-__inline BOOL DialogTemplate_HasFont(const DLGTEMPLATE *pTemplate) {
+BOOL DialogTemplate_HasFont(const DLGTEMPLATE *pTemplate) {
 
     return (DS_SETFONT & (DialogTemplate_IsDialogEx(pTemplate)
                               ? ((DLGTEMPLATEEX *)pTemplate)->style
                               : pTemplate->style));
 }
 
-__inline int DialogTemplate_FontAttrSize(BOOL bDialogEx) {
+int DialogTemplate_FontAttrSize(BOOL bDialogEx) {
 
     return (int)sizeof(WORD) * (bDialogEx ? 3 : 1);
 }
 
-__inline BYTE *DialogTemplate_GetFontSizeField(const DLGTEMPLATE *pTemplate) {
+BYTE *DialogTemplate_GetFontSizeField(const DLGTEMPLATE *pTemplate) {
 
     BOOL bDialogEx = DialogTemplate_IsDialogEx(pTemplate);
     WORD *pw;

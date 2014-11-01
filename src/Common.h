@@ -44,6 +44,11 @@ inline void CrashMe() {
 #define CrashIf(cond) __analysis_assume(!(cond))
 #endif
 
+inline void CrashIfLastError() {
+    DWORD err = GetLastError();
+    CrashIf(err != ERROR_SUCCESS);
+}
+
 template <typename T> T *AllocMust() {
     auto res = (T *)calloc(1, sizeof(T));
     CrashAlwaysIf(!res);

@@ -18,6 +18,7 @@ See License.txt for details about distribution and modification.
 #include "Version.h"
 #include "UITask.h"
 #include "Http.h"
+#include "Install.h"
 
 // Local and global Variables for Notepad2.c
 HWND hwndNextCBChain;
@@ -1376,6 +1377,8 @@ MainWndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
 LRESULT MsgCreate(HWND hwnd, WPARAM wp, LPARAM lp) {
     CREATESTRUCTW* cs = (CREATESTRUCTW*) lp;
     HINSTANCE hInstance = cs->hInstance;
+
+    (void)IsRunningInstalled();
 
     CrashIf(gDoc);
     gDoc = AllocMust<Document>();

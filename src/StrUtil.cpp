@@ -35,3 +35,9 @@ WCHAR *Utf8ToWstrBuf(const char *s, WCHAR *bufOut, size_t cchBufOutSize) {
 WCHAR *Utf8ToWstr(const char *s) {
     return Utf8ToWstrBuf(s, NULL, 0);
 }
+
+std::string WstrToUtf8Str(const WCHAR *s) {
+    AutoWstrToUtf8 sA(s);
+    char *cstr = sA.Get();
+    return std::string(cstr);
+}
