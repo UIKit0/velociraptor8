@@ -1143,11 +1143,26 @@ void PathFixBackslashes(WCHAR* lpsz) {
     }
 }
 
+std::string ExpandEnvString(std::string& s) {
+    WCHAR buf[512] = { 0 };
+    AutoUtf8ToWstr sW(s.c_str());
+
+    DWORD ret = ExpandEnvironmentStringsW(sW.Get(), buf, dimof(buf));
+    if (ret) {
+        AutoWstrToUtf8 bufUtf(buf);
+        char *bufStr = bufUtf.Get();
+        // TODO: make faster by remembering the length in AutoWstrToUtf8 and
+        // using std::string(bufStr, bufStrSize);
+        return std::string(bufStr);
+    }
+    return std::string();
+}
+
 //  Adjusted for Windows 95
 void ExpandEnvironmentStringsEx(WCHAR* lpSrc, DWORD dwSrc) {
     WCHAR szBuf[312];
 
-    if (ExpandEnvironmentStrings(lpSrc, szBuf, dimof(szBuf)))
+    if (ExpandEnvironmentStringsW(lpSrc, szBuf, dimof(szBuf)))
         lstrcpyn(lpSrc, szBuf, dwSrc);
 }
 
