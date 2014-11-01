@@ -5443,8 +5443,8 @@ void LoadSettings() {
     iIndentWidth = max(min(iIndentWidth, 256), 0);
     iIndentWidthG = iIndentWidth;
 
-    bMarkLongLines = IniSectionGetInt(pIniSection, L"MarkLongLines", 0);
-    if (bMarkLongLines)
+    bMarkLongLines = IniSectionGetInt(pIniSection, L"MarkLongLines", 1);
+    if (bMarkLongLines > 0)
         bMarkLongLines = 1;
 
     iLongLinesLimit = IniSectionGetInt(pIniSection, L"LongLinesLimit", 72);
@@ -6324,7 +6324,7 @@ int CheckIniFile(WCHAR* lpszFile, const WCHAR* lpszModule) {
 
 int CheckIniFileRedirect(WCHAR* lpszFile, const WCHAR* lpszModule) {
     WCHAR tch[MAX_PATH];
-    if (GetPrivateProfileString(L"Notepad2", L"Notepad2.ini", L"", tch,
+    if (GetPrivateProfileString(L"Notepad2", SETTINGS_FILE_NAME, L"", tch,
         dimof(tch), lpszFile)) {
         if (CheckIniFile(tch, lpszModule)) {
             lstrcpy(lpszFile, tch);
@@ -6375,7 +6375,7 @@ int FindIniFile() {
     bFound = CheckIniFile(tchTest, tchModule);
 
     if (!bFound) {
-        lstrcpy(tchTest, L"Notepad2.ini");
+        lstrcpy(tchTest, SETTINGS_FILE_NAME);
         bFound = CheckIniFile(tchTest, tchModule);
     }
 
@@ -6407,7 +6407,7 @@ int TestIniFile() {
         PathAppend(szIniFile, PathFindFileName(wchModule));
         PathRenameExtension(szIniFile, L".ini");
         if (!PathFileExists(szIniFile)) {
-            lstrcpy(PathFindFileName(szIniFile), L"Notepad2.ini");
+            lstrcpy(PathFindFileName(szIniFile), SETTINGS_FILE_NAME);
             if (!PathFileExists(szIniFile)) {
                 lstrcpy(PathFindFileName(szIniFile),
                         PathFindFileName(wchModule));

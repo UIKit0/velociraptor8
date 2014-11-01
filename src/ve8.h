@@ -4,6 +4,8 @@ See Readme.txt for more information about this source code.
 Please send me your comments to this work.
 */
 
+#define SETTINGS_FILE_NAME L"ve8.ini"
+
 //==== Data Type for WM_COPYDATA ==============================================
 #define DATA_NOTEPAD2_PARAMS 0xFB10
 struct VeParams {
