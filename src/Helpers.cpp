@@ -1147,8 +1147,10 @@ std::string ExpandEnvString(std::string& s) {
     WCHAR buf[512] = { 0 };
     AutoUtf8ToWstr sW(s.c_str());
 
+    // 0 if fails, if buffer too small, returns number of required chars
     DWORD ret = ExpandEnvironmentStringsW(sW.Get(), buf, dimof(buf));
-    if (ret) {
+    // TODO: handle the case where ret > dimof(buf) by allocating dynamically
+    if ((ret > 0) && (ret <= dimof(buf))) {
         AutoWstrToUtf8 bufUtf(buf);
         char *bufStr = bufUtf.Get();
         // TODO: make faster by remembering the length in AutoWstrToUtf8 and
