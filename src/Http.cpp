@@ -1,5 +1,7 @@
 #include "Common.h"
 #include <Wininet.h>
+#include <thread>
+
 #include "Http.h"
 
 // per RFC 1945 10.15 and 3.7, a user agent product token shouldn't contain whitespace

@@ -18,7 +18,6 @@
 
 #include <memory>
 #include <functional>
-#include <thread>
 
 #define COUNTOF(ar) (sizeof(ar) / sizeof(ar[0]))
 #define CSTRLEN(s) (COUNTOF(s) - 1)
