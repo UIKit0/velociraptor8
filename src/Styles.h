@@ -21,7 +21,7 @@ typedef struct _keywordlist {
 
 } KEYWORDLIST, *PKEYWORDLIST;
 
-struct EDITLEXER {
+struct EditLexer {
     int iLexer;
     int rid;
     WCHAR* pszName;
@@ -38,7 +38,7 @@ void Style_Load();
 void Style_Save();
 BOOL Style_Import(HWND);
 BOOL Style_Export(HWND);
-void Style_SetLexer(HWND, EDITLEXER*);
+void Style_SetLexer(HWND, EditLexer*);
 void Style_SetLongLineColors(HWND);
 void Style_SetCurrentLineBackground(HWND);
 void Style_SetLexerFromFile(HWND, LPCWSTR);
@@ -65,8 +65,8 @@ BOOL Style_SelectColor(HWND, BOOL, WCHAR *, int);
 void Style_SetStyles(HWND, int, LPCWSTR);
 void Style_SetFontQuality(HWND, LPCWSTR);
 void Style_GetCurrentLexerName(WCHAR *, int);
-int Style_GetLexerIconId(EDITLEXER*);
-HTREEITEM Style_AddLexerToTreeView(HWND, EDITLEXER*);
+int Style_GetLexerIconId(EditLexer*);
+HTREEITEM Style_AddLexerToTreeView(HWND, EditLexer*);
 INT_PTR CALLBACK Styles_ConfigDlgProc(HWND, UINT, WPARAM, LPARAM);
 void Style_ConfigDlg(HWND);
 INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND, UINT, WPARAM, LPARAM);

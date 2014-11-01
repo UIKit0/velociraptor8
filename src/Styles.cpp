@@ -22,7 +22,7 @@ extern int iEncoding;
 
 KEYWORDLIST KeyWords_NULL = { "", "", "", "", "", "", "", "", "" };
 
-EDITLEXER lexDefault = {
+EditLexer lexDefault = {
     SCLEX_NULL, 63000, L"Default Text", L"txt; text; wtx; log; asc; doc", L"",
     &KeyWords_NULL,
     {
@@ -206,7 +206,7 @@ KEYWORDLIST KeyWords_HTML = {
     "", "", "", ""
 };
 
-EDITLEXER lexHTML = { SCLEX_HTML, 63001, L"Web Source Code",
+EditLexer lexHTML = { SCLEX_HTML, 63001, L"Web Source Code",
                       L"html; htm; asp; aspx; shtml; htd; xhtml; php; php3; "
                       L"phtml; htt; cfm; tpl; dtd; hta; htc",
                       L"",
@@ -461,7 +461,7 @@ EDITLEXER lexHTML = { SCLEX_HTML, 63001, L"Web Source Code",
 
 KEYWORDLIST KeyWords_XML = { "", "", "", "", "", "", "", "", "" };
 
-EDITLEXER lexXML = {
+EditLexer lexXML = {
     SCLEX_XML, 63002, L"XML Document",
     L"xml; xsl; rss; svg; xul; xsd; xslt; axl; rdf; xaml; vcproj", L"",
     &KeyWords_XML,
@@ -605,7 +605,7 @@ KEYWORDLIST KeyWords_CSS = {
     "^-moz- ^-ms- ^-o- ^-webkit-", ""
 };
 
-EDITLEXER lexCSS =
+EditLexer lexCSS =
     { SCLEX_CSS, 63003, L"CSS Style Sheets", L"css", L"", &KeyWords_CSS,
       { { STYLE_DEFAULT, 63126, L"Default", L"", L"" },
         //{ SCE_CSS_DEFAULT, L"Default", L"", L"" },
@@ -667,7 +667,7 @@ KEYWORDLIST KeyWords_CPP = { "__abstract __alignof __asm __assume __based "
                              "virtual void volatile wchar_t while",
                              "", "", "", "", "", "", "", "" };
 
-EDITLEXER lexCPP = {
+EditLexer lexCPP = {
     SCLEX_CPP, 63004, L"C/C++ Source Code",
     L"c; cpp; cxx; cc; h; hpp; hxx; hh; m; mm; idl; inl; odl", L"",
     &KeyWords_CPP,
@@ -948,7 +948,7 @@ KEYWORDLIST KeyWords_CS = {
     "", "", "", "", ""
 };
 
-EDITLEXER lexCS = {
+EditLexer lexCS = {
     SCLEX_CPP, 63005, L"C# Source Code", L"cs", L"", &KeyWords_CS,
     { { STYLE_DEFAULT, 63126, L"Default", L"", L"" },
       //{ SCE_C_DEFAULT, L"Default", L"", L"" },
@@ -983,7 +983,7 @@ KEYWORDLIST KeyWords_RC = {
     "", "", "", "", "", "", "", ""
 };
 
-EDITLEXER lexRC = {
+EditLexer lexRC = {
     SCLEX_CPP, 63006, L"Resource Script", L"rc; rc2; rct; rh; r; dlg", L"",
     &KeyWords_RC,
     { { STYLE_DEFAULT, 63126, L"Default", L"", L"" },
@@ -1006,7 +1006,7 @@ EDITLEXER lexRC = {
 
 KEYWORDLIST KeyWords_MAK = { "", "", "", "", "", "", "", "", "" };
 
-EDITLEXER lexMAK = {
+EditLexer lexMAK = {
     SCLEX_MAKEFILE, 63007, L"Makefiles", L"mak; make; mk; dsp; msc; msvc", L"",
     &KeyWords_MAK,
     { { STYLE_DEFAULT, 63126, L"Default", L"fore:#0A246A", L"" },
@@ -1036,7 +1036,7 @@ KEYWORDLIST KeyWords_VBS = { "alias and as attribute begin boolean byref byte "
                              "until variant wend while with withevents xor",
                              "", "", "", "", "", "", "", "" };
 
-EDITLEXER lexVBS = {
+EditLexer lexVBS = {
     SCLEX_VBSCRIPT, 63008, L"VBScript", L"vbs; dsm", L"", &KeyWords_VBS,
     { { STYLE_DEFAULT, 63126, L"Default", L"", L"" },
       //{ SCE_B_DEFAULT, L"Default", L"", L"" },
@@ -1082,7 +1082,7 @@ KEYWORDLIST KeyWords_VB = { "addhandler addressof alias and andalso ansi any "
                             "while with withevents writeonly xor",
                             "", "", "", "", "", "", "", "" };
 
-EDITLEXER lexVB = {
+EditLexer lexVB = {
     SCLEX_VB, 63009, L"Visual Basic", L"vb; bas; frm; cls; ctl; pag; dsr; dob",
     L"", &KeyWords_VB,
     { { STYLE_DEFAULT, 63126, L"Default", L"", L"" },
@@ -1115,7 +1115,7 @@ KEYWORDLIST KeyWords_JS = { "abstract boolean break byte case catch char class "
                             "void volatile while with",
                             "", "", "", "", "", "", "", "" };
 
-EDITLEXER lexJS = {
+EditLexer lexJS = {
     SCLEX_CPP, 63010, L"JavaScript", L"js; jse; jsm; json; as", L"",
     &KeyWords_JS,
     { { STYLE_DEFAULT, 63126, L"Default", L"", L"" },
@@ -1152,7 +1152,7 @@ KEYWORDLIST KeyWords_JAVA = {
     "", "", "", "", "", "", "", ""
 };
 
-EDITLEXER lexJAVA = {
+EditLexer lexJAVA = {
     SCLEX_CPP, 63011, L"Java Source Code", L"java", L"", &KeyWords_JAVA,
     { { STYLE_DEFAULT, 63126, L"Default", L"", L"" },
       //{ SCE_C_DEFAULT, L"Default", L"", L"" },
@@ -1188,7 +1188,7 @@ KEYWORDLIST KeyWords_PAS = {
     "", "", "", "", "", "", "", ""
 };
 
-EDITLEXER lexPAS = {
+EditLexer lexPAS = {
     SCLEX_PASCAL, 63012, L"Pascal Source Code", L"pas; dpr; dpk; dfm; inc; pp",
     L"", &KeyWords_PAS,
     { { STYLE_DEFAULT, 63126, L"Default", L"", L"" },
@@ -1389,7 +1389,7 @@ KEYWORDLIST KeyWords_ASM = {
     "", "", ""
 };
 
-EDITLEXER
+EditLexer
 lexASM = { SCLEX_ASM, 63013, L"Assembly Script", L"asm", L"", &KeyWords_ASM,
            { { STYLE_DEFAULT, 63126, L"Default", L"", L"" },
              //{ SCE_ASM_DEFAULT, L"Default", L"", L"" },
@@ -1457,7 +1457,7 @@ KEYWORDLIST KeyWords_PL = { "__DATA__ __END__ __FILE__ __LINE__ __PACKAGE__ "
                             "when while write xor",
                             "", "", "", "", "", "", "", "" };
 
-EDITLEXER
+EditLexer
 lexPL = { SCLEX_PERL, 63014, L"Perl Script", L"pl; pm; cgi; pod", L"",
           &KeyWords_PL,
           { { STYLE_DEFAULT, 63126, L"Default", L"", L"" },
@@ -1524,7 +1524,7 @@ lexPL = { SCLEX_PERL, 63014, L"Perl Script", L"pl; pm; cgi; pod", L"",
 
 KEYWORDLIST KeyWords_INI = { "", "", "", "", "", "", "", "", "" };
 
-EDITLEXER lexINI = {
+EditLexer lexINI = {
     SCLEX_PROPERTIES, 63015, L"Configuration Files",
     L"ini; inf; reg; cfg; properties; oem; sif; url; sed; theme", L"",
     &KeyWords_INI,
@@ -1561,7 +1561,7 @@ KEYWORDLIST KeyWords_BAT = {
     "", "", "", "", "", "", "", ""
 };
 
-EDITLEXER lexBAT = {
+EditLexer lexBAT = {
     SCLEX_BATCH, 63016, L"Batch Files", L"bat; cmd", L"", &KeyWords_BAT,
     { { STYLE_DEFAULT, 63126, L"Default", L"", L"" },
       //{ SCE_BAT_DEFAULT, L"Default", L"", L"" },
@@ -1579,7 +1579,7 @@ EDITLEXER lexBAT = {
 
 KEYWORDLIST KeyWords_DIFF = { "", "", "", "", "", "", "", "", "" };
 
-EDITLEXER lexDIFF = {
+EditLexer lexDIFF = {
     SCLEX_DIFF, 63017, L"Diff Files", L"diff; patch", L"", &KeyWords_DIFF,
     { { STYLE_DEFAULT, 63126, L"Default", L"", L"" },
       //{ SCE_DIFF_DEFAULT, L"Default", L"", L"" },
@@ -1645,7 +1645,7 @@ KEYWORDLIST KeyWords_SQL = {
     "", "", "", "", "", "", "", ""
 };
 
-EDITLEXER lexSQL = {
+EditLexer lexSQL = {
     SCLEX_SQL, 63018, L"SQL Query", L"sql", L"", &KeyWords_SQL,
     { { STYLE_DEFAULT, 63126, L"Default", L"", L"" },
       //{ SCE_SQL_DEFAULT, L"Default", L"", L"" },
@@ -1668,7 +1668,7 @@ KEYWORDLIST KeyWords_PY = {
     "", "", "", "", "", "", "", ""
 };
 
-EDITLEXER lexPY = {
+EditLexer lexPY = {
     SCLEX_PYTHON, 63019, L"Python Script", L"py; pyw", L"", &KeyWords_PY,
     { { STYLE_DEFAULT, 63126, L"Default", L"", L"" },
       //{ SCE_P_DEFAULT, L"Default", L"", L"" },
@@ -1791,7 +1791,7 @@ KEYWORDLIST KeyWords_CONF = {
     "", "", "", "", "", "", ""
 };
 
-EDITLEXER lexCONF = {
+EditLexer lexCONF = {
     SCLEX_CONF, 63020, L"Apache Config Files", L"conf; htaccess", L"",
     &KeyWords_CONF,
     { { STYLE_DEFAULT, 63126, L"Default", L"", L"" },
@@ -1912,7 +1912,7 @@ KEYWORDLIST KeyWords_PS = {
     "importsystemmodules prompt psedit tabexpansion", "", "", "", "", ""
 };
 
-EDITLEXER lexPS = {
+EditLexer lexPS = {
     SCLEX_POWERSHELL, 63021, L"PowerShell Script", L"ps1; psd1; psm1", L"",
     &KeyWords_PS,
     { { STYLE_DEFAULT, 63126, L"Default", L"", L"" },
@@ -2043,7 +2043,7 @@ KEYWORDLIST KeyWords_NSIS = {
     "", "", "", "", "", ""
 };
 
-EDITLEXER lexNSIS = {
+EditLexer lexNSIS = {
     SCLEX_NSIS, 63284, L"NSIS Script", L"nsi; nsh", L"", &KeyWords_NSIS,
     { { STYLE_DEFAULT, 63126, L"Default", L"", L"" },
       //{ SCE_NSIS_DEFAULT, L"Default", L"", L"" },
@@ -2141,7 +2141,7 @@ KEYWORDLIST KeyWords_INNO = {
     "", "", "", ""
 };
 
-EDITLEXER lexINNO =
+EditLexer lexINNO =
     { SCLEX_INNOSETUP, 63293, L"Inno Setup Script", L"iss; isl; islu", L"",
       &KeyWords_INNO,
       { { STYLE_DEFAULT, 63126, L"Default", L"", L"" },
@@ -2173,7 +2173,7 @@ KEYWORDLIST KeyWords_RUBY = { "__FILE__ __LINE__ alias and begin break case "
                               "undef unless until when while yield",
                               "", "", "", "", "", "", "", "" };
 
-EDITLEXER lexRUBY =
+EditLexer lexRUBY =
     { SCLEX_RUBY, 63304, L"Ruby Script",
       L"rb; ruby; rbw; rake; rjs; Rakefile; gemspec", L"", &KeyWords_RUBY,
       { { STYLE_DEFAULT, 63126, L"Default", L"", L"" },
@@ -2252,7 +2252,7 @@ KEYWORDLIST KeyWords_LUA = {
     "", "", "", "", ""
 };
 
-EDITLEXER lexLUA = {
+EditLexer lexLUA = {
     SCLEX_LUA, 63298, L"Lua Script", L"lua", L"", &KeyWords_LUA,
     { { STYLE_DEFAULT, 63126, L"Default", L"", L"" },
       //{ SCE_LUA_DEFAULT, L"Default", L"", L"" },
@@ -2308,7 +2308,7 @@ KEYWORDLIST KeyWords_BASH = { "alias ar asa awk banner basename bash bc bdiff "
                               "shred stat su tac unlink users vdir whoami yes",
                               "", "", "", "", "", "", "", "" };
 
-EDITLEXER
+EditLexer
 lexBASH = { SCLEX_BASH, 63259, L"Shell Script", L"sh", L"", &KeyWords_BASH,
             { { STYLE_DEFAULT, 63126, L"Default", L"", L"" },
               { SCE_SH_ERROR, 63260, L"Error", L"", L"" },
@@ -2379,7 +2379,7 @@ KEYWORDLIST KeyWords_TCL = {
 #define SCE_TCL__MULTI_SUBSTITUTION                                            \
     MULTI_STYLE(SCE_TCL_SUBSTITUTION, SCE_TCL_SUB_BRACE, 0, 0)
 
-EDITLEXER lexTCL = {
+EditLexer lexTCL = {
     SCLEX_TCL, 63273, L"Tcl Script", L"tcl; itcl", L"", &KeyWords_TCL,
     { { STYLE_DEFAULT, 63126, L"Default", L"", L"" },
       { SCE_TCL__MULTI_COMMENT, 63127, L"Comment", L"fore:#008000", L"" },
@@ -3669,7 +3669,7 @@ KEYWORDLIST KeyWords_AU3 = {
     ""
 };
 
-EDITLEXER lexAU3 = {
+EditLexer lexAU3 = {
     SCLEX_AU3, 63276, L"AutoIt3 Script", L"au3", L"", &KeyWords_AU3,
     { { STYLE_DEFAULT, 63126, L"Default", L"", L"" },
       { MULTI_STYLE(SCE_AU3_COMMENT, SCE_AU3_COMMENTBLOCK, 0, 0),
@@ -3691,7 +3691,7 @@ EDITLEXER lexAU3 = {
       { -1, 00000, L"", L"", L"" } }
 };
 
-EDITLEXER lexLATEX = {
+EditLexer lexLATEX = {
     SCLEX_LATEX, 63281, L"LaTeX Files", L"tex; latex; sty", L"", &KeyWords_NULL,
     { { STYLE_DEFAULT, 63126, L"Default", L"", L"" },
       { MULTI_STYLE(SCE_L_COMMAND, SCE_L_SHORTCMD, SCE_L_CMDOPT, 0),
@@ -3710,7 +3710,7 @@ EDITLEXER lexLATEX = {
       { -1, 00000, L"", L"", L"" } }
 };
 
-EDITLEXER lexANSI = {
+EditLexer lexANSI = {
     SCLEX_NULL, 63258, L"ANSI Art", L"nfo; diz", L"", &KeyWords_NULL,
     { { STYLE_DEFAULT, 63126, L"Default", L"font:Lucida Console", L"" },
       { STYLE_LINENUMBER,                63101, L"Margins and Line Numbers",
@@ -3925,7 +3925,7 @@ KEYWORDLIST KeyWords_AHK = {
     "", ""
 };
 
-EDITLEXER lexAHK =
+EditLexer lexAHK =
     { SCLEX_AHK, 63305, L"AutoHotkey Script", L"ahk; ia; scriptlet",
       L"", &KeyWords_AHK, { { STYLE_DEFAULT, 63126, L"Default", L"", L"" },
                             //{ SCE_AHK_DEFAULT, L"Default", L"", L"" },
@@ -4031,7 +4031,7 @@ KEYWORDLIST KeyWords_CMAKE = {
     "", "", "", "", "", "", ""
 };
 
-EDITLEXER lexCmake = {
+EditLexer lexCmake = {
     SCLEX_CMAKE, 63324, L"Cmake Script", L"cmake; ctest", L"", &KeyWords_CMAKE,
     { { STYLE_DEFAULT, 63126, L"Default", L"", L"" },
       //{ SCE_CMAKE_DEFAULT, L"Default", L"", L"" },
@@ -4195,7 +4195,7 @@ KEYWORDLIST KeyWords_AVS = {
     "", "", "", ""
 };
 
-EDITLEXER lexAVS = {
+EditLexer lexAVS = {
     SCLEX_AVS, 63332, L"AviSynth Script", L"avs; avsi", L"", &KeyWords_AVS,
     { { STYLE_DEFAULT, 63126, L"Default", L"", L"" },
       //{ SCE_AVS_DEFAULT, L"Default", L"", L"" },
@@ -4220,7 +4220,7 @@ EDITLEXER lexAVS = {
 
 KEYWORDLIST KeyWords_MARKDOWN = { "", "", "", "", "", "", "", "", "" };
 
-EDITLEXER lexMARKDOWN = {
+EditLexer lexMARKDOWN = {
     SCLEX_MARKDOWN, 63336, L"Markdown", L"md; markdown; mdown; mkdn; mkd", L"",
     &KeyWords_MARKDOWN,
     { { STYLE_DEFAULT, 63126, L"Default", L"", L"" },
@@ -4256,7 +4256,7 @@ EDITLEXER lexMARKDOWN = {
 KEYWORDLIST KeyWords_YAML = { "y n yes no on off true false", "", "", "", "",
                               "",                             "", "", "" };
 
-EDITLEXER lexYAML = {
+EditLexer lexYAML = {
     SCLEX_YAML, 63355, L"YAML", L"yaml; yml", L"", &KeyWords_YAML,
     { { STYLE_DEFAULT, 63126, L"Default", L"", L"" },
       //{ SCE_YAML_DEFAULT, L"Default", L"", L"" },
@@ -4306,7 +4306,7 @@ KEYWORDLIST KeyWords_VHDL = {
     "", "", ""
 };
 
-EDITLEXER lexVHDL = {
+EditLexer lexVHDL = {
     SCLEX_VHDL, 63370, L"VHDL", L"vhdl; vhd", L"", &KeyWords_VHDL,
     { { STYLE_DEFAULT, 63126, L"Default", L"", L"" },
       { MULTI_STYLE(SCE_VHDL_COMMENTLINEBANG, SCE_VHDL_COMMENT,
@@ -4331,7 +4331,7 @@ EDITLEXER lexVHDL = {
 // This array holds all the lexers...
 // Don't forget to change the number of the lexer for HTML and XML
 // in Notepad2.c ParseCommandLine() if you change this array!
-EDITLEXER *pLexArray[NUMLEXERS] = {
+EditLexer *pLexArray[NUMLEXERS] = {
     &lexDefault,  &lexANSI,  &lexAVS,  &lexCONF, // Apache Config Scripts
     &lexASM,      &lexAHK,   &lexAU3,  &lexBAT,  &lexINI,  &lexCPP, &lexCS,
     &lexCmake,    &lexCSS,   &lexDIFF, &lexINNO, &lexJAVA, &lexJS,  &lexMAK,
@@ -4341,7 +4341,7 @@ EDITLEXER *pLexArray[NUMLEXERS] = {
 };
 
 // Currently used lexer
-EDITLEXER *pLexCurrent = &lexDefault;
+EditLexer *pLexCurrent = &lexDefault;
 COLORREF crCustom[16];
 BOOL bUse2ndDefaultStyle;
 BOOL fStylesModified = FALSE;
@@ -4598,7 +4598,7 @@ BOOL Style_Export(HWND hwnd) {
     return FALSE;
 }
 
-void Style_SetLexer(HWND hwnd, EDITLEXER *pLexNew) {
+void Style_SetLexer(HWND hwnd, EditLexer *pLexNew) {
     int i;
     // WCHAR *p;
     int rgb;
@@ -5140,7 +5140,7 @@ void Style_SetCurrentLineBackground(HWND hwnd) {
         SendMessage(hwnd, SCI_SETCARETLINEVISIBLE, FALSE, 0);
 }
 
-EDITLEXER *__fastcall Style_SniffShebang(char *pchText) {
+EditLexer *__fastcall Style_SniffShebang(char *pchText) {
     if (StrCmpNA(pchText, "#!", 2) == 0) {
         char *pch = pchText + 2;
         while (*pch == ' ' || *pch == '\t')
@@ -5178,7 +5178,7 @@ EDITLEXER *__fastcall Style_SniffShebang(char *pchText) {
     return (NULL);
 }
 
-EDITLEXER *__fastcall Style_MatchLexer(LPCWSTR lpszMatch, BOOL bCheckNames) {
+EditLexer *__fastcall Style_MatchLexer(LPCWSTR lpszMatch, BOOL bCheckNames) {
     int i;
     WCHAR tch[256 + 16];
     WCHAR *p1, *p2;
@@ -5222,13 +5222,13 @@ extern FILEVARS fvCurFile;
 void Style_SetLexerFromFile(HWND hwnd, LPCWSTR lpszFile) {
     LPWSTR lpszExt = PathFindExtension(lpszFile);
     BOOL bFound = FALSE;
-    EDITLEXER *pLexNew = pLexArray[iDefaultLexer];
-    EDITLEXER *pLexSniffed;
+    EditLexer *pLexNew = pLexArray[iDefaultLexer];
+    EditLexer *pLexSniffed;
 
     if ((fvCurFile.mask & FV_MODE) && fvCurFile.tchMode[0]) {
 
         WCHAR wchMode[32];
-        EDITLEXER *pLexMode;
+        EditLexer *pLexMode;
         UINT cp = (UINT)SendMessage(hwnd, SCI_GETCODEPAGE, 0, 0);
         MultiByteToWideChar(cp, 0, fvCurFile.tchMode, -1, wchMode,
                             COUNTOF(wchMode));
@@ -5340,7 +5340,7 @@ void Style_SetLexerFromFile(HWND hwnd, LPCWSTR lpszFile) {
 }
 
 void Style_SetLexerFromName(HWND hwnd, LPCWSTR lpszFile, LPCWSTR lpszName) {
-    EDITLEXER *pLexNew;
+    EditLexer *pLexNew;
     if (pLexNew = Style_MatchLexer(lpszName, FALSE))
         Style_SetLexer(hwnd, pLexNew);
     else if (pLexNew = Style_MatchLexer(lpszName, TRUE))
@@ -5882,7 +5882,7 @@ void Style_GetCurrentLexerName(LPWSTR lpszName, int cchName) {
         lstrcpyn(lpszName, pLexCurrent->pszName, cchName);
 }
 
-int Style_GetLexerIconId(EDITLEXER *plex) {
+int Style_GetLexerIconId(EditLexer *plex) {
     WCHAR *p;
     WCHAR *pszExtensions;
     WCHAR *pszFile;
@@ -5915,7 +5915,7 @@ int Style_GetLexerIconId(EDITLEXER *plex) {
     return (shfi.iIcon);
 }
 
-HTREEITEM Style_AddLexerToTreeView(HWND hwnd, EDITLEXER *plex) {
+HTREEITEM Style_AddLexerToTreeView(HWND hwnd, EditLexer *plex) {
     int i = 0;
     WCHAR tch[128];
 
@@ -5957,7 +5957,7 @@ HTREEITEM Style_AddLexerToTreeView(HWND hwnd, EDITLEXER *plex) {
     return hTreeNode;
 }
 
-void Style_AddLexerToListView(HWND hwnd, EDITLEXER *plex) {
+void Style_AddLexerToListView(HWND hwnd, EditLexer *plex) {
     WCHAR tch[128];
     LVITEM lvi;
     ZeroMemory(&lvi, sizeof(LVITEM));
@@ -5979,7 +5979,7 @@ Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 
     static HWND hwndTV;
     static BOOL fDragging;
-    static EDITLEXER *pCurrentLexer;
+    static EditLexer *pCurrentLexer;
     static PEDITSTYLE pCurrentStyle;
     static HFONT hFontTitle;
     static HBRUSH hbrFore;
@@ -6083,7 +6083,7 @@ Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 
                             pCurrentStyle = 0;
                             if (pCurrentLexer =
-                                    (EDITLEXER *)lpnmtv->itemNew.lParam) {
+                                    (EditLexer *)lpnmtv->itemNew.lParam) {
                                 SetDlgItemText(hwnd, IDC_STYLELABEL, wch);
                                 EnableWindow(GetDlgItem(hwnd, IDC_STYLEEDIT),
                                              TRUE);
@@ -6703,7 +6703,7 @@ Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
                 lvi.iItem = i;
                 ListView_GetItem(hwndLV, &lvi);
                 ;
-                if (lstrcmp(((EDITLEXER *)lvi.lParam)->pszName,
+                if (lstrcmp(((EditLexer *)lvi.lParam)->pszName,
                             pLexCurrent->pszName) == 0) {
                     ListView_SetItemState(hwndLV, i,
                                           LVIS_FOCUSED | LVIS_SELECTED,
@@ -6841,7 +6841,7 @@ Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
                     lvi.iItem = ListView_GetNextItem(hwndLV, -1,
                                                      LVNI_ALL | LVNI_SELECTED);
                     if (ListView_GetItem(hwndLV, &lvi)) {
-                        pLexCurrent = (EDITLEXER *)lvi.lParam;
+                        pLexCurrent = (EditLexer *)lvi.lParam;
                         iDefaultLexer = iInternalDefault;
                         bAutoSelect = (IsDlgButtonChecked(
                                            hwnd, IDC_AUTOSELECT) == BST_CHECKED)
