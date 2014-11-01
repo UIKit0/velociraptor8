@@ -1,18 +1,30 @@
 #include "Common.h"
 #include "Install.h"
 
+// http://msdn.microsoft.com/en-us/library/windows/desktop/bb773569(v=vs.85).aspx
+// TODO: on win8 use PathCchCanonicalize or PathCchCanonicalizeEx
+void NormalizePathInPlace(WCHAR *src, size_t srcCchSize) {
+    // TODO: make it work even if srcCchSize is < MAX_PATH
+    CrashIf(srcCchSize < MAX_PATH);
+    WCHAR buf[MAX_PATH];
+    BOOL ok = PathCanonicalizeW(buf, src);
+    if (!ok) {
+        return;
+    }
+    memcpy(src, buf, sizeof(buf));
+}
 // http://msdn.microsoft.com/en-us/library/windows/desktop/ms683197(v=vs.85).aspx
 static std::string GetExePath() {
     WCHAR buf[1024*4];
     // it's full path, not name
     DWORD bufCchSize = dimof(buf);
-    // TODO: normalize path
     DWORD ret = GetModuleFileNameW(NULL, buf, bufCchSize);
     CrashIf(ret == 0);
     // on XP it returns bufCchSize if buffer too small
     CrashIf(ret == bufCchSize);
     // post XP error is indicated by GetLastError()
     CrashIfLastError();
+    NormalizePathInPlace(buf, dimof(buf));
     return WstrToUtf8Str(buf);
 }
 
