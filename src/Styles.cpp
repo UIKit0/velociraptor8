@@ -5220,7 +5220,7 @@ extern int fNoCGIGuess;
 extern FILEVARS fvCurFile;
 
 void Style_SetLexerFromFile(HWND hwnd, const WCHAR* lpszFile) {
-    LPWSTR lpszExt = PathFindExtension(lpszFile);
+    WCHAR* lpszExt = PathFindExtension(lpszFile);
     BOOL bFound = FALSE;
     EditLexer *pLexNew = pLexArray[iDefaultLexer];
     EditLexer *pLexSniffed;
@@ -5399,7 +5399,7 @@ void Style_SetIndentGuides(HWND hwnd, BOOL bShow) {
 
 extern WCHAR tchFileDlgFilters[5 * 1024];
 
-BOOL Style_GetOpenDlgFilterStr(LPWSTR lpszFilter, int cchFilter) {
+BOOL Style_GetOpenDlgFilterStr(WCHAR* lpszFilter, int cchFilter) {
     if (lstrlen(tchFileDlgFilters) == 0)
         GetString(IDS_FILTER_ALL, lpszFilter, cchFilter);
     else {
@@ -5410,7 +5410,7 @@ BOOL Style_GetOpenDlgFilterStr(LPWSTR lpszFilter, int cchFilter) {
     return TRUE;
 }
 
-BOOL Style_StrGetFont(const WCHAR* lpszStyle, LPWSTR lpszFont, int cchFont) {
+BOOL Style_StrGetFont(const WCHAR* lpszStyle, WCHAR* lpszFont, int cchFont) {
     WCHAR tch[256];
     WCHAR *p;
 
@@ -5434,7 +5434,7 @@ BOOL Style_StrGetFont(const WCHAR* lpszStyle, LPWSTR lpszFont, int cchFont) {
     return FALSE;
 }
 
-BOOL Style_StrGetFontQuality(const WCHAR* lpszStyle, LPWSTR lpszQuality,
+BOOL Style_StrGetFontQuality(const WCHAR* lpszStyle, WCHAR* lpszQuality,
                              int cchQuality) {
     WCHAR tch[256];
     WCHAR *p;
@@ -5505,7 +5505,7 @@ BOOL Style_StrGetSize(const WCHAR* lpszStyle, int *i) {
     return FALSE;
 }
 
-BOOL Style_StrGetSizeStr(const WCHAR* lpszStyle, LPWSTR lpszSize, int cchSize) {
+BOOL Style_StrGetSizeStr(const WCHAR* lpszStyle, WCHAR* lpszSize, int cchSize) {
     WCHAR tch[256];
     WCHAR *p;
 
@@ -5584,7 +5584,7 @@ BOOL Style_StrGetAlpha(const WCHAR* lpszStyle, int *i) {
     return FALSE;
 }
 
-BOOL Style_SelectFont(HWND hwnd, LPWSTR lpszStyle, int cchStyle,
+BOOL Style_SelectFont(HWND hwnd, WCHAR* lpszStyle, int cchStyle,
                       BOOL bDefaultStyle) {
     CHOOSEFONT cf;
     LOGFONT lf;
@@ -5675,7 +5675,7 @@ BOOL Style_SelectFont(HWND hwnd, LPWSTR lpszStyle, int cchStyle,
     return TRUE;
 }
 
-BOOL Style_SelectColor(HWND hwnd, BOOL bFore, LPWSTR lpszStyle, int cchStyle) {
+BOOL Style_SelectColor(HWND hwnd, BOOL bFore, WCHAR* lpszStyle, int cchStyle) {
     CHOOSECOLOR cc;
     WCHAR szNewStyle[512];
     int iRGBResult;
@@ -5877,7 +5877,7 @@ void Style_SetFontQuality(HWND hwnd, const WCHAR* lpszStyle) {
     SendMessage(hwnd, SCI_SETFONTQUALITY, wQuality, 0);
 }
 
-void Style_GetCurrentLexerName(LPWSTR lpszName, int cchName) {
+void Style_GetCurrentLexerName(WCHAR* lpszName, int cchName) {
     if (!GetString(pLexCurrent->rid, lpszName, cchName))
         lstrcpyn(lpszName, pLexCurrent->pszName, cchName);
 }

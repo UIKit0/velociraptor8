@@ -875,7 +875,7 @@ BOOL PathIsLnkFile(const WCHAR* pszPath) {
 }
 
 //  Purpose: Try to get the path to which a lnk-file is linked
-BOOL PathGetLnkPath(const WCHAR* pszLnkFile, LPWSTR pszResPath, int cchResPath) {
+BOOL PathGetLnkPath(const WCHAR* pszLnkFile, WCHAR* pszResPath, int cchResPath) {
 
     IShellLink *psl;
     WIN32_FIND_DATA fd;
@@ -1055,9 +1055,9 @@ BOOL StrLTrim(WCHAR * pszSource, const WCHAR* pszTrimChars) {
     return TRUE;
 }
 
-BOOL TrimString(LPWSTR lpString) {
+BOOL TrimString(WCHAR* lpString) {
 
-    LPWSTR psz;
+    WCHAR* psz;
 
     if (!lpString || !*lpString)
         return FALSE;
@@ -1079,9 +1079,9 @@ BOOL TrimString(LPWSTR lpString) {
     return TRUE;
 }
 
-BOOL ExtractFirstArgument(const WCHAR* lpArgs, LPWSTR lpArg1, LPWSTR lpArg2) {
+BOOL ExtractFirstArgument(const WCHAR* lpArgs, WCHAR* lpArg1, WCHAR* lpArg2) {
 
-    LPWSTR psz;
+    WCHAR* psz;
     BOOL bQuoted = FALSE;
 
     lstrcpy(lpArg1, lpArgs);
@@ -1117,8 +1117,8 @@ BOOL ExtractFirstArgument(const WCHAR* lpArgs, LPWSTR lpArg1, LPWSTR lpArg2) {
     return TRUE;
 }
 
-void PrepareFilterStr(LPWSTR lpFilter) {
-    LPWSTR psz = StrEnd(lpFilter);
+void PrepareFilterStr(WCHAR* lpFilter) {
+    WCHAR* psz = StrEnd(lpFilter);
     while (psz != lpFilter) {
         if (*(psz = CharPrev(lpFilter, psz)) == L'|')
             *psz = L'\0';
@@ -1126,14 +1126,14 @@ void PrepareFilterStr(LPWSTR lpFilter) {
 }
 
 //  in place conversion
-void StrTab2Space(LPWSTR lpsz) {
+void StrTab2Space(WCHAR* lpsz) {
     WCHAR *c = lpsz;
     while (c = StrChr(lpsz, L'\t'))
         *c = L' ';
 }
 
 //  in place conversion
-void PathFixBackslashes(LPWSTR lpsz) {
+void PathFixBackslashes(WCHAR* lpsz) {
     WCHAR *c = lpsz;
     while (c = StrChr(c, L'/')) {
         if (*CharPrev(lpsz, c) == L':' && *CharNext(c) == L'/')
@@ -1144,21 +1144,21 @@ void PathFixBackslashes(LPWSTR lpsz) {
 }
 
 //  Adjusted for Windows 95
-void ExpandEnvironmentStringsEx(LPWSTR lpSrc, DWORD dwSrc) {
+void ExpandEnvironmentStringsEx(WCHAR* lpSrc, DWORD dwSrc) {
     WCHAR szBuf[312];
 
     if (ExpandEnvironmentStrings(lpSrc, szBuf, dimof(szBuf)))
         lstrcpyn(lpSrc, szBuf, dwSrc);
 }
 
-void PathCanonicalizeEx(LPWSTR lpSrc) {
+void PathCanonicalizeEx(WCHAR* lpSrc) {
     WCHAR szDst[MAX_PATH];
 
     if (PathCanonicalize(szDst, lpSrc))
         lstrcpy(lpSrc, szDst);
 }
 
-DWORD GetLongPathNameEx(LPWSTR lpszPath, DWORD cchBuffer) {
+DWORD GetLongPathNameEx(WCHAR* lpszPath, DWORD cchBuffer) {
     DWORD dwRet = GetLongPathName(lpszPath, lpszPath, cchBuffer);
     if (dwRet) {
         if (PathGetDriveNumber(lpszPath) != -1)
@@ -1192,7 +1192,7 @@ DWORD_PTR SHGetFileInfo2(const WCHAR* pszPath, DWORD dwFileAttributes,
     }
 }
 
-int FormatNumberStr(LPWSTR lpNumberStr) {
+int FormatNumberStr(WCHAR* lpNumberStr) {
     WCHAR *c;
     WCHAR szSep[8];
     int i = 0;
@@ -1326,7 +1326,7 @@ BOOL MRU_AddFile(LPMRULIST pmru, const WCHAR* pszFile, BOOL bRelativePath,
 
     if (bRelativePath) {
         WCHAR wchFile[MAX_PATH];
-        PathRelativeToApp((LPWSTR) pszFile, wchFile, dimof(wchFile), TRUE,
+        PathRelativeToApp((WCHAR*) pszFile, wchFile, dimof(wchFile), TRUE,
                           TRUE, bUnexpandMyDocs);
         pmru->pszItems[0] = StrDup(wchFile);
     } else
@@ -1389,7 +1389,7 @@ BOOL MRU_Empty(LPMRULIST pmru) {
     return (1);
 }
 
-int MRU_Enum(LPMRULIST pmru, int iIndex, LPWSTR pszItem, int cchItem) {
+int MRU_Enum(LPMRULIST pmru, int iIndex, WCHAR* pszItem, int cchItem) {
 
     if (pszItem == NULL || cchItem == 0) {
         int i = 0;
@@ -1505,7 +1505,7 @@ BOOL MRU_MergeSave(LPMRULIST pmru, BOOL bAddFiles, BOOL bRelativePath,
 typedef HTHEME(WINAPI *OpenThemeDataProc)(HWND hwnd, const WCHAR* pszClassList);
 typedef HRESULT(WINAPI *CloseThemeDataProc)(HTHEME hTheme);
 
-BOOL GetThemedDialogFont(LPWSTR lpFaceName, WORD *wSize) {
+BOOL GetThemedDialogFont(WCHAR* lpFaceName, WORD *wSize) {
 // TODO(kjk): port this
 #if 0
     HDC hDC;

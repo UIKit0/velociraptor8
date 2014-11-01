@@ -1,7 +1,7 @@
 #include "Common.h"
 #include "WinUtil.h"
 
-static LPWSTR knownCursorIds [] = {
+static WCHAR* knownCursorIds [] = {
     IDC_ARROW,
     IDC_IBEAM,
     IDC_HAND,
@@ -14,7 +14,7 @@ static LPWSTR knownCursorIds [] = {
 
 static HCURSOR cachedCursors[dimof(knownCursorIds)] = {};
 
-HCURSOR GetCursor(LPWSTR id) {
+HCURSOR GetCursor(WCHAR* id) {
     int cursorIdx = -1;
     for (int i = 0; i < dimof(knownCursorIds); i++) {
         if (id == knownCursorIds[i]) {
@@ -30,7 +30,7 @@ HCURSOR GetCursor(LPWSTR id) {
     return cachedCursors[cursorIdx];
 }
 
-void SetCursor(LPWSTR id) {
+void SetCursor(WCHAR* id) {
     SetCursor(GetCursor(id));
 }
 

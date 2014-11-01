@@ -1,4 +1,4 @@
 
-HCURSOR GetCursor(LPWSTR);
-void SetCursor(LPWSTR);
+HCURSOR GetCursor(WCHAR*);
+void SetCursor(WCHAR*);
 void FillWndClassEx(WNDCLASSEX& wcex, const WCHAR *clsName, WNDPROC wndproc);

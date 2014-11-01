@@ -4379,13 +4379,13 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
         case CMD_WEBACTION1:
         case CMD_WEBACTION2: {
             BOOL bCmdEnabled;
-            LPWSTR lpszTemplateName;
+            WCHAR* lpszTemplateName;
             WCHAR szCmdTemplate[256];
             char mszSelection[512] = { 0 };
             DWORD cchSelection;
             char *lpsz;
-            LPWSTR lpszCommand;
-            LPWSTR lpszArgs;
+            WCHAR* lpszCommand;
+            WCHAR* lpszArgs;
             SHELLEXECUTEINFO sei;
             WCHAR wchDirectory[MAX_PATH] = L"";
 
@@ -5842,12 +5842,12 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 }
 
 void ParseCommandLine() {
-    LPWSTR lp1, lp2, lp3;
+    WCHAR* lp1, *lp2, *lp3;
     BOOL bContinue = TRUE;
     BOOL bIsFileArg = FALSE;
     BOOL bIsNotepadReplacement = FALSE;
 
-    LPWSTR lpCmdLine = GetCommandLine();
+    WCHAR* lpCmdLine = GetCommandLine();
 
     if (lstrlen(lpCmdLine) == 0)
         return;
@@ -6174,7 +6174,7 @@ void ParseCommandLine() {
 
         // pathname
         else {
-            LPWSTR lpFileBuf = (WCHAR *)LocalAlloc(
+            WCHAR* lpFileBuf = (WCHAR *)LocalAlloc(
                 LPTR, sizeof(WCHAR) * (lstrlen(lpCmdLine) + 1));
 
             cchiFileList = lstrlen(lpCmdLine) - lstrlen(lp3);
@@ -6281,7 +6281,7 @@ void LoadFlags() {
     LocalFree(pIniSection);
 }
 
-int CheckIniFile(LPWSTR lpszFile, const WCHAR* lpszModule) {
+int CheckIniFile(WCHAR* lpszFile, const WCHAR* lpszModule) {
     WCHAR tchFileExpanded[MAX_PATH];
     WCHAR tchBuild[MAX_PATH];
     ExpandEnvironmentStrings(lpszFile, tchFileExpanded,
@@ -6318,7 +6318,7 @@ int CheckIniFile(LPWSTR lpszFile, const WCHAR* lpszModule) {
     return 0;
 }
 
-int CheckIniFileRedirect(LPWSTR lpszFile, const WCHAR* lpszModule) {
+int CheckIniFileRedirect(WCHAR* lpszFile, const WCHAR* lpszModule) {
     WCHAR tch[MAX_PATH];
     if (GetPrivateProfileString(L"Notepad2", L"Notepad2.ini", L"", tch,
         dimof(tch), lpszFile)) {
@@ -6963,7 +6963,7 @@ BOOL FileSave(BOOL bSaveAlways, BOOL bAsk, BOOL bSaveAs, BOOL bSaveCopy) {
     return (fSuccess);
 }
 
-BOOL OpenFileDlg(HWND hwnd, LPWSTR lpstrFile, int cchFile,
+BOOL OpenFileDlg(HWND hwnd, WCHAR* lpstrFile, int cchFile,
                  const WCHAR* lpstrInitialDir) {
     OPENFILENAME ofn;
     WCHAR szFile[MAX_PATH];
@@ -7011,7 +7011,7 @@ BOOL OpenFileDlg(HWND hwnd, LPWSTR lpstrFile, int cchFile,
         return FALSE;
 }
 
-BOOL SaveFileDlg(HWND hwnd, LPWSTR lpstrFile, int cchFile,
+BOOL SaveFileDlg(HWND hwnd, WCHAR* lpstrFile, int cchFile,
                  const WCHAR* lpstrInitialDir) {
     OPENFILENAME ofn;
     WCHAR szNewFile[MAX_PATH];
@@ -7323,10 +7323,10 @@ BOOL RelaunchMultiInst() {
         STARTUPINFO si;
         PROCESS_INFORMATION pi;
 
-        LPWSTR lpCmdLineNew = StrDup(GetCommandLine());
-        LPWSTR lp1 = (WCHAR *)LocalAlloc(LPTR, sizeof(WCHAR) *
+        WCHAR* lpCmdLineNew = StrDup(GetCommandLine());
+        WCHAR* lp1 = (WCHAR *)LocalAlloc(LPTR, sizeof(WCHAR) *
                                                    (lstrlen(lpCmdLineNew) + 1));
-        LPWSTR lp2 = (WCHAR *)LocalAlloc(LPTR, sizeof(WCHAR) *
+        WCHAR* lp2 = (WCHAR *)LocalAlloc(LPTR, sizeof(WCHAR) *
                                                    (lstrlen(lpCmdLineNew) + 1));
 
         StrTab2Space(lpCmdLineNew);
@@ -7360,9 +7360,9 @@ BOOL RelaunchMultiInst() {
 
         return TRUE;
     } else {
-        int i;
-        for (i = 0; i < cFileList; i++)
+        for (int i = 0; i < cFileList; i++) {
             LocalFree(lpFileList[i]);
+        }
         return FALSE;
     }
 }
@@ -7374,8 +7374,8 @@ BOOL RelaunchElevated() {
 
     else {
 
-        LPWSTR lpCmdLine;
-        LPWSTR lpArg1, lpArg2;
+        WCHAR* lpCmdLine;
+        WCHAR* lpArg1,* lpArg2;
         STARTUPINFO si;
         SHELLEXECUTEINFO sei;
 

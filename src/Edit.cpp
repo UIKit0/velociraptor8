@@ -1440,13 +1440,13 @@ BOOL EditLoadFile(HWND hwnd, const WCHAR* pszFile, BOOL bSkipEncodingDetection,
 
         lpDataUTF8 = (char *)GlobalAlloc(GPTR, (cbData * 3) + 2);
         cbData = WideCharToMultiByte(
-            CP_UTF8, 0, (bBOM) ? (WCHAR *) lpData + 1 : (LPWSTR) lpData,
+            CP_UTF8, 0, (bBOM) ? (WCHAR *) lpData + 1 : (WCHAR*) lpData,
             (bBOM) ? (cbData) / sizeof(WCHAR) : cbData / sizeof(WCHAR) + 1,
             lpDataUTF8, (int)GlobalSize(lpDataUTF8), NULL, NULL);
 
         if (cbData == 0) {
             cbData = WideCharToMultiByte(
-                CP_ACP, 0, (bBOM) ? (WCHAR *) lpData + 1 : (LPWSTR) lpData, (-1),
+                CP_ACP, 0, (bBOM) ? (WCHAR *) lpData + 1 : (WCHAR*) lpData, (-1),
                 lpDataUTF8, (int)GlobalSize(lpDataUTF8), NULL, NULL);
             *pbUnicodeErr = TRUE;
         }
