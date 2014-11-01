@@ -20,10 +20,8 @@ See License.txt for details about distribution and modification.
 #include "Http.h"
 
 // Local and global Variables for Notepad2.c
-HWND hwndStatus;
 HWND hwndToolbar;
 HWND hwndReBar;
-HWND hwndEditFrame;
 HWND hwndMain;
 HWND hwndNextCBChain;
 HWND hDlgFindReplace;
@@ -1489,7 +1487,7 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wp, LPARAM lp) {
                 (bViewWhiteSpace) ? SCWS_VISIBLEALWAYS : SCWS_INVISIBLE, 0);
     SendMessage(gDoc->hwndEdit, SCI_SETVIEWEOL, bViewEOLs, 0);
 
-    hwndEditFrame = CreateWindowEx(
+    gDoc->hwndEditFrame = CreateWindowEx(
         WS_EX_CLIENTEDGE, WC_LISTVIEW, NULL,
         WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0, 0, 100,
         100, hwnd, (HMENU)IDC_EDITFRAME, hInstance, NULL);
@@ -1510,8 +1508,8 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wp, LPARAM lp) {
             cxEditFrame = 0;
             cyEditFrame = 0;
         } else {
-            GetClientRect(hwndEditFrame, &rc);
-            GetWindowRect(hwndEditFrame, &rc2);
+            GetClientRect(gDoc->hwndEditFrame, &rc);
+            GetWindowRect(gDoc->hwndEditFrame, &rc2);
 
             cxEditFrame = ((rc2.right - rc2.left) - (rc.right - rc.left)) / 2;
             cyEditFrame = ((rc2.bottom - rc2.top) - (rc.bottom - rc.top)) / 2;
@@ -1556,7 +1554,7 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wp, LPARAM lp) {
         MRU_Create(L"Recent Replace", (/*IsWindowsNT()*/ 1) ? MRU_UTF8 : 0, 16);
     MRU_Load(mruReplace);
 
-    if (gDoc->hwndEdit == NULL || hwndEditFrame == NULL || hwndStatus == NULL ||
+    if (gDoc->hwndEdit == NULL || gDoc->hwndEditFrame == NULL || gDoc->hwndStatus == NULL ||
         hwndToolbar == NULL || hwndReBar == NULL)
         return (-1);
 
@@ -1716,7 +1714,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
     if (bShowStatusbar)
         dwStatusbarStyle |= WS_VISIBLE;
 
-    hwndStatus =
+    gDoc->hwndStatus =
         CreateStatusWindow(dwStatusbarStyle, NULL, hwnd, IDC_STATUSBAR);
 
     // Create ReBar and add Toolbar
@@ -1772,11 +1770,11 @@ void MsgThemeChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
             cxEditFrame = 0;
             cyEditFrame = 0;
         } else {
-            SetWindowPos(hwndEditFrame, NULL, 0, 0, 0, 0,
+            SetWindowPos(gDoc->hwndEditFrame, NULL, 0, 0, 0, 0,
                          SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE |
                              SWP_FRAMECHANGED);
-            GetClientRect(hwndEditFrame, &rc);
-            GetWindowRect(hwndEditFrame, &rc2);
+            GetClientRect(gDoc->hwndEditFrame, &rc);
+            GetWindowRect(gDoc->hwndEditFrame, &rc2);
 
             cxEditFrame = ((rc2.right - rc2.left) - (rc.right - rc.left)) / 2;
             cyEditFrame = ((rc2.bottom - rc2.top) - (rc.bottom - rc.top)) / 2;
@@ -1800,7 +1798,7 @@ void MsgThemeChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
     DestroyWindow(hwndToolbar);
     DestroyWindow(hwndReBar);
-    DestroyWindow(hwndStatus);
+    DestroyWindow(gDoc->hwndStatus);
     CreateBars(hwnd, hInstance);
     UpdateToolbar();
 
@@ -1847,14 +1845,14 @@ void MsgSize(HWND hwnd, WPARAM wParam, LPARAM lParam) {
     }
 
     if (bShowStatusbar) {
-        SendMessage(hwndStatus, WM_SIZE, 0, 0);
-        GetWindowRect(hwndStatus, &rc);
+        SendMessage(gDoc->hwndStatus, WM_SIZE, 0, 0);
+        GetWindowRect(gDoc->hwndStatus, &rc);
         cy -= (rc.bottom - rc.top);
     }
 
     hdwp = BeginDeferWindowPos(2);
 
-    DeferWindowPos(hdwp, hwndEditFrame, NULL, x, y, cx, cy,
+    DeferWindowPos(hdwp, gDoc->hwndEditFrame, NULL, x, y, cx, cy,
                    SWP_NOZORDER | SWP_NOACTIVATE);
 
     DeferWindowPos(hdwp, gDoc->hwndEdit, NULL, x + cxEditFrame, y + cyEditFrame,
@@ -1866,15 +1864,15 @@ void MsgSize(HWND hwnd, WPARAM wParam, LPARAM lParam) {
     // Statusbar width
     aWidth[0] = max(
         120, min(cx / 3, StatusCalcPaneWidth(
-                             hwndStatus, L"Ln 9'999'999 : 9'999'999   Col "
+        gDoc->hwndStatus, L"Ln 9'999'999 : 9'999'999   Col "
                                          L"9'999'999 : 999   Sel 9'999'999")));
-    aWidth[1] = aWidth[0] + StatusCalcPaneWidth(hwndStatus, L"9'999'999 Bytes");
-    aWidth[2] = aWidth[1] + StatusCalcPaneWidth(hwndStatus, L"Unicode BE BOM");
-    aWidth[3] = aWidth[2] + StatusCalcPaneWidth(hwndStatus, L"CR+LF");
-    aWidth[4] = aWidth[3] + StatusCalcPaneWidth(hwndStatus, L"OVR");
+    aWidth[1] = aWidth[0] + StatusCalcPaneWidth(gDoc->hwndStatus, L"9'999'999 Bytes");
+    aWidth[2] = aWidth[1] + StatusCalcPaneWidth(gDoc->hwndStatus, L"Unicode BE BOM");
+    aWidth[3] = aWidth[2] + StatusCalcPaneWidth(gDoc->hwndStatus, L"CR+LF");
+    aWidth[4] = aWidth[3] + StatusCalcPaneWidth(gDoc->hwndStatus, L"OVR");
     aWidth[5] = -1;
 
-    SendMessage(hwndStatus, SB_SETPARTS, COUNTOF(aWidth), (LPARAM)aWidth);
+    SendMessage(gDoc->hwndStatus, SB_SETPARTS, COUNTOF(aWidth), (LPARAM) aWidth);
 
     // UpdateStatusbar();
 }
@@ -2974,12 +2972,12 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
         case IDM_EDIT_SORTLINES:
             if (EditSortDlg(hwnd, &iSortOptions)) {
                 BeginWaitCursor();
-                StatusSetText(hwndStatus, 255, L"...");
-                StatusSetSimple(hwndStatus, TRUE);
-                InvalidateRect(hwndStatus, NULL, TRUE);
-                UpdateWindow(hwndStatus);
+                StatusSetText(gDoc->hwndStatus, 255, L"...");
+                StatusSetSimple(gDoc->hwndStatus, TRUE);
+                InvalidateRect(gDoc->hwndStatus, NULL, TRUE);
+                UpdateWindow(gDoc->hwndStatus);
                 EditSortLines(gDoc->hwndEdit, iSortOptions);
-                StatusSetSimple(hwndStatus, FALSE);
+                StatusSetSimple(gDoc->hwndStatus, FALSE);
                 EndWaitCursor();
             }
             break;
@@ -3968,11 +3966,11 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
         case IDM_VIEW_STATUSBAR:
             if (bShowStatusbar) {
                 bShowStatusbar = 0;
-                ShowWindow(hwndStatus, SW_HIDE);
+                ShowWindow(gDoc->hwndStatus, SW_HIDE);
             } else {
                 bShowStatusbar = 1;
                 UpdateStatusbar();
-                ShowWindow(hwndStatus, SW_SHOW);
+                ShowWindow(gDoc->hwndStatus, SW_SHOW);
             }
             SendWMSize(hwnd);
             break;
@@ -4150,13 +4148,13 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
                                               szIniFile)) {
 
                     BeginWaitCursor();
-                    StatusSetTextID(hwndStatus, STATUS_HELP,
+                    StatusSetTextID(gDoc->hwndStatus, STATUS_HELP,
                                     IDS_SAVINGSETTINGS);
-                    StatusSetSimple(hwndStatus, TRUE);
-                    InvalidateRect(hwndStatus, NULL, TRUE);
-                    UpdateWindow(hwndStatus);
+                    StatusSetSimple(gDoc->hwndStatus, TRUE);
+                    InvalidateRect(gDoc->hwndStatus, NULL, TRUE);
+                    UpdateWindow(gDoc->hwndStatus);
                     SaveSettings(TRUE);
-                    StatusSetSimple(hwndStatus, FALSE);
+                    StatusSetSimple(gDoc->hwndStatus, FALSE);
                     EndWaitCursor();
                     MsgBox(MBINFO, IDS_SAVEDSETTINGS);
                 } else {
@@ -6608,12 +6606,12 @@ void UpdateStatusbar() {
 
     Style_GetCurrentLexerName(tchLexerName, COUNTOF(tchLexerName));
 
-    StatusSetText(hwndStatus, STATUS_DOCPOS, tchDocPos);
-    StatusSetText(hwndStatus, STATUS_DOCSIZE, tchDocSize);
-    StatusSetText(hwndStatus, STATUS_CODEPAGE, mEncoding[iEncoding].wchLabel);
-    StatusSetText(hwndStatus, STATUS_EOLMODE, tchEOLMode);
-    StatusSetText(hwndStatus, STATUS_OVRMODE, tchOvrMode);
-    StatusSetText(hwndStatus, STATUS_LEXER, tchLexerName);
+    StatusSetText(gDoc->hwndStatus, STATUS_DOCPOS, tchDocPos);
+    StatusSetText(gDoc->hwndStatus, STATUS_DOCSIZE, tchDocSize);
+    StatusSetText(gDoc->hwndStatus, STATUS_CODEPAGE, mEncoding[iEncoding].wchLabel);
+    StatusSetText(gDoc->hwndStatus, STATUS_EOLMODE, tchEOLMode);
+    StatusSetText(gDoc->hwndStatus, STATUS_OVRMODE, tchOvrMode);
+    StatusSetText(gDoc->hwndStatus, STATUS_LEXER, tchLexerName);
 
     // InvalidateRect(hwndStatus,NULL,TRUE);
 }
@@ -6653,11 +6651,11 @@ BOOL FileIO(BOOL fLoad, LPCWSTR psz, BOOL bNoEncDetect, int *ienc, int *ieol,
     FormatString(tch, COUNTOF(tch), (fLoad) ? IDS_LOADFILE : IDS_SAVEFILE,
                  PathFindFileName(psz));
 
-    StatusSetText(hwndStatus, STATUS_HELP, tch);
-    StatusSetSimple(hwndStatus, TRUE);
+    StatusSetText(gDoc->hwndStatus, STATUS_HELP, tch);
+    StatusSetSimple(gDoc->hwndStatus, TRUE);
 
-    InvalidateRect(hwndStatus, NULL, TRUE);
-    UpdateWindow(hwndStatus);
+    InvalidateRect(gDoc->hwndStatus, NULL, TRUE);
+    UpdateWindow(gDoc->hwndStatus);
 
     if (fLoad)
         fSuccess = EditLoadFile(gDoc->hwndEdit, psz, bNoEncDetect, ienc, ieol,
@@ -6670,11 +6668,11 @@ BOOL FileIO(BOOL fLoad, LPCWSTR psz, BOOL bNoEncDetect, int *ienc, int *ieol,
     bReadOnly = (dwFileAttributes != INVALID_FILE_ATTRIBUTES &&
                  dwFileAttributes & FILE_ATTRIBUTE_READONLY);
 
-    StatusSetSimple(hwndStatus, FALSE);
+    StatusSetSimple(gDoc->hwndStatus, FALSE);
 
     EndWaitCursor();
 
-    return (fSuccess);
+    return fSuccess;
 }
 
 BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect,

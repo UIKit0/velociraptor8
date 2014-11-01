@@ -27,6 +27,8 @@ struct VeParams {
 
 struct Document {
     HWND hwndEdit;
+    HWND hwndEditFrame;
+    HWND hwndStatus;
 };
 
 extern Document *gDoc;

@@ -28,19 +28,16 @@ extern RECT pagesetupMargin;
 HGLOBAL hDevMode = NULL;
 HGLOBAL hDevNames = NULL;
 
-//  EditPrint() - Code from SciTE
-extern HWND hwndStatus;
-
 void StatusUpdatePrintPage(int iPageNum) {
     WCHAR tch[32];
 
     FormatString(tch, COUNTOF(tch), IDS_PRINTFILE, iPageNum);
 
-    StatusSetText(hwndStatus, 255, tch);
-    StatusSetSimple(hwndStatus, TRUE);
+    StatusSetText(gDoc->hwndStatus, 255, tch);
+    StatusSetSimple(gDoc->hwndStatus, TRUE);
 
-    InvalidateRect(hwndStatus, NULL, TRUE);
-    UpdateWindow(hwndStatus);
+    InvalidateRect(gDoc->hwndStatus, NULL, TRUE);
+    UpdateWindow(gDoc->hwndStatus);
 }
 
 BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle, LPCWSTR pszPageFormat) {
@@ -410,9 +407,8 @@ BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle, LPCWSTR pszPageFormat) {
         DeleteObject(fontFooter);
 
     // Reset Statusbar to default mode
-    StatusSetSimple(hwndStatus, FALSE);
+    StatusSetSimple(gDoc->hwndStatus, FALSE);
 
-    // Remove wait cursor...
     EndWaitCursor();
 
     return TRUE;
