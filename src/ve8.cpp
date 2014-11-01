@@ -20,8 +20,6 @@ See License.txt for details about distribution and modification.
 #include "Http.h"
 
 // Local and global Variables for Notepad2.c
-HWND hwndToolbar;
-HWND hwndReBar;
 HWND hwndMain;
 HWND hwndNextCBChain;
 HWND hDlgFindReplace;
@@ -145,7 +143,7 @@ BOOL bTransparentModeAvailable;
 BOOL bShowToolbar;
 BOOL bShowStatusbar;
 
-struct WININFO {
+struct WinInfo {
     int x;
     int y;
     int cx;
@@ -153,7 +151,7 @@ struct WININFO {
     int max;
 };
 
-WININFO wi;
+WinInfo wi;
 BOOL bStickyWinPos;
 
 BOOL bIsAppThemed;
@@ -485,8 +483,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine,
     g_uWinVer = MAKEWORD(HIBYTE(g_uWinVer), LOBYTE(g_uWinVer));
 
     // Don't keep working directory locked
-    GetCurrentDirectoryW(COUNTOF(g_wchWorkingDirectory), g_wchWorkingDirectory);
-    GetModuleFileNameW(NULL, wchWorkingDirectory, COUNTOF(wchWorkingDirectory));
+    GetCurrentDirectoryW(dimof(g_wchWorkingDirectory), g_wchWorkingDirectory);
+    GetModuleFileNameW(NULL, wchWorkingDirectory, dimof(wchWorkingDirectory));
     PathRemoveFileSpecW(wchWorkingDirectory);
     SetCurrentDirectoryW(wchWorkingDirectory);
 
@@ -729,7 +727,7 @@ HWND InitInstance(HINSTANCE hInstance, LPSTR pszCmdLine, int nCmdShow) {
         // Open from Directory
         if (PathIsDirectoryW(lpFileArg)) {
             WCHAR tchFile[MAX_PATH];
-            if (OpenFileDlg(hwndMain, tchFile, COUNTOF(tchFile), lpFileArg))
+            if (OpenFileDlg(hwndMain, tchFile, dimof(tchFile), lpFileArg))
                 bOpened = FileLoad(FALSE, FALSE, FALSE, FALSE, tchFile);
         } else {
             if (bOpened = FileLoad(FALSE, FALSE, FALSE, FALSE, lpFileArg)) {
@@ -806,9 +804,9 @@ HWND InitInstance(HINSTANCE hInstance, LPSTR pszCmdLine, int nCmdShow) {
 
             UINT cp = (UINT) SendMessage(gDoc->hwndEdit, SCI_GETCODEPAGE, 0, 0);
             WideCharToMultiByte(cp, 0, lpMatchArg, -1, efrData.szFind,
-                                COUNTOF(efrData.szFind), NULL, NULL);
+                dimof(efrData.szFind), NULL, NULL);
             WideCharToMultiByte(CP_UTF8, 0, lpMatchArg, -1, efrData.szFindUTF8,
-                                COUNTOF(efrData.szFindUTF8), NULL, NULL);
+                dimof(efrData.szFindUTF8), NULL, NULL);
             cpLastFind = cp;
 
             if (flagMatchText & 4)
@@ -1013,11 +1011,11 @@ MainWndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
 
             // SetForegroundWindow(hwnd);
 
-            DragQueryFile(hDrop, 0, szBuf, COUNTOF(szBuf));
+            DragQueryFile(hDrop, 0, szBuf, dimof(szBuf));
 
             if (PathIsDirectory(szBuf)) {
                 WCHAR tchFile[MAX_PATH];
-                if (OpenFileDlg(hwndMain, tchFile, COUNTOF(tchFile), szBuf))
+                if (OpenFileDlg(hwndMain, tchFile, dimof(tchFile), szBuf))
                     FileLoad(FALSE, FALSE, FALSE, FALSE, tchFile);
             } else
                 FileLoad(FALSE, FALSE, FALSE, FALSE, szBuf);
@@ -1053,7 +1051,7 @@ MainWndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
 
                     if (PathIsDirectory(&params->wchData)) {
                         WCHAR tchFile[MAX_PATH];
-                        if (OpenFileDlg(hwndMain, tchFile, COUNTOF(tchFile),
+                        if (OpenFileDlg(hwndMain, tchFile, dimof(tchFile),
                                         &params->wchData))
                             bOpened =
                                 FileLoad(FALSE, FALSE, FALSE, FALSE, tchFile);
@@ -1109,7 +1107,7 @@ MainWndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
                         if (params->flagTitleExcerpt) {
                             lstrcpyn(szTitleExcerpt,
                                      StrEnd(&params->wchData) + 1,
-                                     COUNTOF(szTitleExcerpt));
+                                     dimof(szTitleExcerpt));
                             SetWindowTitle(
                                 hwnd, uidsAppTitle, fIsElevated, IDS_UNTITLED,
                                 szCurFile, iPathNameFormat,
@@ -1555,7 +1553,7 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wp, LPARAM lp) {
     MRU_Load(mruReplace);
 
     if (gDoc->hwndEdit == NULL || gDoc->hwndEditFrame == NULL || gDoc->hwndStatus == NULL ||
-        hwndToolbar == NULL || hwndReBar == NULL)
+        gDoc->hwndToolbar == NULL || gDoc->hwndReBar == NULL)
         return (-1);
 
     return 0;
@@ -1590,16 +1588,16 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
     if (bShowToolbar)
         dwReBarStyle |= WS_VISIBLE;
 
-    hwndToolbar =
+    gDoc->hwndToolbar =
         CreateWindowEx(0, TOOLBARCLASSNAME, NULL, dwToolbarStyle, 0, 0, 0, 0,
                        hwnd, (HMENU)IDC_TOOLBAR, hInstance, NULL);
 
-    SendMessage(hwndToolbar, TB_BUTTONSTRUCTSIZE, (WPARAM)sizeof(TBBUTTON), 0);
+    SendMessage(gDoc->hwndToolbar, TB_BUTTONSTRUCTSIZE, (WPARAM)sizeof(TBBUTTON), 0);
 
     // Add normal Toolbar Bitmap
     hbmp = NULL;
     if (lstrlen(tchToolbarBitmap)) {
-        if (!SearchPath(NULL, tchToolbarBitmap, NULL, COUNTOF(szTmp), szTmp,
+        if (!SearchPath(NULL, tchToolbarBitmap, NULL, dimof(szTmp), szTmp,
                         NULL))
             lstrcpy(szTmp, tchToolbarBitmap);
         hbmp = (HBITMAP)LoadImageW(NULL, szTmp, IMAGE_BITMAP, 0, 0,
@@ -1620,12 +1618,12 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
                             ILC_COLOR32 | ILC_MASK, 0, 0);
     ImageList_AddMasked(himl, hbmp, CLR_DEFAULT);
     DeleteObject(hbmp);
-    SendMessage(hwndToolbar, TB_SETIMAGELIST, 0, (LPARAM)himl);
+    SendMessage(gDoc->hwndToolbar, TB_SETIMAGELIST, 0, (LPARAM) himl);
 
     // Optionally add hot Toolbar Bitmap
     hbmp = NULL;
     if (lstrlen(tchToolbarBitmapHot)) {
-        if (!SearchPath(NULL, tchToolbarBitmapHot, NULL, COUNTOF(szTmp), szTmp,
+        if (!SearchPath(NULL, tchToolbarBitmapHot, NULL, dimof(szTmp), szTmp,
                         NULL))
             lstrcpy(szTmp, tchToolbarBitmapHot);
         if (hbmp = (HBITMAP)LoadImageW(NULL, szTmp, IMAGE_BITMAP, 0, 0,
@@ -1635,14 +1633,14 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
                                     ILC_COLOR32 | ILC_MASK, 0, 0);
             ImageList_AddMasked(himl, hbmp, CLR_DEFAULT);
             DeleteObject(hbmp);
-            SendMessage(hwndToolbar, TB_SETHOTIMAGELIST, 0, (LPARAM)himl);
+            SendMessage(gDoc->hwndToolbar, TB_SETHOTIMAGELIST, 0, (LPARAM) himl);
         }
     }
 
     // Optionally add disabled Toolbar Bitmap
     hbmp = NULL;
     if (lstrlen(tchToolbarBitmapDisabled)) {
-        if (!SearchPath(NULL, tchToolbarBitmapDisabled, NULL, COUNTOF(szTmp),
+        if (!SearchPath(NULL, tchToolbarBitmapDisabled, NULL, dimof(szTmp),
                         szTmp, NULL))
             lstrcpy(szTmp, tchToolbarBitmapDisabled);
         if (hbmp = (HBITMAP)LoadImageW(NULL, szTmp, IMAGE_BITMAP, 0, 0,
@@ -1652,7 +1650,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
                                     ILC_COLOR32 | ILC_MASK, 0, 0);
             ImageList_AddMasked(himl, hbmp, CLR_DEFAULT);
             DeleteObject(hbmp);
-            SendMessage(hwndToolbar, TB_SETDISABLEDIMAGELIST, 0, (LPARAM)himl);
+            SendMessage(gDoc->hwndToolbar, TB_SETDISABLEDIMAGELIST, 0, (LPARAM) himl);
             bExternalBitmap = TRUE;
         }
     }
@@ -1670,7 +1668,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
             himl = ImageList_Create(bmp.bmWidth / NUMTOOLBITMAPS, bmp.bmHeight,
                                     ILC_COLOR32 | ILC_MASK, 0, 0);
             ImageList_AddMasked(himl, hbmpCopy, CLR_DEFAULT);
-            SendMessage(hwndToolbar, TB_SETDISABLEDIMAGELIST, 0, (LPARAM)himl);
+            SendMessage(gDoc->hwndToolbar, TB_SETDISABLEDIMAGELIST, 0, (LPARAM) himl);
         }
     }
     if (hbmpCopy)
@@ -1681,7 +1679,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
     cchIniSection = (int)LocalSize(pIniSection) / sizeof(WCHAR);
     LoadIniSection(L"Toolbar Labels", pIniSection, cchIniSection);
     n = 1;
-    for (i = 0; i < COUNTOF(tbbMainWnd); i++) {
+    for (i = 0; i < dimof(tbbMainWnd); i++) {
 
         if (tbbMainWnd[i].fsStyle == TBSTYLE_SEP)
             continue;
@@ -1689,26 +1687,26 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
         wsprintf(tchIndex, L"%02i", n++);
 
         if (IniSectionGetString(pIniSection, tchIndex, L"", tchDesc,
-                                COUNTOF(tchDesc))) {
+            dimof(tchDesc))) {
             tbbMainWnd[i].iString =
-                SendMessage(hwndToolbar, TB_ADDSTRING, 0, (LPARAM)tchDesc);
+                SendMessage(gDoc->hwndToolbar, TB_ADDSTRING, 0, (LPARAM) tchDesc);
             tbbMainWnd[i].fsStyle |= BTNS_AUTOSIZE | BTNS_SHOWTEXT;
         } else
             tbbMainWnd[i].fsStyle &= ~(BTNS_AUTOSIZE | BTNS_SHOWTEXT);
     }
     LocalFree(pIniSection);
 
-    SendMessage(hwndToolbar, TB_SETEXTENDEDSTYLE, 0,
-                SendMessage(hwndToolbar, TB_GETEXTENDEDSTYLE, 0, 0) |
+    SendMessage(gDoc->hwndToolbar, TB_SETEXTENDEDSTYLE, 0,
+        SendMessage(gDoc->hwndToolbar, TB_GETEXTENDEDSTYLE, 0, 0) |
                     TBSTYLE_EX_MIXEDBUTTONS);
 
-    SendMessage(hwndToolbar, TB_ADDBUTTONS, NUMINITIALTOOLS,
+    SendMessage(gDoc->hwndToolbar, TB_ADDBUTTONS, NUMINITIALTOOLS,
                 (LPARAM)tbbMainWnd);
-    if (Toolbar_SetButtons(hwndToolbar, IDT_FILE_NEW, tchToolbarButtons,
-                           tbbMainWnd, COUNTOF(tbbMainWnd)) == 0)
-        SendMessage(hwndToolbar, TB_ADDBUTTONS, NUMINITIALTOOLS,
+    if (Toolbar_SetButtons(gDoc->hwndToolbar, IDT_FILE_NEW, tchToolbarButtons,
+        tbbMainWnd, dimof(tbbMainWnd)) == 0)
+                           SendMessage(gDoc->hwndToolbar, TB_ADDBUTTONS, NUMINITIALTOOLS,
                     (LPARAM)tbbMainWnd);
-    SendMessage(hwndToolbar, TB_GETITEMRECT, 0, (LPARAM) & rc);
+    SendMessage(gDoc->hwndToolbar, TB_GETITEMRECT, 0, (LPARAM) & rc);
     // SendMessage(hwndToolbar,TB_SETINDENT,2,0);
 
     if (bShowStatusbar)
@@ -1718,14 +1716,14 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
         CreateStatusWindow(dwStatusbarStyle, NULL, hwnd, IDC_STATUSBAR);
 
     // Create ReBar and add Toolbar
-    hwndReBar =
+    gDoc->hwndReBar =
         CreateWindowEx(WS_EX_TOOLWINDOW, REBARCLASSNAME, NULL, dwReBarStyle, 0,
                        0, 0, 0, hwnd, (HMENU)IDC_REBAR, hInstance, NULL);
 
     rbi.cbSize = sizeof(REBARINFO);
     rbi.fMask = 0;
     rbi.himl = (HIMAGELIST)NULL;
-    SendMessage(hwndReBar, RB_SETBARINFO, 0, (LPARAM) & rbi);
+    SendMessage(gDoc->hwndReBar, RB_SETBARINFO, 0, (LPARAM) & rbi);
 
     rbBand.cbSize = sizeof(REBARBANDINFO);
     rbBand.fMask = /*RBBIM_COLORS | RBBIM_TEXT | RBBIM_BACKGROUND | */
@@ -1736,14 +1734,14 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
         rbBand.fStyle |= RBBS_CHILDEDGE;
     rbBand.hbmBack = NULL;
     rbBand.lpText = L"Toolbar";
-    rbBand.hwndChild = hwndToolbar;
-    rbBand.cxMinChild = (rc.right - rc.left) * COUNTOF(tbbMainWnd);
+    rbBand.hwndChild = gDoc->hwndToolbar;
+    rbBand.cxMinChild = (rc.right - rc.left) * dimof(tbbMainWnd);
     rbBand.cyMinChild = (rc.bottom - rc.top) + 2 * rc.top;
     rbBand.cx = 0;
-    SendMessage(hwndReBar, RB_INSERTBAND, (WPARAM) - 1, (LPARAM) & rbBand);
+    SendMessage(gDoc->hwndReBar, RB_INSERTBAND, (WPARAM) -1, (LPARAM) & rbBand);
 
-    SetWindowPos(hwndReBar, NULL, 0, 0, 0, 0, SWP_NOZORDER);
-    GetWindowRect(hwndReBar, &rc);
+    SetWindowPos(gDoc->hwndReBar, NULL, 0, 0, 0, 0, SWP_NOZORDER);
+    GetWindowRect(gDoc->hwndReBar, &rc);
     cyReBar = rc.bottom - rc.top;
 
     cyReBarFrame = bIsAppThemed ? 0 : 2;
@@ -1793,11 +1791,11 @@ void MsgThemeChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
     }
 
     // recreate toolbar and statusbar
-    Toolbar_GetButtons(hwndToolbar, IDT_FILE_NEW, tchToolbarButtons,
-                       COUNTOF(tchToolbarButtons));
+    Toolbar_GetButtons(gDoc->hwndToolbar, IDT_FILE_NEW, tchToolbarButtons,
+        dimof(tchToolbarButtons));
 
-    DestroyWindow(hwndToolbar);
-    DestroyWindow(hwndReBar);
+    DestroyWindow(gDoc->hwndToolbar);
+    DestroyWindow(gDoc->hwndReBar);
     DestroyWindow(gDoc->hwndStatus);
     CreateBars(hwnd, hInstance);
     UpdateToolbar();
@@ -1831,8 +1829,8 @@ void MsgSize(HWND hwnd, WPARAM wParam, LPARAM lParam) {
             y = (rc.bottom - rc.top);
             cy -= (rc.bottom - rc.top);*/
 
-        // SendMessage(hwndToolbar,TB_GETITEMRECT,0,(LPARAM)&rc);
-        SetWindowPos(hwndReBar, NULL, 0, 0, LOWORD(lParam), cyReBar,
+        // SendMessage(gDoc->hwndToolbar,TB_GETITEMRECT,0,(LPARAM)&rc);
+        SetWindowPos(gDoc->hwndReBar, NULL, 0, 0, LOWORD(lParam), cyReBar,
                      SWP_NOZORDER);
         // the ReBar automatically sets the correct height
         // calling SetWindowPos() with the height of one toolbar button
@@ -1872,7 +1870,7 @@ void MsgSize(HWND hwnd, WPARAM wParam, LPARAM lParam) {
     aWidth[4] = aWidth[3] + StatusCalcPaneWidth(gDoc->hwndStatus, L"OVR");
     aWidth[5] = -1;
 
-    SendMessage(gDoc->hwndStatus, SB_SETPARTS, COUNTOF(aWidth), (LPARAM) aWidth);
+    SendMessage(gDoc->hwndStatus, SB_SETPARTS, dimof(aWidth), (LPARAM) aWidth);
 
     // UpdateStatusbar();
 }
@@ -2259,19 +2257,19 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
             WCHAR tchTemp[MAX_PATH + 4];
 
             if (!IniGetString(L"Settings2", L"filebrowser.exe", L"", tchTemp,
-                              COUNTOF(tchTemp))) {
+                dimof(tchTemp))) {
                 if (!SearchPath(NULL, L"metapath.exe", NULL,
-                                COUNTOF(tchExeFile), tchExeFile, NULL)) {
-                    GetModuleFileName(NULL, tchExeFile, COUNTOF(tchExeFile));
+                    dimof(tchExeFile), tchExeFile, NULL)) {
+                    GetModuleFileName(NULL, tchExeFile, dimof(tchExeFile));
                     PathRemoveFileSpec(tchExeFile);
                     PathAppend(tchExeFile, L"metapath.exe");
                 }
             } else {
                 ExtractFirstArgument(tchTemp, tchExeFile, tchParam);
                 if (PathIsRelative(tchExeFile)) {
-                    if (!SearchPath(NULL, tchExeFile, NULL, COUNTOF(tchTemp),
+                    if (!SearchPath(NULL, tchExeFile, NULL, dimof(tchTemp),
                                     tchTemp, NULL)) {
-                        GetModuleFileName(NULL, tchTemp, COUNTOF(tchTemp));
+                        GetModuleFileName(NULL, tchTemp, dimof(tchTemp));
                         PathRemoveFileSpec(tchTemp);
                         PathAppend(tchTemp, tchExeFile);
                         lstrcpy(tchExeFile, tchTemp);
@@ -2280,12 +2278,12 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
             }
 
             if (lstrlen(tchParam) && lstrlen(szCurFile))
-                StrCatBuff(tchParam, L" ", COUNTOF(tchParam));
+                StrCatBuff(tchParam, L" ", dimof(tchParam));
 
             if (lstrlen(szCurFile)) {
                 lstrcpy(tchTemp, szCurFile);
                 PathQuoteSpaces(tchTemp);
-                StrCatBuff(tchParam, tchTemp, COUNTOF(tchParam));
+                StrCatBuff(tchParam, tchTemp, dimof(tchParam));
             }
 
             ZeroMemory(&sei, sizeof(SHELLEXECUTEINFO));
@@ -2322,7 +2320,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
             if (bSaveBeforeRunningTools && !FileSave(FALSE, TRUE, FALSE, FALSE))
                 break;
 
-            GetModuleFileName(NULL, szModuleName, COUNTOF(szModuleName));
+            GetModuleFileName(NULL, szModuleName, dimof(szModuleName));
 
             wsprintf(tch, L"\"-appid=%s\"", g_wchAppUserModelID);
             lstrcpy(szParameters, tch);
@@ -2448,11 +2446,11 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
                                SHGFI_DISPLAYNAME);
                 pszTitle = shfi.szDisplayName;
             } else {
-                GetString(IDS_UNTITLED, tchUntitled, COUNTOF(tchUntitled));
+                GetString(IDS_UNTITLED, tchUntitled, dimof(tchUntitled));
                 pszTitle = tchUntitled;
             }
 
-            GetString(IDS_PRINT_PAGENUM, tchPageFmt, COUNTOF(tchPageFmt));
+            GetString(IDS_PRINT_PAGENUM, tchPageFmt, dimof(tchPageFmt));
 
             if (!EditPrint(gDoc->hwndEdit, pszTitle, tchPageFmt))
                 MsgBox(MBWARN, IDS_PRINT_ERROR, pszTitle);
@@ -2492,12 +2490,12 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
                 if (FavoritesDlg(hwnd, tchSelItem)) {
                     if (PathIsLnkToDirectory(tchSelItem, NULL, 0))
                         PathGetLnkPath(tchSelItem, tchSelItem,
-                                       COUNTOF(tchSelItem));
+                        dimof(tchSelItem));
 
                     if (PathIsDirectory(tchSelItem)) {
                         WCHAR tchFile[MAX_PATH];
 
-                        if (OpenFileDlg(hwndMain, tchFile, COUNTOF(tchFile),
+                        if (OpenFileDlg(hwndMain, tchFile, dimof(tchFile),
                                         tchSelItem))
                             FileLoad(TRUE, FALSE, FALSE, FALSE, tchFile);
                     } else
@@ -3082,7 +3080,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
                 char *p;
                 // int iSelStart;
                 lstrcpynA(msz, mEncoding[iEncoding].pszParseNames,
-                          COUNTOF(msz));
+                    dimof(msz));
                 if (p = StrChrA(msz, ','))
                     *p = 0;
                 // iSelStart = SendMessage(gDoc->hwndEdit,SCI_GETSELECTIONSTART,0,0);
@@ -3108,7 +3106,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
                              (LOWORD(wParam) == IDM_EDIT_INSERT_SHORTDATE)
                                  ? L"DateTimeShort"
                                  : L"DateTimeLong",
-                             L"", tchTemplate, COUNTOF(tchTemplate))) {
+                                 L"", tchTemplate, dimof(tchTemplate))) {
                 struct tm sst;
                 sst.tm_isdst = -1;
                 sst.tm_sec = (int)st.wSecond;
@@ -3119,15 +3117,15 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
                 sst.tm_year = (int)st.wYear - 1900;
                 sst.tm_wday = (int)st.wDayOfWeek;
                 mktime(&sst);
-                wcsftime(tchDateTime, COUNTOF(tchDateTime), tchTemplate, &sst);
+                wcsftime(tchDateTime, dimof(tchDateTime), tchTemplate, &sst);
             } else {
                 GetDateFormat(LOCALE_USER_DEFAULT,
                               (LOWORD(wParam) == IDM_EDIT_INSERT_SHORTDATE)
                                   ? DATE_SHORTDATE
                                   : DATE_LONGDATE,
-                              &st, NULL, tchDate, COUNTOF(tchDate));
+                                  &st, NULL, tchDate, dimof(tchDate));
                 GetTimeFormat(LOCALE_USER_DEFAULT, TIME_NOSECONDS, &st, NULL,
-                              tchTime, COUNTOF(tchTime));
+                    tchTime, dimof(tchTime));
 
                 wsprintf(tchDateTime, L"%s %s", tchTime, tchDate);
             }
@@ -3136,7 +3134,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
                       ? CP_UTF8
                       : CP_ACP;
             WideCharToMultiByte(uCP, 0, tchDateTime, -1, mszBuf,
-                                COUNTOF(mszBuf), NULL, NULL);
+                dimof(mszBuf), NULL, NULL);
             // iSelStart = SendMessage(gDoc->hwndEdit,SCI_GETSELECTIONSTART,0,0);
             SendMessage(gDoc->hwndEdit, SCI_REPLACESEL, 0, (LPARAM) mszBuf);
             // SendMessage(gDoc->hwndEdit,SCI_SETANCHOR,(WPARAM)iSelStart,0);
@@ -3159,14 +3157,14 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
                 } else
                     pszInsert = szCurFile;
             } else {
-                GetString(IDS_UNTITLED, tchUntitled, COUNTOF(tchUntitled));
+                GetString(IDS_UNTITLED, tchUntitled, dimof(tchUntitled));
                 pszInsert = tchUntitled;
             }
 
             uCP = (SendMessage(gDoc->hwndEdit, SCI_GETCODEPAGE, 0, 0) == SC_CP_UTF8)
                       ? CP_UTF8
                       : CP_ACP;
-            WideCharToMultiByte(uCP, 0, pszInsert, -1, mszBuf, COUNTOF(mszBuf),
+            WideCharToMultiByte(uCP, 0, pszInsert, -1, mszBuf, dimof(mszBuf),
                                 NULL, NULL);
             // iSelStart = SendMessage(gDoc->hwndEdit,SCI_GETSELECTIONSTART,0,0);
             SendMessage(gDoc->hwndEdit, SCI_REPLACESEL, 0, (LPARAM) mszBuf);
@@ -3509,15 +3507,15 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
                         WCHAR wch[512];
 
                         MultiByteToWideChar(CP_UTF8, 0, efrData.szFindUTF8, -1,
-                                            wch, COUNTOF(wch));
+                            wch, dimof(wch));
                         WideCharToMultiByte(cp, 0, wch, -1, efrData.szFind,
-                                            COUNTOF(efrData.szFind), NULL,
+                            dimof(efrData.szFind), NULL,
                                             NULL);
 
                         MultiByteToWideChar(CP_UTF8, 0, efrData.szReplaceUTF8,
-                                            -1, wch, COUNTOF(wch));
+                            -1, wch, dimof(wch));
                         WideCharToMultiByte(cp, 0, wch, -1, efrData.szReplace,
-                                            COUNTOF(efrData.szReplace), NULL,
+                            dimof(efrData.szReplace), NULL,
                                             NULL);
                     } else {
 
@@ -3950,17 +3948,17 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
         case IDM_VIEW_TOOLBAR:
             if (bShowToolbar) {
                 bShowToolbar = 0;
-                ShowWindow(hwndReBar, SW_HIDE);
+                ShowWindow(gDoc->hwndReBar, SW_HIDE);
             } else {
                 bShowToolbar = 1;
                 UpdateToolbar();
-                ShowWindow(hwndReBar, SW_SHOW);
+                ShowWindow(gDoc->hwndReBar, SW_SHOW);
             }
             SendWMSize(hwnd);
             break;
 
         case IDM_VIEW_CUSTOMIZETB:
-            SendMessage(hwndToolbar, TB_CUSTOMIZE, 0, 0);
+            SendMessage(gDoc->hwndToolbar, TB_CUSTOMIZE, 0, 0);
             break;
 
         case IDM_VIEW_STATUSBAR:
@@ -4087,7 +4085,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
             break;
 
         case IDM_VIEW_SHOWEXCERPT:
-            EditGetExcerpt(gDoc->hwndEdit, szTitleExcerpt, COUNTOF(szTitleExcerpt));
+            EditGetExcerpt(gDoc->hwndEdit, szTitleExcerpt, dimof(szTitleExcerpt));
             SetWindowTitle(hwnd, uidsAppTitle, fIsElevated, IDS_UNTITLED,
                            szCurFile, iPathNameFormat,
                            bModified || iEncoding != iOriginalEncoding,
@@ -4338,7 +4336,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
             IniGetString(L"Settings2", L"TimeStamp",
                          L"\\$Date:[^\\$]+\\$ | $Date: %Y/%m/%d %H:%M:%S $",
-                         wchFind, COUNTOF(wchFind));
+                         wchFind, dimof(wchFind));
 
             if (pwchSep = StrChr(wchFind, L'|')) {
                 lstrcpy(wchTemplate, pwchSep + 1);
@@ -4361,13 +4359,13 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
             sst.tm_year = (int)st.wYear - 1900;
             sst.tm_wday = (int)st.wDayOfWeek;
             mktime(&sst);
-            wcsftime(wchReplace, COUNTOF(wchReplace), wchTemplate, &sst);
+            wcsftime(wchReplace, dimof(wchReplace), wchTemplate, &sst);
 
             cp = (UINT) SendMessage(gDoc->hwndEdit, SCI_GETCODEPAGE, 0, 0);
             WideCharToMultiByte(cp, 0, wchFind, -1, efrTS.szFind,
-                                COUNTOF(efrTS.szFind), NULL, NULL);
+                dimof(efrTS.szFind), NULL, NULL);
             WideCharToMultiByte(cp, 0, wchReplace, -1, efrTS.szReplace,
-                                COUNTOF(efrTS.szReplace), NULL, NULL);
+                dimof(efrTS.szReplace), NULL, NULL);
 
             if (SendMessage(gDoc->hwndEdit, SCI_GETSELECTIONSTART, 0, 0) !=
                 SendMessage(gDoc->hwndEdit, SCI_GETSELECTIONEND, 0, 0))
@@ -4394,7 +4392,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
                                    : L"WebTemplate2";
 
             bCmdEnabled = IniGetString(L"Settings2", lpszTemplateName, L"",
-                                       szCmdTemplate, COUNTOF(szCmdTemplate));
+                szCmdTemplate, dimof(szCmdTemplate));
 
             if (bCmdEnabled) {
 
@@ -4404,7 +4402,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
                 if (cchSelection > 0 && cchSelection <= 500 &&
                     SendMessage(gDoc->hwndEdit, SCI_GETSELTEXT, 0, 0) <
-                        COUNTOF(mszSelection)) {
+                    dimof(mszSelection)) {
                     SendMessage(gDoc->hwndEdit, SCI_GETSELTEXT, 0,
                                 (LPARAM)mszSelection);
                     mszSelection[cchSelection] = 0; // zero terminate
@@ -4431,12 +4429,12 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
                                        : CP_ACP;
                         MultiByteToWideChar(uCP, 0, mszSelection, -1,
                                             wszSelection,
-                                            COUNTOF(wszSelection));
+                                            dimof(wszSelection));
 
                         lpszCommand = (WCHAR *)GlobalAlloc(
                             GPTR,
                             sizeof(WCHAR) *
-                                (512 + COUNTOF(szCmdTemplate) + MAX_PATH + 32));
+                            (512 + dimof(szCmdTemplate) + MAX_PATH + 32));
                         wsprintf(lpszCommand, szCmdTemplate, wszSelection);
                         ExpandEnvironmentStringsEx(
                             lpszCommand,
@@ -4511,10 +4509,10 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
                     WCHAR wszBuf[512];
 
                     MultiByteToWideChar(cpLastFind, 0, mszSelection, -1, wszBuf,
-                                        COUNTOF(wszBuf));
+                        dimof(wszBuf));
                     WideCharToMultiByte(
                         CP_UTF8, 0, wszBuf, -1, efrData.szFindUTF8,
-                        COUNTOF(efrData.szFindUTF8), NULL, NULL);
+                        dimof(efrData.szFindUTF8), NULL, NULL);
                 } else
                     lstrcpyA(efrData.szFindUTF8, mszSelection);
 
@@ -4587,7 +4585,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
             break;
 
         case CMD_TOGGLETITLE:
-            EditGetExcerpt(gDoc->hwndEdit, szTitleExcerpt, COUNTOF(szTitleExcerpt));
+            EditGetExcerpt(gDoc->hwndEdit, szTitleExcerpt, dimof(szTitleExcerpt));
             SetWindowTitle(hwnd, uidsAppTitle, fIsElevated, IDS_UNTITLED,
                            szCurFile, iPathNameFormat,
                            bModified || iEncoding != iOriginalEncoding,
@@ -4629,7 +4627,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
             if (lstrlen(szCurFile))
                 pszCopy = szCurFile;
             else {
-                GetString(IDS_UNTITLED, tchUntitled, COUNTOF(tchUntitled));
+                GetString(IDS_UNTITLED, tchUntitled, dimof(tchUntitled));
                 pszCopy = tchUntitled;
             }
 
@@ -5104,7 +5102,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
                             int cchIns = 2;
                             int iCurPos = (int)SendMessage(
                                 gDoc->hwndEdit, SCI_GETCURRENTPOS, 0, 0);
-                            int iHelper = iCurPos - (COUNTOF(tchBuf) - 1);
+                            int iHelper = iCurPos - (dimof(tchBuf) - 1);
                             int iStartPos = max(0, iHelper);
                             int iSize = iCurPos - iStartPos;
 
@@ -5211,11 +5209,11 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
                     return TRUE;
 
                 case TBN_GETBUTTONINFO: {
-                    if (((LPTBNOTIFY)lParam)->iItem < COUNTOF(tbbMainWnd)) {
+                    if (((LPTBNOTIFY) lParam)->iItem < dimof(tbbMainWnd)) {
                         WCHAR tch[256];
                         GetString(
                             tbbMainWnd[((LPTBNOTIFY)lParam)->iItem].idCommand,
-                            tch, COUNTOF(tch));
+                            tch, dimof(tch));
                         lstrcpyn(((LPTBNOTIFY)lParam)->pszText,
                                  /*StrChr(tch,L'\n')+1*/ tch,
                                  ((LPTBNOTIFY)lParam)->cchText);
@@ -5229,10 +5227,10 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
                 case TBN_RESET: {
                     int i;
-                    int c = (int)SendMessage(hwndToolbar, TB_BUTTONCOUNT, 0, 0);
+                    int c = (int) SendMessage(gDoc->hwndToolbar, TB_BUTTONCOUNT, 0, 0);
                     for (i = 0; i < c; i++)
-                        SendMessage(hwndToolbar, TB_DELETEBUTTON, 0, 0);
-                    SendMessage(hwndToolbar, TB_ADDBUTTONS, NUMINITIALTOOLS,
+                        SendMessage(gDoc->hwndToolbar, TB_DELETEBUTTON, 0, 0);
+                    SendMessage(gDoc->hwndToolbar, TB_ADDBUTTONS, NUMINITIALTOOLS,
                                 (LPARAM)tbbMainWnd);
                     return 0;
                 }
@@ -5308,7 +5306,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
                     if (((LPTOOLTIPTEXT)lParam)->uFlags & TTF_IDISHWND) {
                         ;
                     } else {
-                        GetString((UINT)pnmh->idFrom, tch, COUNTOF(tch));
+                        GetString((UINT) pnmh->idFrom, tch, dimof(tch));
                         lstrcpyn(((LPTOOLTIPTEXT)lParam)->szText,
                                  /*StrChr(tch,L'\n')+1*/ tch, 80);
                     }
@@ -5351,19 +5349,19 @@ void LoadSettings() {
         efrData.bNoFindWrap = TRUE;
 
     if (!IniSectionGetString(pIniSection, L"OpenWithDir", L"", tchOpenWithDir,
-                             COUNTOF(tchOpenWithDir)))
+        dimof(tchOpenWithDir)))
         SHGetSpecialFolderPath(NULL, tchOpenWithDir, CSIDL_DESKTOPDIRECTORY,
                                TRUE);
     else
-        PathAbsoluteFromApp(tchOpenWithDir, NULL, COUNTOF(tchOpenWithDir),
+        PathAbsoluteFromApp(tchOpenWithDir, NULL, dimof(tchOpenWithDir),
                             TRUE);
 
     if (!IniSectionGetString(pIniSection, L"Favorites", L"", tchFavoritesDir,
-                             COUNTOF(tchFavoritesDir)))
+        dimof(tchFavoritesDir)))
         SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT,
                         tchFavoritesDir);
     else
-        PathAbsoluteFromApp(tchFavoritesDir, NULL, COUNTOF(tchFavoritesDir),
+        PathAbsoluteFromApp(tchFavoritesDir, NULL, dimof(tchFavoritesDir),
                             TRUE);
 
     iPathNameFormat = IniSectionGetInt(pIniSection, L"PathNameFormat", 0);
@@ -5570,7 +5568,7 @@ void LoadSettings() {
                         "SetLayeredWindowAttributes") != NULL);
 
     IniSectionGetString(pIniSection, L"ToolbarButtons", L"", tchToolbarButtons,
-                        COUNTOF(tchToolbarButtons));
+        dimof(tchToolbarButtons));
 
     bShowToolbar = IniSectionGetInt(pIniSection, L"ShowToolbar", 1);
     if (bShowToolbar)
@@ -5620,15 +5618,15 @@ void LoadSettings() {
         bStickyWinPos = 1;
 
     IniSectionGetString(pIniSection, L"DefaultExtension", L"txt",
-                        tchDefaultExtension, COUNTOF(tchDefaultExtension));
+        tchDefaultExtension, dimof(tchDefaultExtension));
     StrTrim(tchDefaultExtension, L" \t.\"");
 
     IniSectionGetString(pIniSection, L"DefaultDirectory", L"", tchDefaultDir,
-                        COUNTOF(tchDefaultDir));
+        dimof(tchDefaultDir));
 
-    ZeroMemory(tchFileDlgFilters, sizeof(WCHAR) * COUNTOF(tchFileDlgFilters));
+    ZeroMemory(tchFileDlgFilters, sizeof(WCHAR) * dimof(tchFileDlgFilters));
     IniSectionGetString(pIniSection, L"FileDlgFilters", L"", tchFileDlgFilters,
-                        COUNTOF(tchFileDlgFilters) - 2);
+        dimof(tchFileDlgFilters) - 2);
 
     dwFileCheckInverval =
         IniSectionGetInt(pIniSection, L"FileCheckInverval", 2000);
@@ -5637,11 +5635,11 @@ void LoadSettings() {
 
     LoadIniSection(L"Toolbar Images", pIniSection, cchIniSection);
     IniSectionGetString(pIniSection, L"BitmapDefault", L"", tchToolbarBitmap,
-                        COUNTOF(tchToolbarBitmap));
+        dimof(tchToolbarBitmap));
     IniSectionGetString(pIniSection, L"BitmapHot", L"", tchToolbarBitmapHot,
-                        COUNTOF(tchToolbarBitmap));
+        dimof(tchToolbarBitmap));
     IniSectionGetString(pIniSection, L"BitmapDisabled", L"",
-                        tchToolbarBitmapDisabled, COUNTOF(tchToolbarBitmap));
+        tchToolbarBitmapDisabled, dimof(tchToolbarBitmap));
 
     if (!flagPosParam /*|| bStickyWinPos*/) { // ignore window position if /p
                                               // was specified
@@ -5715,10 +5713,10 @@ void SaveSettings(BOOL bSaveSettingsNow) {
     IniSectionSetInt(pIniSection, L"CloseFind", efrData.bFindClose);
     IniSectionSetInt(pIniSection, L"CloseReplace", efrData.bReplaceClose);
     IniSectionSetInt(pIniSection, L"NoFindWrap", efrData.bNoFindWrap);
-    PathRelativeToApp(tchOpenWithDir, wchTmp, COUNTOF(wchTmp), FALSE, TRUE,
+    PathRelativeToApp(tchOpenWithDir, wchTmp, dimof(wchTmp), FALSE, TRUE,
                       flagPortableMyDocs);
     IniSectionSetString(pIniSection, L"OpenWithDir", wchTmp);
-    PathRelativeToApp(tchFavoritesDir, wchTmp, COUNTOF(wchTmp), FALSE, TRUE,
+    PathRelativeToApp(tchFavoritesDir, wchTmp, dimof(wchTmp), FALSE, TRUE,
                       flagPortableMyDocs);
     IniSectionSetString(pIniSection, L"Favorites", wchTmp);
     IniSectionSetInt(pIniSection, L"PathNameFormat", iPathNameFormat);
@@ -5777,8 +5775,8 @@ void SaveSettings(BOOL bSaveSettingsNow) {
     IniSectionSetInt(pIniSection, L"AlwaysOnTop", bAlwaysOnTop);
     IniSectionSetInt(pIniSection, L"MinimizeToTray", bMinimizeToTray);
     IniSectionSetInt(pIniSection, L"TransparentMode", bTransparentMode);
-    Toolbar_GetButtons(hwndToolbar, IDT_FILE_NEW, tchToolbarButtons,
-                       COUNTOF(tchToolbarButtons));
+    Toolbar_GetButtons(gDoc->hwndToolbar, IDT_FILE_NEW, tchToolbarButtons,
+        dimof(tchToolbarButtons));
     IniSectionSetString(pIniSection, L"ToolbarButtons", tchToolbarButtons);
     IniSectionSetInt(pIniSection, L"ShowToolbar", bShowToolbar);
     IniSectionSetInt(pIniSection, L"ShowStatusbar", bShowStatusbar);
@@ -5910,13 +5908,13 @@ void ParseCommandLine() {
             // Shell integration
             else if (StrCmpNI(lp1, L"appid=", CSTRLEN(L"appid=")) == 0) {
                 StrCpyN(g_wchAppUserModelID, lp1 + CSTRLEN(L"appid="),
-                        COUNTOF(g_wchAppUserModelID));
+                    dimof(g_wchAppUserModelID));
                 StrTrim(g_wchAppUserModelID, L" ");
                 if (lstrlen(g_wchAppUserModelID) == 0)
                     lstrcpy(g_wchAppUserModelID, L"(default)");
             } else if (StrCmpNI(lp1, L"sysmru=", CSTRLEN(L"sysmru=")) == 0) {
                 WCHAR wch[8];
-                StrCpyN(wch, lp1 + CSTRLEN(L"sysmru="), COUNTOF(wch));
+                StrCpyN(wch, lp1 + CSTRLEN(L"sysmru="), dimof(wch));
                 StrTrim(wch, L" ");
                 if (*wch == L'1')
                     flagUseSystemMRU = 2;
@@ -5947,7 +5945,7 @@ void ParseCommandLine() {
                         if (*(lp1 + 1) == L'0' || *CharUpper(lp1 + 1) == L'O')
                             lstrcpy(szIniFile, L"*?");
                         else if (ExtractFirstArgument(lp2, lp1, lp2)) {
-                            StrCpyN(szIniFile, lp1, COUNTOF(szIniFile));
+                            StrCpyN(szIniFile, lp1, dimof(szIniFile));
                             TrimString(szIniFile);
                             PathUnquoteSpaces(szIniFile);
                         }
@@ -6040,7 +6038,7 @@ void ParseCommandLine() {
                     case L'T':
                         if (ExtractFirstArgument(lp2, lp1, lp2)) {
                             StrCpyN(szTitleExcerpt, lp1,
-                                    COUNTOF(szTitleExcerpt));
+                                dimof(szTitleExcerpt));
                             fKeepTitleExcerpt = 1;
                         }
                         break;
@@ -6270,7 +6268,7 @@ void LoadFlags() {
 
     if (lstrlen(g_wchAppUserModelID) == 0) {
         IniSectionGetString(pIniSection, L"ShellAppUserModelID", L"(default)",
-                            g_wchAppUserModelID, COUNTOF(g_wchAppUserModelID));
+            g_wchAppUserModelID, dimof(g_wchAppUserModelID));
     }
 
     if (flagUseSystemMRU == 0) {
@@ -6285,7 +6283,7 @@ int CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule) {
     WCHAR tchFileExpanded[MAX_PATH];
     WCHAR tchBuild[MAX_PATH];
     ExpandEnvironmentStrings(lpszFile, tchFileExpanded,
-                             COUNTOF(tchFileExpanded));
+        dimof(tchFileExpanded));
 
     if (PathIsRelative(tchFileExpanded)) {
         // program directory
@@ -6305,7 +6303,7 @@ int CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule) {
             }
         }
         // general
-        if (SearchPath(NULL, tchFileExpanded, NULL, COUNTOF(tchBuild), tchBuild,
+        if (SearchPath(NULL, tchFileExpanded, NULL, dimof(tchBuild), tchBuild,
                        NULL)) {
             lstrcpy(lpszFile, tchBuild);
             return (1);
@@ -6321,14 +6319,14 @@ int CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule) {
 int CheckIniFileRedirect(LPWSTR lpszFile, LPCWSTR lpszModule) {
     WCHAR tch[MAX_PATH];
     if (GetPrivateProfileString(L"Notepad2", L"Notepad2.ini", L"", tch,
-                                COUNTOF(tch), lpszFile)) {
+        dimof(tch), lpszFile)) {
         if (CheckIniFile(tch, lpszModule)) {
             lstrcpy(lpszFile, tch);
             return (1);
         } else {
             WCHAR tchFileExpanded[MAX_PATH];
             ExpandEnvironmentStrings(tch, tchFileExpanded,
-                                     COUNTOF(tchFileExpanded));
+                dimof(tchFileExpanded));
             if (PathIsRelative(tchFileExpanded)) {
                 lstrcpy(lpszFile, lpszModule);
                 lstrcpy(PathFindFileName(lpszFile), tchFileExpanded);
@@ -6347,14 +6345,14 @@ int FindIniFile() {
     int bFound = 0;
     WCHAR tchTest[MAX_PATH];
     WCHAR tchModule[MAX_PATH];
-    GetModuleFileName(NULL, tchModule, COUNTOF(tchModule));
+    GetModuleFileName(NULL, tchModule, dimof(tchModule));
 
     if (lstrlen(szIniFile)) {
         if (lstrcmpi(szIniFile, L"*?") == 0)
             return 0;
         else {
             if (!CheckIniFile(szIniFile, tchModule)) {
-                ExpandEnvironmentStringsEx(szIniFile, COUNTOF(szIniFile));
+                ExpandEnvironmentStringsEx(szIniFile, dimof(szIniFile));
                 if (PathIsRelative(szIniFile)) {
                     lstrcpy(tchTest, tchModule);
                     PathRemoveFileSpec(tchTest);
@@ -6399,7 +6397,7 @@ int TestIniFile() {
     if (PathIsDirectory(szIniFile) ||
         *CharPrev(szIniFile, StrEnd(szIniFile)) == L'\\') {
         WCHAR wchModule[MAX_PATH];
-        GetModuleFileName(NULL, wchModule, COUNTOF(wchModule));
+        GetModuleFileName(NULL, wchModule, dimof(wchModule));
         PathAppend(szIniFile, PathFindFileName(wchModule));
         PathRenameExtension(szIniFile, L".ini");
         if (!PathFileExists(szIniFile)) {
@@ -6454,10 +6452,10 @@ int CreateIniFileEx(LPCWSTR lpszIniFile) {
 }
 
 #define EnableTool(id, b)                                                      \
-    SendMessage(hwndToolbar, TB_ENABLEBUTTON, id, MAKELONG(((b) ? 1 : 0), 0))
+    SendMessage(gDoc->hwndToolbar, TB_ENABLEBUTTON, id, MAKELONG(((b) ? 1 : 0), 0))
 
 #define CheckTool(id, b)                                                       \
-    SendMessage(hwndToolbar, TB_CHECKBUTTON, id, MAKELONG(b, 0))
+    SendMessage(gDoc->hwndToolbar, TB_CHECKBUTTON, id, MAKELONG(b, 0))
 
 void UpdateToolbar() {
 
@@ -6569,26 +6567,26 @@ void UpdateStatusbar() {
     FormatNumberStr(tchLinesSelected);
 
     if (!bMarkLongLines)
-        FormatString(tchDocPos, COUNTOF(tchDocPos), IDS_DOCPOS, tchLn, tchLines,
+        FormatString(tchDocPos, dimof(tchDocPos), IDS_DOCPOS, tchLn, tchLines,
                      tchCol, tchSel, tchLinesSelected);
     else
-        FormatString(tchDocPos, COUNTOF(tchDocPos), IDS_DOCPOS2, tchLn,
+        FormatString(tchDocPos, dimof(tchDocPos), IDS_DOCPOS2, tchLn,
                      tchLines, tchCol, tchCols, tchSel, tchLinesSelected);
 
 #else
 
     if (!bMarkLongLines)
-        FormatString(tchDocPos, COUNTOF(tchDocPos), IDS_DOCPOS, tchLn, tchLines,
+        FormatString(tchDocPos, dimof(tchDocPos), IDS_DOCPOS, tchLn, tchLines,
                      tchCol, tchSel);
     else
-        FormatString(tchDocPos, COUNTOF(tchDocPos), IDS_DOCPOS2, tchLn,
+        FormatString(tchDocPos, dimof(tchDocPos), IDS_DOCPOS2, tchLn,
                      tchLines, tchCol, tchCols, tchSel);
 #endif
 
     iBytes = (int) SendMessage(gDoc->hwndEdit, SCI_GETLENGTH, 0, 0);
-    StrFormatByteSize(iBytes, tchBytes, COUNTOF(tchBytes));
+    StrFormatByteSize(iBytes, tchBytes, dimof(tchBytes));
 
-    FormatString(tchDocSize, COUNTOF(tchDocSize), IDS_DOCSIZE, tchBytes);
+    FormatString(tchDocSize, dimof(tchDocSize), IDS_DOCSIZE, tchBytes);
 
     Encoding_GetLabel(iEncoding);
 
@@ -6604,7 +6602,7 @@ void UpdateStatusbar() {
     else
         lstrcpy(tchOvrMode, L"INS");
 
-    Style_GetCurrentLexerName(tchLexerName, COUNTOF(tchLexerName));
+    Style_GetCurrentLexerName(tchLexerName, dimof(tchLexerName));
 
     StatusSetText(gDoc->hwndStatus, STATUS_DOCPOS, tchDocPos);
     StatusSetText(gDoc->hwndStatus, STATUS_DOCSIZE, tchDocSize);
@@ -6648,7 +6646,7 @@ BOOL FileIO(BOOL fLoad, LPCWSTR psz, BOOL bNoEncDetect, int *ienc, int *ieol,
 
     BeginWaitCursor();
 
-    FormatString(tch, COUNTOF(tch), (fLoad) ? IDS_LOADFILE : IDS_SAVEFILE,
+    FormatString(tch, dimof(tch), (fLoad) ? IDS_LOADFILE : IDS_SAVEFILE,
                  PathFindFileName(psz));
 
     StatusSetText(gDoc->hwndStatus, STATUS_HELP, tch);
@@ -6723,19 +6721,19 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect,
     }
 
     if (!lpszFile || lstrlen(lpszFile) == 0) {
-        if (!OpenFileDlg(hwndMain, tch, COUNTOF(tch), NULL))
+        if (!OpenFileDlg(hwndMain, tch, dimof(tch), NULL))
             return FALSE;
     } else
         lstrcpy(tch, lpszFile);
 
-    ExpandEnvironmentStringsEx(tch, COUNTOF(tch));
+    ExpandEnvironmentStringsEx(tch, dimof(tch));
 
     if (PathIsRelative(tch)) {
-        StrCpyN(szFileName, g_wchWorkingDirectory, COUNTOF(szFileName));
+        StrCpyN(szFileName, g_wchWorkingDirectory, dimof(szFileName));
         PathAppend(szFileName, tch);
         if (!PathFileExists(szFileName)) {
             WCHAR wchFullPath[MAX_PATH];
-            if (SearchPath(NULL, tch, NULL, COUNTOF(wchFullPath), wchFullPath,
+            if (SearchPath(NULL, tch, NULL, dimof(wchFullPath), wchFullPath,
                            NULL)) {
                 lstrcpy(szFileName, wchFullPath);
             }
@@ -6744,10 +6742,10 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect,
         lstrcpy(szFileName, tch);
 
     PathCanonicalizeEx(szFileName);
-    GetLongPathNameEx(szFileName, COUNTOF(szFileName));
+    GetLongPathNameEx(szFileName, dimof(szFileName));
 
     if (PathIsLnkFile(szFileName))
-        PathGetLnkPath(szFileName, szFileName, COUNTOF(szFileName));
+        PathGetLnkPath(szFileName, szFileName, dimof(szFileName));
 
     // Ask to create a new file...
     if (!bReload && !PathFileExists(szFileName)) {
@@ -6869,7 +6867,7 @@ BOOL FileSave(BOOL bSaveAlways, BOOL bAsk, BOOL bSaveAs, BOOL bSaveCopy) {
         if (lstrlen(szCurFile))
             lstrcpy(tch, szCurFile);
         else
-            GetString(IDS_UNTITLED, tch, COUNTOF(tch));
+            GetString(IDS_UNTITLED, tch, dimof(tch));
 
         switch (MsgBox(MBYESNOCANCEL, IDS_ASK_SAVE, tch)) {
             case IDCANCEL:
@@ -6906,7 +6904,7 @@ BOOL FileSave(BOOL bSaveAlways, BOOL bAsk, BOOL bSaveAs, BOOL bSaveCopy) {
         } else
             lstrcpy(tchFile, szCurFile);
 
-        if (SaveFileDlg(hwndMain, tchFile, COUNTOF(tchFile), tchInitialDir)) {
+        if (SaveFileDlg(hwndMain, tchFile, dimof(tchFile), tchInitialDir)) {
             if (fSuccess = FileIO(FALSE, tchFile, FALSE, &iEncoding, &iEOLMode,
                                   NULL, NULL, &bCancelDataLoss, bSaveCopy)) {
                 if (!bSaveCopy) {
@@ -6971,7 +6969,7 @@ BOOL OpenFileDlg(HWND hwnd, LPWSTR lpstrFile, int cchFile,
     WCHAR tchInitialDir[MAX_PATH] = L"";
 
     lstrcpy(szFile, L"");
-    Style_GetOpenDlgFilterStr(szFilter, COUNTOF(szFilter));
+    Style_GetOpenDlgFilterStr(szFilter, dimof(szFilter));
 
     if (!lpstrInitialDir) {
         if (lstrlen(szCurFile)) {
@@ -6979,10 +6977,10 @@ BOOL OpenFileDlg(HWND hwnd, LPWSTR lpstrFile, int cchFile,
             PathRemoveFileSpec(tchInitialDir);
         } else if (lstrlen(tchDefaultDir)) {
             ExpandEnvironmentStrings(tchDefaultDir, tchInitialDir,
-                                     COUNTOF(tchInitialDir));
+                dimof(tchInitialDir));
             if (PathIsRelative(tchInitialDir)) {
                 WCHAR tchModule[MAX_PATH];
-                GetModuleFileName(NULL, tchModule, COUNTOF(tchModule));
+                GetModuleFileName(NULL, tchModule, dimof(tchModule));
                 PathRemoveFileSpec(tchModule);
                 PathAppend(tchModule, tchInitialDir);
                 PathCanonicalize(tchInitialDir, tchModule);
@@ -6997,7 +6995,7 @@ BOOL OpenFileDlg(HWND hwnd, LPWSTR lpstrFile, int cchFile,
     ofn.lpstrFilter = szFilter;
     ofn.lpstrFile = szFile;
     ofn.lpstrInitialDir = (lpstrInitialDir) ? lpstrInitialDir : tchInitialDir;
-    ofn.nMaxFile = COUNTOF(szFile);
+    ofn.nMaxFile = dimof(szFile);
     ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | /* OFN_NOCHANGEDIR |*/
                 OFN_DONTADDTORECENT | OFN_PATHMUSTEXIST |
                 OFN_SHAREAWARE /*| OFN_NODEREFERENCELINKS*/;
@@ -7019,7 +7017,7 @@ BOOL SaveFileDlg(HWND hwnd, LPWSTR lpstrFile, int cchFile,
     WCHAR tchInitialDir[MAX_PATH] = L"";
 
     lstrcpy(szNewFile, lpstrFile);
-    Style_GetOpenDlgFilterStr(szFilter, COUNTOF(szFilter));
+    Style_GetOpenDlgFilterStr(szFilter, dimof(szFilter));
 
     if (lstrlen(lpstrInitialDir))
         lstrcpy(tchInitialDir, lpstrInitialDir);
@@ -7028,10 +7026,10 @@ BOOL SaveFileDlg(HWND hwnd, LPWSTR lpstrFile, int cchFile,
         PathRemoveFileSpec(tchInitialDir);
     } else if (lstrlen(tchDefaultDir)) {
         ExpandEnvironmentStrings(tchDefaultDir, tchInitialDir,
-                                 COUNTOF(tchInitialDir));
+            dimof(tchInitialDir));
         if (PathIsRelative(tchInitialDir)) {
             WCHAR tchModule[MAX_PATH];
-            GetModuleFileName(NULL, tchModule, COUNTOF(tchModule));
+            GetModuleFileName(NULL, tchModule, dimof(tchModule));
             PathRemoveFileSpec(tchModule);
             PathAppend(tchModule, tchInitialDir);
             PathCanonicalize(tchInitialDir, tchModule);
@@ -7063,7 +7061,7 @@ BOOL CALLBACK EnumWndProc(HWND hwnd, LPARAM lParam) {
     BOOL bContinue = TRUE;
     WCHAR className[64];
 
-    if (GetClassNameW(hwnd, className, COUNTOF(className)))
+    if (GetClassNameW(hwnd, className, dimof(className)))
 
         if (lstrcmpiW(className, fullWndClass) == 0) {
 
@@ -7083,7 +7081,7 @@ BOOL CALLBACK EnumWndProc2(HWND hwnd, LPARAM lParam) {
     BOOL bContinue = TRUE;
     WCHAR className[64];
 
-    if (GetClassNameW(hwnd, className, COUNTOF(className)))
+    if (GetClassNameW(hwnd, className, dimof(className)))
 
         if (lstrcmpiW(className, fullWndClass) == 0) {
 
@@ -7096,7 +7094,7 @@ BOOL CALLBACK EnumWndProc2(HWND hwnd, LPARAM lParam) {
                     bContinue = FALSE;
 
                 GetDlgItemText(hwnd, IDC_FILENAME, tchFileName,
-                               COUNTOF(tchFileName));
+                    dimof(tchFileName));
                 if (lstrcmpi(tchFileName, lpFileArg) == 0)
                     *(HWND *)lParam = hwnd;
                 else
@@ -7124,21 +7122,21 @@ BOOL ActivatePrevInst() {
                                                   sizeof(WCHAR));
 
         if (PathIsRelative(lpFileArg)) {
-            StrCpyN(tchTmp, g_wchWorkingDirectory, COUNTOF(tchTmp));
+            StrCpyN(tchTmp, g_wchWorkingDirectory, dimof(tchTmp));
             PathAppend(tchTmp, lpFileArg);
             if (PathFileExists(tchTmp))
                 lstrcpy(lpFileArg, tchTmp);
             else {
-                if (SearchPath(NULL, lpFileArg, NULL, COUNTOF(tchTmp), tchTmp,
+                if (SearchPath(NULL, lpFileArg, NULL, dimof(tchTmp), tchTmp,
                                NULL))
                     lstrcpy(lpFileArg, tchTmp);
                 else {
-                    StrCpyN(tchTmp, g_wchWorkingDirectory, COUNTOF(tchTmp));
+                    StrCpyN(tchTmp, g_wchWorkingDirectory, dimof(tchTmp));
                     PathAppend(tchTmp, lpFileArg);
                     lstrcpy(lpFileArg, tchTmp);
                 }
             }
-        } else if (SearchPath(NULL, lpFileArg, NULL, COUNTOF(tchTmp), tchTmp,
+        } else if (SearchPath(NULL, lpFileArg, NULL, dimof(tchTmp), tchTmp,
                               NULL))
             lstrcpy(lpFileArg, tchTmp);
 
@@ -7244,16 +7242,16 @@ BOOL ActivatePrevInst() {
                     lpFileArg, (DWORD)GlobalSize(lpFileArg) / sizeof(WCHAR));
 
                 if (PathIsRelative(lpFileArg)) {
-                    StrCpyN(tchTmp, g_wchWorkingDirectory, COUNTOF(tchTmp));
+                    StrCpyN(tchTmp, g_wchWorkingDirectory, dimof(tchTmp));
                     PathAppend(tchTmp, lpFileArg);
                     if (PathFileExists(tchTmp))
                         lstrcpy(lpFileArg, tchTmp);
                     else {
-                        if (SearchPath(NULL, lpFileArg, NULL, COUNTOF(tchTmp),
+                        if (SearchPath(NULL, lpFileArg, NULL, dimof(tchTmp),
                                        tchTmp, NULL))
                             lstrcpy(lpFileArg, tchTmp);
                     }
-                } else if (SearchPath(NULL, lpFileArg, NULL, COUNTOF(tchTmp),
+                } else if (SearchPath(NULL, lpFileArg, NULL, dimof(tchTmp),
                                       tchTmp, NULL))
                     lstrcpy(lpFileArg, tchTmp);
 
@@ -7492,15 +7490,15 @@ void SetNotifyIconTitle(HWND hwnd) {
     nid.uFlags = NIF_TIP;
 
     if (lstrlen(szTitleExcerpt)) {
-        GetString(IDS_TITLEEXCERPT, tchFormat, COUNTOF(tchFormat));
+        GetString(IDS_TITLEEXCERPT, tchFormat, dimof(tchFormat));
         wsprintf(tchTitle, tchFormat, szTitleExcerpt);
     } else if (lstrlen(szCurFile)) {
         SHGetFileInfo2(szCurFile, 0, &shfi, sizeof(SHFILEINFO),
                        SHGFI_DISPLAYNAME);
-        PathCompactPathEx(tchTitle, shfi.szDisplayName, COUNTOF(tchTitle) - 4,
+        PathCompactPathEx(tchTitle, shfi.szDisplayName, dimof(tchTitle) - 4,
                           0);
     } else
-        GetString(IDS_UNTITLED, tchTitle, COUNTOF(tchTitle) - 4);
+        GetString(IDS_UNTITLED, tchTitle, dimof(tchTitle) - 4);
 
     if (bModified || iEncoding != iOriginalEncoding)
         lstrcpy(nid.szTip, L"* ");

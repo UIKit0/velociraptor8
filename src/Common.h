@@ -19,10 +19,8 @@
 #include <memory>
 #include <functional>
 
-#define COUNTOF(ar) (sizeof(ar) / sizeof(ar[0]))
-#define CSTRLEN(s) (COUNTOF(s) - 1)
-
 #define dimof(X)    (sizeof(X) / sizeof((X)[0]))
+#define CSTRLEN(s) (dimof(s) - 1)
 
 #pragma warning(push)
 #pragma warning(disable                                                        \

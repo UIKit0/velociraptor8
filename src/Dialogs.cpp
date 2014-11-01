@@ -34,7 +34,7 @@ int MsgBox(int iType, UINT uIdMsg, ...) {
     int iIcon = 0;
     HWND hwnd;
 
-    if (!GetString(uIdMsg, szBuf, COUNTOF(szBuf)))
+    if (!GetString(uIdMsg, szBuf, dimof(szBuf)))
         return 0;
 
     wvsprintfW(szText, szBuf, (va_list)((PUINT_PTR) & uIdMsg + 1));
@@ -50,15 +50,15 @@ int MsgBox(int iType, UINT uIdMsg, ...) {
             NULL, dwLastIOError, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
             lpMsgBuf, 0, NULL);
         StrTrimW(lpMsgBuf, L" \a\b\f\n\r\t\v");
-        StrCatBuff(szText, L"\n", COUNTOF(szText));
-        StrCatBuff(szText, lpMsgBuf, COUNTOF(szText));
+        StrCatBuff(szText, L"\n", dimof(szText));
+        StrCatBuff(szText, lpMsgBuf, dimof(szText));
         LocalFree(lpMsgBuf);
         wcht = *CharPrev(szText, StrEnd(szText));
         if (IsCharAlphaNumeric(wcht) || wcht == '"' || wcht == '\'')
-            StrCatBuff(szText, L".", COUNTOF(szText));
+            StrCatBuff(szText, L".", dimof(szText));
     }
 
-    GetString(IDS_APPTITLE, szTitle, COUNTOF(szTitle));
+    GetString(IDS_APPTITLE, szTitle, dimof(szTitle));
 
     switch (iType) {
         case MBINFO:
@@ -94,8 +94,8 @@ void DisplayCmdLineHelp() {
     WCHAR szTitle[32];
     WCHAR szText[2048];
 
-    GetString(IDS_APPTITLE, szTitle, COUNTOF(szTitle));
-    GetString(IDS_CMDLINEHELP, szText, COUNTOF(szText));
+    GetString(IDS_APPTITLE, szTitle, dimof(szTitle));
+    GetString(IDS_CMDLINEHELP, szText, dimof(szText));
 
     mbp.cbSize = sizeof(MSGBOXPARAMS);
     mbp.hwndOwner = NULL;
@@ -130,7 +130,7 @@ BOOL GetDirectory(HWND hwndParent, int iTitle, WCHAR * pszFolder,
     BOOL fOk = FALSE;
 
     lstrcpy(szTitle, L"");
-    GetString(iTitle, szTitle, COUNTOF(szTitle));
+    GetString(iTitle, szTitle, dimof(szTitle));
 
     if (!pszBase || !*pszBase)
         GetCurrentDirectory(MAX_PATH, szBase);
@@ -285,18 +285,18 @@ RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
                     ZeroMemory(&ofn, sizeof(OPENFILENAME));
 
                     GetDlgItemText(hwnd, IDC_COMMANDLINE, szArgs,
-                                   COUNTOF(szArgs));
-                    ExpandEnvironmentStringsEx(szArgs, COUNTOF(szArgs));
+                        dimof(szArgs));
+                    ExpandEnvironmentStringsEx(szArgs, dimof(szArgs));
                     ExtractFirstArgument(szArgs, szFile, szArg2);
 
-                    GetString(IDS_FILTER_EXE, szFilter, COUNTOF(szFilter));
+                    GetString(IDS_FILTER_EXE, szFilter, dimof(szFilter));
                     PrepareFilterStr(szFilter);
 
                     ofn.lStructSize = sizeof(OPENFILENAME);
                     ofn.hwndOwner = hwnd;
                     ofn.lpstrFilter = szFilter;
                     ofn.lpstrFile = szFile;
-                    ofn.nMaxFile = COUNTOF(szFile);
+                    ofn.nMaxFile = dimof(szFile);
                     ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY |
                                 OFN_NOCHANGEDIR | OFN_DONTADDTORECENT |
                                 OFN_PATHMUSTEXIST | OFN_SHAREAWARE |
@@ -335,12 +335,12 @@ RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
                     if (GetDlgItemText(hwnd, IDC_COMMANDLINE, arg1, MAX_PATH)) {
                         BOOL bQuickExit = FALSE;
 
-                        ExpandEnvironmentStringsEx(arg1, COUNTOF(arg1));
+                        ExpandEnvironmentStringsEx(arg1, dimof(arg1));
                         ExtractFirstArgument(arg1, arg1, arg2);
 
                         if (lstrcmpi(arg1, L"notepad2") == 0 ||
                             lstrcmpi(arg1, L"notepad2.exe") == 0) {
-                            GetModuleFileName(NULL, arg1, COUNTOF(arg1));
+                            GetModuleFileName(NULL, arg1, dimof(arg1));
                             bQuickExit = TRUE;
                         }
 
@@ -573,9 +573,9 @@ BOOL OpenWithDlg(HWND hwnd, LPCWSTR lpstrFile) {
 
         // resolve links and get short path name
         if (!(PathIsLnkFile(lpstrFile) &&
-              PathGetLnkPath(lpstrFile, szParam, COUNTOF(szParam))))
+            PathGetLnkPath(lpstrFile, szParam, dimof(szParam))))
             lstrcpy(szParam, lpstrFile);
-        // GetShortPathName(szParam,szParam,sizeof(WCHAR)*COUNTOF(szParam));
+        // GetShortPathName(szParam,szParam,sizeof(WCHAR)*dimof(szParam));
         PathQuoteSpaces(szParam);
 
         ShellExecuteEx(&sei);
@@ -862,7 +862,7 @@ DWORD WINAPI FileMRUIconThread(LPVOID lpParam) {
 
         lvi.mask = LVIF_TEXT;
         lvi.pszText = tch;
-        lvi.cchTextMax = COUNTOF(tch);
+        lvi.cchTextMax = dimof(tch);
         lvi.iItem = iItem;
         if (ListView_GetItem(hwnd, &lvi)) {
 
@@ -1040,7 +1040,7 @@ FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 
                           lvi.mask = LVIF_TEXT;
                           lvi.pszText = tch;
-                          lvi.cchTextMax = COUNTOF(tch);
+                          lvi.cchTextMax = dimof(tch);
                           lvi.iItem = lpdi->item.iItem;
 
                           ListView_GetItem(GetDlgItem(hwnd,IDC_FILEMRU),&lvi);
@@ -1139,7 +1139,7 @@ FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
                     lvi.iImage = shfi.iIcon;
 
                     for (i = 0; i < MRU_Enum(pFileMRU, 0, NULL, 0); i++) {
-                        MRU_Enum(pFileMRU, i, tch, COUNTOF(tch));
+                        MRU_Enum(pFileMRU, i, tch, dimof(tch));
                         PathAbsoluteFromApp(tch, NULL, 0, TRUE);
                         //  SendDlgItemMessage(hwnd,IDC_FILEMRU,LB_ADDSTRING,0,(LPARAM)tch);
                         // }
@@ -1177,7 +1177,7 @@ FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 
                         lvi.mask = LVIF_TEXT;
                         lvi.pszText = tch;
-                        lvi.cchTextMax = COUNTOF(tch);
+                        lvi.cchTextMax = dimof(tch);
                         lvi.iItem =
                             ListView_GetNextItem(GetDlgItem(hwnd, IDC_FILEMRU),
                                                  -1, LVNI_ALL | LVNI_SELECTED);
@@ -1376,7 +1376,7 @@ WordWrapSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
             int i;
 
             for (i = 0; i < 4; i++) {
-                GetDlgItemText(hwnd, 200 + i, tch, COUNTOF(tch));
+                GetDlgItemText(hwnd, 200 + i, tch, dimof(tch));
                 lstrcat(tch, L"|");
                 p1 = tch;
                 while (p2 = StrChr(p1, L'|')) {
@@ -1913,7 +1913,7 @@ SelectDefLineEndingDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 
             // Load options
             for (i = 0; i < 3; i++) {
-                GetString(IDS_EOLMODENAME0 + i, wch, COUNTOF(wch));
+                GetString(IDS_EOLMODENAME0 + i, wch, dimof(wch));
                 SendDlgItemMessage(hwnd, 100, CB_ADDSTRING, 0, (LPARAM)wch);
             }
 
@@ -2024,7 +2024,7 @@ INT_PTR InfoBox(int iType, LPCWSTR lpstrSetting, int uidMessage, ...) {
     if (lstrlen(lpstrSetting) > 0 && iMode == 1)
         return (iType == MBYESNO) ? IDYES : IDOK;
 
-    if (!GetString(uidMessage, wchFormat, COUNTOF(wchFormat)))
+    if (!GetString(uidMessage, wchFormat, dimof(wchFormat)))
         return (-1);
 
     ib.lpstrMessage = (WCHAR *)LocalAlloc(LPTR, 1024 * sizeof(WCHAR));

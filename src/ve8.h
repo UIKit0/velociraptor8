@@ -29,6 +29,8 @@ struct Document {
     HWND hwndEdit;
     HWND hwndEditFrame;
     HWND hwndStatus;
+    HWND hwndToolbar;
+    HWND hwndReBar;
 };
 
 extern Document *gDoc;

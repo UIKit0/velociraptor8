@@ -743,7 +743,7 @@ void Encoding_InitDefaults() {
     // DOS-437
     if (mEncoding[g_DOSEncoding].uCodePage != 437) {
         int i;
-        for (i = CPI_UTF7 + 1; i < COUNTOF(mEncoding); ++i) {
+        for (i = CPI_UTF7 + 1; i < dimof(mEncoding); ++i) {
             if (mEncoding[i].uCodePage == 437 && Encoding_IsValid(i)) {
                 g_DOSEncoding = i;
                 break;
@@ -775,7 +775,7 @@ int Encoding_MapIniSetting(BOOL bLoad, int iSetting) {
                 return CPI_UTF7;
             default: {
                 int i;
-                for (i = CPI_UTF7 + 1; i < COUNTOF(mEncoding); i++) {
+                for (i = CPI_UTF7 + 1; i < dimof(mEncoding); i++) {
                     if (mEncoding[i].uCodePage == (UINT)iSetting &&
                         Encoding_IsValid(i))
                         return (i);
@@ -813,7 +813,7 @@ void Encoding_GetLabel(int iEncoding) {
     if (mEncoding[iEncoding].wchLabel[0] == 0) {
         WCHAR *pwsz;
         WCHAR wch[256] = L"";
-        GetString(mEncoding[iEncoding].idsName, wch, COUNTOF(wch));
+        GetString(mEncoding[iEncoding].idsName, wch, dimof(wch));
         if (pwsz = StrChr(wch, L';')) {
             if (pwsz = StrChr(CharNext(pwsz), L';')) {
                 pwsz = CharNext(pwsz);
@@ -822,13 +822,13 @@ void Encoding_GetLabel(int iEncoding) {
         if (!pwsz)
             pwsz = wch;
         StrCpyN(mEncoding[iEncoding].wchLabel, pwsz,
-                COUNTOF(mEncoding[iEncoding].wchLabel));
+            dimof(mEncoding[iEncoding].wchLabel));
     }
 }
 
 int Encoding_MatchW(const WCHAR *pwszTest) {
     char tchTest[256];
-    WideCharToMultiByte(CP_ACP, 0, pwszTest, -1, tchTest, COUNTOF(tchTest),
+    WideCharToMultiByte(CP_ACP, 0, pwszTest, -1, tchTest, dimof(tchTest),
                         NULL, NULL);
     return (Encoding_MatchA(tchTest));
 }
@@ -846,7 +846,7 @@ int Encoding_MatchA(char *pchTest) {
     }
     *pchDst++ = ',';
     *pchDst = 0;
-    for (i = 0; i < COUNTOF(mEncoding); i++) {
+    for (i = 0; i < dimof(mEncoding); i++) {
         if (StrStrIA(mEncoding[i].pszParseNames, chTest)) {
             CPINFO cpi;
             if ((mEncoding[i].uFlags & NCP_INTERNAL) ||
@@ -862,7 +862,7 @@ int Encoding_MatchA(char *pchTest) {
 
 BOOL Encoding_IsValid(int iTestEncoding) {
     CPINFO cpi;
-    if (iTestEncoding >= 0 && iTestEncoding < COUNTOF(mEncoding)) {
+    if (iTestEncoding >= 0 && iTestEncoding < dimof(mEncoding)) {
         if ((mEncoding[iTestEncoding].uFlags & NCP_INTERNAL) ||
             IsValidCodePage(mEncoding[iTestEncoding].uCodePage) &&
                 GetCPInfo(mEncoding[iTestEncoding].uCodePage, &cpi)) {
@@ -888,18 +888,18 @@ void Encoding_AddToListView(HWND hwnd, int idSel, BOOL bRecodeOnly) {
     WCHAR wchBuf[256];
 
     PENCODINGENTRY pEE = (PENCODINGENTRY)LocalAlloc(
-        LPTR, COUNTOF(mEncoding) * sizeof(ENCODINGENTRY));
-    for (i = 0; i < COUNTOF(mEncoding); i++) {
+        LPTR, dimof(mEncoding) * sizeof(ENCODINGENTRY));
+    for (i = 0; i < dimof(mEncoding); i++) {
         pEE[i].id = i;
-        GetString(mEncoding[i].idsName, pEE[i].wch, COUNTOF(pEE[i].wch));
+        GetString(mEncoding[i].idsName, pEE[i].wch, dimof(pEE[i].wch));
     }
-    qsort(pEE, COUNTOF(mEncoding), sizeof(ENCODINGENTRY), CmpEncoding);
+    qsort(pEE, dimof(mEncoding), sizeof(ENCODINGENTRY), CmpEncoding);
 
     ZeroMemory(&lvi, sizeof(LVITEM));
     lvi.mask = LVIF_PARAM | LVIF_TEXT | LVIF_IMAGE;
     lvi.pszText = wchBuf;
 
-    for (i = 0; i < COUNTOF(mEncoding); i++) {
+    for (i = 0; i < dimof(mEncoding); i++) {
 
         int id = pEE[i].id;
         if (!bRecodeOnly || (mEncoding[id].uFlags & NCP_RECODE)) {
@@ -910,16 +910,16 @@ void Encoding_AddToListView(HWND hwnd, int idSel, BOOL bRecodeOnly) {
             lvi.iItem = ListView_GetItemCount(hwnd);
 
             if (pwsz = StrChr(pEE[i].wch, L';')) {
-                StrCpyN(wchBuf, CharNext(pwsz), COUNTOF(wchBuf));
+                StrCpyN(wchBuf, CharNext(pwsz), dimof(wchBuf));
                 if (pwsz = StrChr(wchBuf, L';'))
                     *pwsz = 0;
             } else
-                StrCpyN(wchBuf, pEE[i].wch, COUNTOF(wchBuf));
+                StrCpyN(wchBuf, pEE[i].wch, dimof(wchBuf));
 
             if (id == CPI_DEFAULT)
-                StrCatN(wchBuf, wchANSI, COUNTOF(wchBuf));
+                StrCatN(wchBuf, wchANSI, dimof(wchBuf));
             else if (id == CPI_OEM)
-                StrCatN(wchBuf, wchOEM, COUNTOF(wchBuf));
+                StrCatN(wchBuf, wchOEM, dimof(wchBuf));
 
             if ((mEncoding[id].uFlags & NCP_INTERNAL) ||
                 (IsValidCodePage(mEncoding[id].uCodePage) &&
@@ -972,21 +972,21 @@ void Encoding_AddToComboboxEx(HWND hwnd, int idSel, BOOL bRecodeOnly) {
     WCHAR wchBuf[256];
 
     PENCODINGENTRY pEE = (PENCODINGENTRY)LocalAlloc(
-        LPTR, COUNTOF(mEncoding) * sizeof(ENCODINGENTRY));
-    for (i = 0; i < COUNTOF(mEncoding); i++) {
+        LPTR, dimof(mEncoding) * sizeof(ENCODINGENTRY));
+    for (i = 0; i < dimof(mEncoding); i++) {
         pEE[i].id = i;
-        GetString(mEncoding[i].idsName, pEE[i].wch, COUNTOF(pEE[i].wch));
+        GetString(mEncoding[i].idsName, pEE[i].wch, dimof(pEE[i].wch));
     }
-    qsort(pEE, COUNTOF(mEncoding), sizeof(ENCODINGENTRY), CmpEncoding);
+    qsort(pEE, dimof(mEncoding), sizeof(ENCODINGENTRY), CmpEncoding);
 
     ZeroMemory(&cbei, sizeof(COMBOBOXEXITEM));
     cbei.mask = CBEIF_TEXT | CBEIF_IMAGE | CBEIF_SELECTEDIMAGE | CBEIF_LPARAM;
     cbei.pszText = wchBuf;
-    cbei.cchTextMax = COUNTOF(wchBuf);
+    cbei.cchTextMax = dimof(wchBuf);
     cbei.iImage = 0;
     cbei.iSelectedImage = 0;
 
-    for (i = 0; i < COUNTOF(mEncoding); i++) {
+    for (i = 0; i < dimof(mEncoding); i++) {
 
         int id = pEE[i].id;
         if (!bRecodeOnly || (mEncoding[id].uFlags & NCP_RECODE)) {
@@ -997,16 +997,16 @@ void Encoding_AddToComboboxEx(HWND hwnd, int idSel, BOOL bRecodeOnly) {
             cbei.iItem = SendMessage(hwnd, CB_GETCOUNT, 0, 0);
 
             if (pwsz = StrChr(pEE[i].wch, L';')) {
-                StrCpyN(wchBuf, CharNext(pwsz), COUNTOF(wchBuf));
+                StrCpyN(wchBuf, CharNext(pwsz), dimof(wchBuf));
                 if (pwsz = StrChr(wchBuf, L';'))
                     *pwsz = 0;
             } else
-                StrCpyN(wchBuf, pEE[i].wch, COUNTOF(wchBuf));
+                StrCpyN(wchBuf, pEE[i].wch, dimof(wchBuf));
 
             if (id == CPI_DEFAULT)
-                StrCatN(wchBuf, wchANSI, COUNTOF(wchBuf));
+                StrCatN(wchBuf, wchANSI, dimof(wchBuf));
             else if (id == CPI_OEM)
-                StrCatN(wchBuf, wchOEM, COUNTOF(wchBuf));
+                StrCatN(wchBuf, wchOEM, dimof(wchBuf));
 
             if ((mEncoding[id].uFlags & NCP_INTERNAL) ||
                 (IsValidCodePage(mEncoding[id].uCodePage) &&
@@ -2268,7 +2268,7 @@ void EditChar2Hex(HWND hwnd) {
                 lstrcpyA(ch, "\\x00");
 
             else {
-                MultiByteToWideChar(cp, 0, ch, -1, wch, COUNTOF(wch));
+                MultiByteToWideChar(cp, 0, ch, -1, wch, dimof(wch));
                 if (wch[0] <= 0xFF)
                     wsprintfA(ch, "\\x%02X", wch[0] & 0xFF);
                 else
@@ -2295,7 +2295,7 @@ void EditHex2Char(HWND hwnd) {
 
         if (iSelEnd - iSelStart) {
 
-            if (SendMessage(hwnd, SCI_GETSELTEXT, 0, 0) <= COUNTOF(ch)) {
+            if (SendMessage(hwnd, SCI_GETSELTEXT, 0, 0) <= dimof(ch)) {
 
                 SendMessage(hwnd, SCI_GETSELTEXT, 0, (LPARAM)ch);
 
@@ -2324,7 +2324,7 @@ void EditHex2Char(HWND hwnd) {
                         WCHAR wch[4];
                         wsprintf(wch, L"%lc", (WCHAR)i);
                         cch = WideCharToMultiByte(cp, 0, wch, -1, ch,
-                                                  COUNTOF(ch), NULL, NULL) -
+                            dimof(ch), NULL, NULL) -
                               1;
                         if (bTrySelExpand &&
                             (char)SendMessage(hwnd, SCI_GETCHARAT,
@@ -2359,7 +2359,7 @@ void EditModifyNumber(HWND hwnd, BOOL bIncrease) {
             int iNumber;
             int iWidth;
 
-            if (SendMessage(hwnd, SCI_GETSELTEXT, 0, 0) <= COUNTOF(chNumber)) {
+            if (SendMessage(hwnd, SCI_GETSELTEXT, 0, 0) <= dimof(chNumber)) {
                 SendMessage(hwnd, SCI_GETSELTEXT, 0, (LPARAM)chNumber);
 
                 if (StrChrIA(chNumber, '-'))
@@ -2958,10 +2958,10 @@ void EditModifyLines(HWND hwnd, LPCWSTR pwszPrefix, LPCWSTR pwszAppend) {
 
     if (lstrlen(pwszPrefix))
         WideCharToMultiByte(mbcp, 0, pwszPrefix, -1, mszPrefix1,
-                            COUNTOF(mszPrefix1), NULL, NULL);
+        dimof(mszPrefix1), NULL, NULL);
     if (lstrlen(pwszAppend))
         WideCharToMultiByte(mbcp, 0, pwszAppend, -1, mszAppend1,
-                            COUNTOF(mszAppend1), NULL, NULL);
+        dimof(mszAppend1), NULL, NULL);
 
     if (SC_SEL_RECTANGLE != SendMessage(hwnd, SCI_GETSELECTIONMODE, 0, 0)) {
         char *p;
@@ -3291,7 +3291,7 @@ void EditAlignText(HWND hwnd, int nMode) {
                     }
 
                     MultiByteToWideChar(mbcp, 0, tchLineBuf, cchLine,
-                                        wchLineBuf, COUNTOF(wchLineBuf));
+                        wchLineBuf, dimof(wchLineBuf));
                     StrTrim(wchLineBuf, L"\r\n\t ");
 
                     while (*p) {
@@ -3371,7 +3371,7 @@ void EditAlignText(HWND hwnd, int nMode) {
 
                                 WideCharToMultiByte(
                                     mbcp, 0, wchNewLineBuf, -1, tchLineBuf,
-                                    COUNTOF(tchLineBuf), NULL, NULL);
+                                    dimof(tchLineBuf), NULL, NULL);
 
                                 iPos =
                                     (int)SendMessage(hwnd, SCI_POSITIONFROMLINE,
@@ -3407,7 +3407,7 @@ void EditAlignText(HWND hwnd, int nMode) {
 
                                 WideCharToMultiByte(
                                     mbcp, 0, wchNewLineBuf, -1, tchLineBuf,
-                                    COUNTOF(tchLineBuf), NULL, NULL);
+                                    dimof(tchLineBuf), NULL, NULL);
 
                                 iPos =
                                     (int)SendMessage(hwnd, SCI_POSITIONFROMLINE,
@@ -3461,7 +3461,7 @@ void EditAlignText(HWND hwnd, int nMode) {
                             }
 
                             WideCharToMultiByte(mbcp, 0, wchNewLineBuf, -1,
-                                                tchLineBuf, COUNTOF(tchLineBuf),
+                                tchLineBuf, dimof(tchLineBuf),
                                                 NULL, NULL);
 
                             if (nMode == ALIGN_RIGHT || nMode == ALIGN_CENTER) {
@@ -3527,10 +3527,10 @@ void EditEncloseSelection(HWND hwnd, LPCWSTR pwszOpen, LPCWSTR pwszClose) {
         mbcp = CP_ACP;
 
     if (lstrlen(pwszOpen))
-        WideCharToMultiByte(mbcp, 0, pwszOpen, -1, mszOpen, COUNTOF(mszOpen),
+        WideCharToMultiByte(mbcp, 0, pwszOpen, -1, mszOpen, dimof(mszOpen),
                             NULL, NULL);
     if (lstrlen(pwszClose))
-        WideCharToMultiByte(mbcp, 0, pwszClose, -1, mszClose, COUNTOF(mszClose),
+        WideCharToMultiByte(mbcp, 0, pwszClose, -1, mszClose, dimof(mszClose),
                             NULL, NULL);
 
     if (SC_SEL_RECTANGLE != SendMessage(hwnd, SCI_GETSELECTIONMODE, 0, 0)) {
@@ -3595,7 +3595,7 @@ void EditToggleLineComments(HWND hwnd, LPCWSTR pwszComment,
 
     if (lstrlen(pwszComment))
         WideCharToMultiByte(mbcp, 0, pwszComment, -1, mszComment,
-                            COUNTOF(mszComment), NULL, NULL);
+        dimof(mszComment), NULL, NULL);
     cchComment = lstrlenA(mszComment);
 
     if (SC_SEL_RECTANGLE != SendMessage(hwnd, SCI_GETSELECTIONMODE, 0, 0) &&
@@ -4950,7 +4950,7 @@ void EditGetExcerpt(HWND hwnd, WCHAR * lpszExcerpt, DWORD cchExcerpt) {
 
     tr.chrg.cpMin = (int)SendMessage(hwnd, SCI_GETSELECTIONSTART, 0, 0);
     tr.chrg.cpMax = min((int)SendMessage(hwnd, SCI_GETSELECTIONEND, 0, 0),
-                        (LONG)(tr.chrg.cpMin + COUNTOF(tch)));
+        (LONG) (tr.chrg.cpMin + dimof(tch)));
     /*}
     else {
 
@@ -4958,7 +4958,7 @@ void EditGetExcerpt(HWND hwnd, WCHAR * lpszExcerpt, DWORD cchExcerpt) {
       tr.chrg.cpMin = SendMessage(hwnd,SCI_POSITIONFROMLINE,(WPARAM)iLine,0);
       tr.chrg.cpMax =
     min(SendMessage(hwnd,SCI_GETLINEENDPOSITION,(WPARAM)iLine,0),(LONG)(tr.chrg.cpMin
-    + COUNTOF(tch)));
+    + dimof(tch)));
     }*/
 
     tr.chrg.cpMax =
@@ -4977,7 +4977,7 @@ void EditGetExcerpt(HWND hwnd, WCHAR * lpszExcerpt, DWORD cchExcerpt) {
                             pszTextW,
                             (int)GlobalSize(pszTextW) / sizeof(WCHAR));
 
-        for (p = pszTextW; *p && cch < COUNTOF(tch) - 1; p++) {
+        for (p = pszTextW; *p && cch < dimof(tch) - 1; p++) {
             if (*p == L'\r' || *p == L'\n' || *p == L'\t' || *p == L' ') {
                 tch[cch++] = L' ';
                 while (*(p + 1) == L'\r' || *(p + 1) == L'\n' ||
@@ -5039,12 +5039,12 @@ EditFindReplaceDlgProcW(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 
             // Load MRUs
             for (i = 0; i < MRU_Enum(mruFind, 0, NULL, 0); i++) {
-                MRU_Enum(mruFind, i, tch, COUNTOF(tch));
+                MRU_Enum(mruFind, i, tch, dimof(tch));
                 SendDlgItemMessage(hwnd, IDC_FINDTEXT, CB_ADDSTRING, 0,
                                    (LPARAM)tch);
             }
             for (i = 0; i < MRU_Enum(mruReplace, 0, NULL, 0); i++) {
-                MRU_Enum(mruReplace, i, tch, COUNTOF(tch));
+                MRU_Enum(mruReplace, i, tch, dimof(tch));
                 SendDlgItemMessage(hwnd, IDC_REPLACETEXT, CB_ADDSTRING, 0,
                                    (LPARAM)tch);
             }
@@ -5167,10 +5167,10 @@ EditFindReplaceDlgProcW(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
             }
 
             hmenu = GetSystemMenu(hwnd, FALSE);
-            GetString(SC_SAVEPOS, tch, COUNTOF(tch));
+            GetString(SC_SAVEPOS, tch, dimof(tch));
             InsertMenu(hmenu, 0, MF_BYPOSITION | MF_STRING | MF_ENABLED,
                        SC_SAVEPOS, tch);
-            GetString(SC_RESETPOS, tch, COUNTOF(tch));
+            GetString(SC_RESETPOS, tch, dimof(tch));
             InsertMenu(hmenu, 1, MF_BYPOSITION | MF_STRING | MF_ENABLED,
                        SC_RESETPOS, tch);
             InsertMenu(hmenu, 2, MF_BYPOSITION | MF_SEPARATOR, 0, NULL);
@@ -5265,7 +5265,7 @@ EditFindReplaceDlgProcW(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
                     if (!bSwitchedFindReplace &&
                         !GetDlgItemTextA2W(uCPEdit, hwnd, IDC_FINDTEXT,
                                            lpefr->szFind,
-                                           COUNTOF(lpefr->szFind))) {
+                                           dimof(lpefr->szFind))) {
 
                         EnableWindow(GetDlgItem(hwnd, IDOK), FALSE);
                         EnableWindow(GetDlgItem(hwnd, IDC_FINDPREV), FALSE);
@@ -5278,7 +5278,7 @@ EditFindReplaceDlgProcW(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
                     if (GetDlgItem(hwnd, IDC_REPLACETEXT))
                         GetDlgItemTextA2W(uCPEdit, hwnd, IDC_REPLACETEXT,
                                           lpefr->szReplace,
-                                          COUNTOF(lpefr->szReplace));
+                                          dimof(lpefr->szReplace));
 
 #ifdef BOOKMARK_EDITION
                     lpefr->bWildcardSearch =
@@ -5332,9 +5332,9 @@ EditFindReplaceDlgProcW(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
                         if (lstrlenA(lpefr->szFind)) {
                             if (GetDlgItemTextA2W(CP_UTF8, hwnd, IDC_FINDTEXT,
                                                   lpefr->szFindUTF8,
-                                                  COUNTOF(lpefr->szFindUTF8))) {
+                                                  dimof(lpefr->szFindUTF8))) {
                                 GetDlgItemText(hwnd, IDC_FINDTEXT, tch,
-                                               COUNTOF(tch));
+                                    dimof(tch));
                                 MRU_Add(mruFind, tch);
                             }
                         }
@@ -5342,9 +5342,9 @@ EditFindReplaceDlgProcW(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
                             if (GetDlgItemTextA2W(
                                     CP_UTF8, hwnd, IDC_REPLACETEXT,
                                     lpefr->szReplaceUTF8,
-                                    COUNTOF(lpefr->szReplaceUTF8))) {
+                                    dimof(lpefr->szReplaceUTF8))) {
                                 GetDlgItemText(hwnd, IDC_REPLACETEXT, tch,
-                                               COUNTOF(tch));
+                                    dimof(tch));
                                 MRU_Add(mruReplace, tch);
                             }
                         } else
@@ -5352,10 +5352,10 @@ EditFindReplaceDlgProcW(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
                     } else {
                         GetDlgItemTextA2W(CP_UTF8, hwnd, IDC_FINDTEXT,
                                           lpefr->szFindUTF8,
-                                          COUNTOF(lpefr->szFindUTF8));
+                                          dimof(lpefr->szFindUTF8));
                         if (!GetDlgItemTextA2W(CP_UTF8, hwnd, IDC_REPLACETEXT,
                                                lpefr->szReplaceUTF8,
-                                               COUNTOF(lpefr->szReplaceUTF8)))
+                                               dimof(lpefr->szReplaceUTF8)))
                             lstrcpyA(lpefr->szReplaceUTF8, "");
                     }
 
@@ -5375,12 +5375,12 @@ EditFindReplaceDlgProcW(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
                                        0, 0);
 
                     for (i = 0; i < MRU_Enum(mruFind, 0, NULL, 0); i++) {
-                        MRU_Enum(mruFind, i, tch, COUNTOF(tch));
+                        MRU_Enum(mruFind, i, tch, dimof(tch));
                         SendDlgItemMessage(hwnd, IDC_FINDTEXT, CB_ADDSTRING, 0,
                                            (LPARAM)tch);
                     }
                     for (i = 0; i < MRU_Enum(mruReplace, 0, NULL, 0); i++) {
-                        MRU_Enum(mruReplace, i, tch, COUNTOF(tch));
+                        MRU_Enum(mruReplace, i, tch, dimof(tch));
                         SendDlgItemMessage(hwnd, IDC_REPLACETEXT, CB_ADDSTRING,
                                            0, (LPARAM)tch);
                     }
@@ -5583,7 +5583,7 @@ void EscapeWildcards(char *szFind2, LPCEDITFINDREPLACE lpefr) {
         iDest++;
     }
     szWildcardEscaped[iDest] = (char)NULL;
-    lstrcpynA(szFind2, szWildcardEscaped, COUNTOF(szWildcardEscaped));
+    lstrcpynA(szFind2, szWildcardEscaped, dimof(szWildcardEscaped));
 }
 #endif
 
@@ -5598,7 +5598,7 @@ BOOL EditFindNext(HWND hwnd, LPCEDITFINDREPLACE lpefr, BOOL fExtendSelection) {
     if (!lstrlenA(lpefr->szFind))
         return /*EditFindReplaceDlg(hwnd,lpefr,FALSE)*/ FALSE;
 
-    lstrcpynA(szFind2, lpefr->szFind, COUNTOF(szFind2));
+    lstrcpynA(szFind2, lpefr->szFind, dimof(szFind2));
     if (lpefr->bTransformBS)
         TransformBackslashes(szFind2, (lpefr->fuFlags & SCFIND_REGEXP),
                              (UINT)SendMessage(hwnd, SCI_GETCODEPAGE, 0, 0));
@@ -5661,7 +5661,7 @@ BOOL EditFindPrev(HWND hwnd, LPCEDITFINDREPLACE lpefr, BOOL fExtendSelection) {
     if (!lstrlenA(lpefr->szFind))
         return /*EditFindReplaceDlg(hwnd,lpefr,FALSE)*/ FALSE;
 
-    lstrcpynA(szFind2, lpefr->szFind, COUNTOF(szFind2));
+    lstrcpynA(szFind2, lpefr->szFind, dimof(szFind2));
     if (lpefr->bTransformBS)
         TransformBackslashes(szFind2, (lpefr->fuFlags & SCFIND_REGEXP),
                              (UINT)SendMessage(hwnd, SCI_GETCODEPAGE, 0, 0));
@@ -5729,7 +5729,7 @@ BOOL EditReplace(HWND hwnd, LPCEDITFINDREPLACE lpefr) {
     if (!lstrlenA(lpefr->szFind))
         return /*EditFindReplaceDlg(hwnd,lpefr,TRUE)*/ FALSE;
 
-    lstrcpynA(szFind2, lpefr->szFind, COUNTOF(szFind2));
+    lstrcpynA(szFind2, lpefr->szFind, dimof(szFind2));
     if (lpefr->bTransformBS)
         TransformBackslashes(szFind2, (lpefr->fuFlags & SCFIND_REGEXP),
                              (UINT)SendMessage(hwnd, SCI_GETCODEPAGE, 0, 0));
@@ -6066,7 +6066,7 @@ BOOL EditReplaceAll(HWND hwnd, LPCEDITFINDREPLACE lpefr, BOOL bShowInfo) {
     // Show wait cursor...
     BeginWaitCursor();
 
-    lstrcpynA(szFind2, lpefr->szFind, COUNTOF(szFind2));
+    lstrcpynA(szFind2, lpefr->szFind, dimof(szFind2));
     if (lpefr->bTransformBS)
         TransformBackslashes(szFind2, (lpefr->fuFlags & SCFIND_REGEXP),
                              (UINT)SendMessage(hwnd, SCI_GETCODEPAGE, 0, 0));
@@ -6198,7 +6198,7 @@ BOOL EditReplaceAllInSelection(HWND hwnd, LPCEDITFINDREPLACE lpefr,
     // Show wait cursor...
     BeginWaitCursor();
 
-    lstrcpynA(szFind2, lpefr->szFind, COUNTOF(szFind2));
+    lstrcpynA(szFind2, lpefr->szFind, dimof(szFind2));
     if (lpefr->bTransformBS)
         TransformBackslashes(szFind2, (lpefr->fuFlags & SCFIND_REGEXP),
                              (UINT)SendMessage(hwnd, SCI_GETCODEPAGE, 0, 0));
@@ -6570,7 +6570,7 @@ EditModifyLinesDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
                     int id_focus = GetWindowLong(GetFocus(), GWL_ID);
                     if (id_focus == 100 || id_focus == 101) {
                         WCHAR wch[8];
-                        GetDlgItemText(hwnd, id_capture, wch, COUNTOF(wch));
+                        GetDlgItemText(hwnd, id_capture, wch, dimof(wch));
                         SendDlgItemMessage(hwnd, id_focus, EM_SETSEL, (WPARAM)0,
                                            (LPARAM) - 1);
                         SendDlgItemMessage(hwnd, id_focus, EM_REPLACESEL,
@@ -6942,7 +6942,7 @@ BOOL FileVars_Init(char *lpData, DWORD cbData, LPFILEVARS lpfv) {
     if ((fNoFileVariables && bNoEncodingTags) || !lpData || !cbData)
         return TRUE;
 
-    lstrcpynA(tch, lpData, min(cbData + 1, COUNTOF(tch)));
+    lstrcpynA(tch, lpData, min(cbData + 1, dimof(tch)));
 
     if (!fNoFileVariables) {
         if (FileVars_ParseInt(tch, "enable-local-variables", &i) && (!i))
@@ -6986,25 +6986,25 @@ BOOL FileVars_Init(char *lpData, DWORD cbData, LPFILEVARS lpfv) {
         !bDisableFileVariables) {
 
         if (FileVars_ParseStr(tch, "encoding", lpfv->tchEncoding,
-                              COUNTOF(lpfv->tchEncoding)))
+            dimof(lpfv->tchEncoding)))
             lpfv->mask |= FV_ENCODING;
         else if (FileVars_ParseStr(tch, "charset", lpfv->tchEncoding,
-                                   COUNTOF(lpfv->tchEncoding)))
+            dimof(lpfv->tchEncoding)))
             lpfv->mask |= FV_ENCODING;
         else if (FileVars_ParseStr(tch, "coding", lpfv->tchEncoding,
-                                   COUNTOF(lpfv->tchEncoding)))
+            dimof(lpfv->tchEncoding)))
             lpfv->mask |= FV_ENCODING;
     }
 
     if (!fNoFileVariables && !bDisableFileVariables) {
         if (FileVars_ParseStr(tch, "mode", lpfv->tchMode,
-                              COUNTOF(lpfv->tchMode)))
+            dimof(lpfv->tchMode)))
             lpfv->mask |= FV_MODE;
     }
 
-    if (lpfv->mask == 0 && cbData > COUNTOF(tch)) {
+    if (lpfv->mask == 0 && cbData > dimof(tch)) {
 
-        lstrcpynA(tch, lpData + cbData - COUNTOF(tch) + 1, COUNTOF(tch));
+        lstrcpynA(tch, lpData + cbData - dimof(tch) + 1, dimof(tch));
 
         if (!fNoFileVariables) {
             if (FileVars_ParseInt(tch, "enable-local-variables", &i) && (!i))
@@ -7048,19 +7048,19 @@ BOOL FileVars_Init(char *lpData, DWORD cbData, LPFILEVARS lpfv) {
             !bDisableFileVariables) {
 
             if (FileVars_ParseStr(tch, "encoding", lpfv->tchEncoding,
-                                  COUNTOF(lpfv->tchEncoding)))
+                dimof(lpfv->tchEncoding)))
                 lpfv->mask |= FV_ENCODING;
             else if (FileVars_ParseStr(tch, "charset", lpfv->tchEncoding,
-                                       COUNTOF(lpfv->tchEncoding)))
+                dimof(lpfv->tchEncoding)))
                 lpfv->mask |= FV_ENCODING;
             else if (FileVars_ParseStr(tch, "coding", lpfv->tchEncoding,
-                                       COUNTOF(lpfv->tchEncoding)))
+                dimof(lpfv->tchEncoding)))
                 lpfv->mask |= FV_ENCODING;
         }
 
         if (!fNoFileVariables && !bDisableFileVariables) {
             if (FileVars_ParseStr(tch, "mode", lpfv->tchMode,
-                                  COUNTOF(lpfv->tchMode)))
+                dimof(lpfv->tchMode)))
                 lpfv->mask |= FV_MODE;
         }
     }
@@ -7160,7 +7160,7 @@ BOOL FileVars_ParseInt(char *pszData, char *pszName, int *piValue) {
         while (*pvStart && StrChrIA(":=\"' \t", *pvStart))
             pvStart++;
 
-        lstrcpynA(tch, pvStart, COUNTOF(tch));
+        lstrcpynA(tch, pvStart, dimof(tch));
 
         pvEnd = tch;
         while (*pvEnd && IsCharAlphaNumericA(*pvEnd))
@@ -7213,7 +7213,7 @@ BOOL FileVars_ParseStr(char *pszData, char *pszName, char *pszValue,
                 bQuoted = TRUE;
             pvStart++;
         }
-        lstrcpynA(tch, pvStart, COUNTOF(tch));
+        lstrcpynA(tch, pvStart, dimof(tch));
 
         pvEnd = tch;
         while (*pvEnd &&
@@ -7251,7 +7251,7 @@ BOOL FileVars_IsNonUTF8(LPFILEVARS lpfv) {
 BOOL FileVars_IsValidEncoding(LPFILEVARS lpfv) {
     CPINFO cpi;
     if (lpfv->mask & FV_ENCODING && lpfv->iEncoding >= 0 &&
-        lpfv->iEncoding < COUNTOF(mEncoding)) {
+        lpfv->iEncoding < dimof(mEncoding)) {
         if ((mEncoding[lpfv->iEncoding].uFlags & NCP_INTERNAL) ||
             IsValidCodePage(mEncoding[lpfv->iEncoding].uCodePage) &&
                 GetCPInfo(mEncoding[lpfv->iEncoding].uCodePage, &cpi)) {

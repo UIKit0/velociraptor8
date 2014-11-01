@@ -31,7 +31,7 @@ HGLOBAL hDevNames = NULL;
 void StatusUpdatePrintPage(int iPageNum) {
     WCHAR tch[32];
 
-    FormatString(tch, COUNTOF(tch), IDS_PRINTFILE, iPageNum);
+    FormatString(tch, dimof(tch), IDS_PRINTFILE, iPageNum);
 
     StatusSetText(gDoc->hwndStatus, 255, tch);
     StatusSetSimple(gDoc->hwndStatus, TRUE);
@@ -436,7 +436,7 @@ PageSetupHook(HWND hwnd, UINT uiMsg, WPARAM wParam, LPARAM lParam) {
                                MAKELONG((short)iPrintZoom, 0));
 
             // Set header options
-            GetString(IDS_PRINT_HEADER, tch, COUNTOF(tch));
+            GetString(IDS_PRINT_HEADER, tch, dimof(tch));
             lstrcat(tch, L"|");
             p1 = tch;
             while (p2 = StrChr(p1, L'|')) {
@@ -448,7 +448,7 @@ PageSetupHook(HWND hwnd, UINT uiMsg, WPARAM wParam, LPARAM lParam) {
             SendDlgItemMessage(hwnd, 32, CB_SETCURSEL, (WPARAM)iPrintHeader, 0);
 
             // Set footer options
-            GetString(IDS_PRINT_FOOTER, tch, COUNTOF(tch));
+            GetString(IDS_PRINT_FOOTER, tch, dimof(tch));
             lstrcat(tch, L"|");
             p1 = tch;
             while (p2 = StrChr(p1, L'|')) {
@@ -460,7 +460,7 @@ PageSetupHook(HWND hwnd, UINT uiMsg, WPARAM wParam, LPARAM lParam) {
             SendDlgItemMessage(hwnd, 33, CB_SETCURSEL, (WPARAM)iPrintFooter, 0);
 
             // Set color options
-            GetString(IDS_PRINT_COLOR, tch, COUNTOF(tch));
+            GetString(IDS_PRINT_COLOR, tch, dimof(tch));
             lstrcat(tch, L"|");
             p1 = tch;
             while (p2 = StrChr(p1, L'|')) {
