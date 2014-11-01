@@ -2155,9 +2155,85 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
     EnableCmd(hmenu, IDM_VIEW_SAVESETTINGSNOW, i);
 }
 
+// TODO: replace hwnd with Doc and use Doc->hwndTopLevel
+static void MenuNewWindow(HWND hwnd, bool isEmpty) {
+    WCHAR moduleName[MAX_PATH];
+    WCHAR szFileName[MAX_PATH];
+    WCHAR szParameters[2 * MAX_PATH + 64];
+
+    int x, y, cx, cy;
+    WCHAR tch[64];
+
+    if (bSaveBeforeRunningTools && !FileSave(FALSE, TRUE, FALSE, FALSE)) {
+        return;
+    }
+
+    GetModuleFileNameW(NULL, moduleName, dimof(moduleName));
+
+    wsprintf(tch, L"\"-appid=%s\"", g_wchAppUserModelID);
+    lstrcpy(szParameters, tch);
+
+    wsprintf(tch, L" \"-sysmru=%i\"", (flagUseSystemMRU == 2) ? 1 : 0);
+    lstrcat(szParameters, tch);
+
+    lstrcat(szParameters, L" -f");
+    if (lstrlen(szIniFile)) {
+        lstrcat(szParameters, L" \"");
+        lstrcat(szParameters, szIniFile);
+        lstrcat(szParameters, L"\"");
+    } else
+        lstrcat(szParameters, L"0");
+
+    lstrcat(szParameters, L" -n");
+
+    WINDOWPLACEMENT wndpl = { 0 };
+    wndpl.length = sizeof(WINDOWPLACEMENT);
+    GetWindowPlacement(hwnd, &wndpl);
+
+    auto hMonitor = MonitorFromRect(&wndpl.rcNormalPosition, MONITOR_DEFAULTTONEAREST);
+    MONITORINFO mi = { 0 };
+    mi.cbSize = sizeof(mi);
+    GetMonitorInfo(hMonitor, &mi);
+
+    // offset new window position +10/+10
+    x = wndpl.rcNormalPosition.left + 10;
+    y = wndpl.rcNormalPosition.top + 10;
+    cx = wndpl.rcNormalPosition.right - wndpl.rcNormalPosition.left;
+    cy = wndpl.rcNormalPosition.bottom - wndpl.rcNormalPosition.top;
+
+    // check if window fits monitor
+    if ((x + cx) > mi.rcWork.right || (y + cy) > mi.rcWork.bottom) {
+        x = mi.rcMonitor.left;
+        y = mi.rcMonitor.top;
+    }
+
+    BOOL imax = IsZoomed(hwnd);
+    wsprintf(tch, L" -pos %i,%i,%i,%i,%i", x, y, cx, cy, (int)imax);
+    lstrcat(szParameters, tch);
+
+    if (!isEmpty && lstrlen(szCurFile)) {
+        lstrcpy(szFileName, szCurFile);
+        PathQuoteSpaces(szFileName);
+        lstrcat(szParameters, L" ");
+        lstrcat(szParameters, szFileName);
+    }
+
+    SHELLEXECUTEINFO sei = { 0 };
+    sei.cbSize = sizeof(SHELLEXECUTEINFO);
+    sei.fMask = /*SEE_MASK_NOZONECHECKS*/ 0x00800000;
+    sei.hwnd = hwnd;
+    sei.lpVerb = NULL;
+    sei.lpFile = moduleName;
+    sei.lpParameters = szParameters;
+    sei.lpDirectory = g_workingDirectory;
+    sei.nShow = SW_SHOWNORMAL;
+    ShellExecuteEx(&sei);
+}
+
 // WM_COMMAND
 LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
-    switch (LOWORD(wParam)) {
+    WORD cmd = LOWORD(wParam);
+    switch (cmd) {
 
         case IDM_FILE_NEW:
             FileLoad(FALSE, TRUE, FALSE, FALSE, L"");
@@ -2308,82 +2384,8 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
         case IDM_FILE_NEWWINDOW:
         case IDM_FILE_NEWWINDOW2: {
-            SHELLEXECUTEINFO sei;
-            WCHAR szModuleName[MAX_PATH];
-            WCHAR szFileName[MAX_PATH];
-            WCHAR szParameters[2 * MAX_PATH + 64];
-
-            MONITORINFO mi;
-            HMONITOR hMonitor;
-            WINDOWPLACEMENT wndpl;
-            int x, y, cx, cy, imax;
-            WCHAR tch[64];
-
-            if (bSaveBeforeRunningTools && !FileSave(FALSE, TRUE, FALSE, FALSE))
-                break;
-
-            GetModuleFileName(NULL, szModuleName, dimof(szModuleName));
-
-            wsprintf(tch, L"\"-appid=%s\"", g_wchAppUserModelID);
-            lstrcpy(szParameters, tch);
-
-            wsprintf(tch, L" \"-sysmru=%i\"", (flagUseSystemMRU == 2) ? 1 : 0);
-            lstrcat(szParameters, tch);
-
-            lstrcat(szParameters, L" -f");
-            if (lstrlen(szIniFile)) {
-                lstrcat(szParameters, L" \"");
-                lstrcat(szParameters, szIniFile);
-                lstrcat(szParameters, L"\"");
-            } else
-                lstrcat(szParameters, L"0");
-
-            lstrcat(szParameters, L" -n");
-
-            wndpl.length = sizeof(WINDOWPLACEMENT);
-            GetWindowPlacement(hwnd, &wndpl);
-
-            hMonitor = MonitorFromRect(&wndpl.rcNormalPosition,
-                                       MONITOR_DEFAULTTONEAREST);
-            mi.cbSize = sizeof(mi);
-            GetMonitorInfo(hMonitor, &mi);
-
-            // offset new window position +10/+10
-            x = wndpl.rcNormalPosition.left + 10;
-            y = wndpl.rcNormalPosition.top + 10;
-            cx = wndpl.rcNormalPosition.right - wndpl.rcNormalPosition.left;
-            cy = wndpl.rcNormalPosition.bottom - wndpl.rcNormalPosition.top;
-
-            // check if window fits monitor
-            if ((x + cx) > mi.rcWork.right || (y + cy) > mi.rcWork.bottom) {
-                x = mi.rcMonitor.left;
-                y = mi.rcMonitor.top;
-            }
-
-            imax = IsZoomed(hwnd);
-
-            wsprintf(tch, L" -pos %i,%i,%i,%i,%i", x, y, cx, cy, imax);
-            lstrcat(szParameters, tch);
-
-            if (LOWORD(wParam) != IDM_FILE_NEWWINDOW2 && lstrlen(szCurFile)) {
-                lstrcpy(szFileName, szCurFile);
-                PathQuoteSpaces(szFileName);
-                lstrcat(szParameters, L" ");
-                lstrcat(szParameters, szFileName);
-            }
-
-            ZeroMemory(&sei, sizeof(SHELLEXECUTEINFO));
-
-            sei.cbSize = sizeof(SHELLEXECUTEINFO);
-            sei.fMask = /*SEE_MASK_NOZONECHECKS*/ 0x00800000;
-            sei.hwnd = hwnd;
-            sei.lpVerb = NULL;
-            sei.lpFile = szModuleName;
-            sei.lpParameters = szParameters;
-            sei.lpDirectory = g_workingDirectory;
-            sei.nShow = SW_SHOWNORMAL;
-
-            ShellExecuteEx(&sei);
+            auto isEmpty = (cmd == IDM_FILE_NEWWINDOW2);
+            MenuNewWindow(hwnd, isEmpty);
         } break;
 
         case IDM_FILE_LAUNCH: {

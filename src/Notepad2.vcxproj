@@ -422,6 +422,12 @@
       <Project>{5877b917-512b-49f5-b514-1b4159e7a9ca}</Project>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="..\res\ve8.exe.manifest" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\res\velociraptor8.ico" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
