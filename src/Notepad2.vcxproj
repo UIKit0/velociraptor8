@@ -376,6 +376,7 @@
     <ClCompile Include="Edit.cpp" />
     <ClCompile Include="Helpers.cpp" />
     <ClCompile Include="Http.cpp" />
+    <ClCompile Include="Install.cpp" />
     <ClCompile Include="ve8.cpp" />
     <ClCompile Include="Print.cpp" />
     <ClCompile Include="StrUtil.cpp" />
@@ -390,6 +391,7 @@
     <ClInclude Include="Edit.h" />
     <ClInclude Include="Helpers.h" />
     <ClInclude Include="Http.h" />
+    <ClInclude Include="Install.h" />
     <ClInclude Include="SciCall.h" />
     <ClInclude Include="StrUtil.h" />
     <ClInclude Include="Styles.h" />
