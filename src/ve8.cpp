@@ -1038,7 +1038,7 @@ MainWndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
             SetDlgItemInt(hwnd, IDC_REUSELOCK, GetTickCount(), FALSE);
 
             if (pcds->dwData == DATA_NOTEPAD2_PARAMS) {
-                NP2PARAMS *params = (NP2PARAMS *)LocalAlloc(LPTR, pcds->cbData);
+                VeParams *params = (VeParams *)LocalAlloc(LPTR, pcds->cbData);
                 CopyMemory(params, pcds->lpData, pcds->cbData);
 
                 if (params->flagLexerSpecified)
@@ -7148,8 +7148,8 @@ BOOL ActivatePrevInst() {
         if (hwnd != NULL) {
             // Enabled
             if (IsWindowEnabled(hwnd)) {
-                NP2PARAMS *params;
-                DWORD cb = sizeof(NP2PARAMS);
+                VeParams *params;
+                DWORD cb = sizeof(VeParams);
 
                 // Make sure the previous window won't pop up a change
                 // notification message
@@ -7168,7 +7168,7 @@ BOOL ActivatePrevInst() {
                 if (lpSchemeArg)
                     cb += (lstrlen(lpSchemeArg) + 1) * sizeof(WCHAR);
 
-                params = (NP2PARAMS *)GlobalAlloc(GPTR, cb);
+                params = (VeParams *)GlobalAlloc(GPTR, cb);
                 params->flagFileSpecified = FALSE;
                 params->flagChangeNotify = 0;
                 params->flagQuietCreate = FALSE;
@@ -7235,8 +7235,8 @@ BOOL ActivatePrevInst() {
                 // Search working directory from second instance, first!
                 // lpFileArg is at least MAX_PATH+2 bytes
                 WCHAR tchTmp[MAX_PATH];
-                NP2PARAMS *params;
-                DWORD cb = sizeof(NP2PARAMS);
+                VeParams *params;
+                DWORD cb = sizeof(VeParams);
                 int cchTitleExcerpt;
 
                 ExpandEnvironmentStringsEx(
@@ -7265,7 +7265,7 @@ BOOL ActivatePrevInst() {
                 if (cchTitleExcerpt)
                     cb += (cchTitleExcerpt + 1) * sizeof(WCHAR);
 
-                params = (NP2PARAMS *)GlobalAlloc(GPTR, cb);
+                params = (VeParams *)GlobalAlloc(GPTR, cb);
                 params->flagFileSpecified = TRUE;
                 lstrcpy(&params->wchData, lpFileArg);
                 params->flagChangeNotify = flagChangeNotify;

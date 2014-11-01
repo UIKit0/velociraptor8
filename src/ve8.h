@@ -9,7 +9,7 @@ Please send me your comments to this work.
 
 //==== Data Type for WM_COPYDATA ==============================================
 #define DATA_NOTEPAD2_PARAMS 0xFB10
-struct NP2PARAMS {
+struct VeParams {
     int flagFileSpecified;
     int flagChangeNotify;
     int flagLexerSpecified;
