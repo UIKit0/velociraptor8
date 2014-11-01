@@ -173,13 +173,13 @@ int cyFavoritesDlg;
 int xFindReplaceDlg;
 int yFindReplaceDlg;
 
-LPWSTR lpFileList[32];
+WCHAR* lpFileList[32];
 int cFileList = 0;
 int cchiFileList = 0;
-LPWSTR lpFileArg = NULL;
-LPWSTR lpSchemeArg = NULL;
-LPWSTR lpMatchArg = NULL;
-LPWSTR lpEncodingArg = NULL;
+WCHAR* lpFileArg = NULL;
+WCHAR* lpSchemeArg = NULL;
+WCHAR* lpMatchArg = NULL;
+WCHAR* lpEncodingArg = NULL;
 LPMRULIST pFileMRU;
 LPMRULIST mruFind;
 LPMRULIST mruReplace;
@@ -235,6 +235,8 @@ int iSortOptions = 0;
 int iAlignMode = 0;
 
 BOOL fIsElevated = FALSE;
+
+#define WC_NOTEPAD2 L"Notepad2"
 
 static WCHAR fullWndClass[16] = WC_NOTEPAD2;
 
@@ -304,7 +306,7 @@ typedef enum {
 #define FOLD_CHILDREN SCMOD_CTRL
 #define FOLD_SIBLINGS SCMOD_SHIFT
 
-BOOL __stdcall FoldToggleNode(int ln, FOLD_ACTION action) {
+static BOOL FoldToggleNode(int ln, FOLD_ACTION action) {
     BOOL fExpanded = SciCall_GetFoldExpanded(ln);
 
     if ((action == FOLD && fExpanded) || (action == EXPAND && !fExpanded)) {
@@ -315,7 +317,7 @@ BOOL __stdcall FoldToggleNode(int ln, FOLD_ACTION action) {
     return FALSE;
 }
 
-void __stdcall FoldToggleAll(FOLD_ACTION action) {
+static void FoldToggleAll(FOLD_ACTION action) {
     BOOL fToggled = FALSE;
     int lnTotal = SciCall_GetLineCount();
     int ln;
@@ -339,7 +341,7 @@ void __stdcall FoldToggleAll(FOLD_ACTION action) {
     }
 }
 
-void __stdcall FoldPerformAction(int ln, int mode, FOLD_ACTION action) {
+static void FoldPerformAction(int ln, int mode, FOLD_ACTION action) {
     if (action == SNIFF)
         action = SciCall_GetFoldExpanded(ln) ? FOLD : EXPAND;
 
@@ -373,7 +375,7 @@ void __stdcall FoldPerformAction(int ln, int mode, FOLD_ACTION action) {
     }
 }
 
-void __stdcall FoldClick(int ln, int mode) {
+static void FoldClick(int ln, int mode) {
     static struct {
         int ln;
         int mode;
@@ -410,7 +412,7 @@ void __stdcall FoldClick(int ln, int mode) {
         EditJumpTo(gDoc->hwndEdit, ln + 1, 0);
 }
 
-void __stdcall FoldAltArrow(int key, int mode) {
+static void FoldAltArrow(int key, int mode) {
     // Because Alt-Shift is already in use (and because the sibling fold feature
     // is not as useful from the keyboard), only the Ctrl modifier is supported
 
@@ -6279,7 +6281,7 @@ void LoadFlags() {
     LocalFree(pIniSection);
 }
 
-int CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule) {
+int CheckIniFile(LPWSTR lpszFile, const WCHAR* lpszModule) {
     WCHAR tchFileExpanded[MAX_PATH];
     WCHAR tchBuild[MAX_PATH];
     ExpandEnvironmentStrings(lpszFile, tchFileExpanded,
@@ -6316,7 +6318,7 @@ int CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule) {
     return 0;
 }
 
-int CheckIniFileRedirect(LPWSTR lpszFile, LPCWSTR lpszModule) {
+int CheckIniFileRedirect(LPWSTR lpszFile, const WCHAR* lpszModule) {
     WCHAR tch[MAX_PATH];
     if (GetPrivateProfileString(L"Notepad2", L"Notepad2.ini", L"", tch,
         dimof(tch), lpszFile)) {
@@ -6420,7 +6422,7 @@ int TestIniFile() {
 
 int CreateIniFile() { return (CreateIniFileEx(szIniFile)); }
 
-int CreateIniFileEx(LPCWSTR lpszIniFile) {
+int CreateIniFileEx(const WCHAR* lpszIniFile) {
 
     if (*lpszIniFile) {
 
@@ -6637,7 +6639,7 @@ void UpdateLineNumberWidth() {
         SendMessage(gDoc->hwndEdit, SCI_SETMARGINWIDTHN, 0, 0);
 }
 
-BOOL FileIO(BOOL fLoad, LPCWSTR psz, BOOL bNoEncDetect, int *ienc, int *ieol,
+BOOL FileIO(BOOL fLoad, const WCHAR* psz, BOOL bNoEncDetect, int *ienc, int *ieol,
             BOOL *pbUnicodeErr, BOOL *pbFileTooBig, BOOL *pbCancelDataLoss,
             BOOL bSaveCopy) {
     WCHAR tch[MAX_PATH + 40];
@@ -6674,7 +6676,7 @@ BOOL FileIO(BOOL fLoad, LPCWSTR psz, BOOL bNoEncDetect, int *ienc, int *ieol,
 }
 
 BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect,
-              LPCWSTR lpszFile) {
+              const WCHAR* lpszFile) {
     WCHAR tch[MAX_PATH] = L"";
     WCHAR szFileName[MAX_PATH] = L"";
     BOOL fSuccess;
@@ -6962,7 +6964,7 @@ BOOL FileSave(BOOL bSaveAlways, BOOL bAsk, BOOL bSaveAs, BOOL bSaveCopy) {
 }
 
 BOOL OpenFileDlg(HWND hwnd, LPWSTR lpstrFile, int cchFile,
-                 LPCWSTR lpstrInitialDir) {
+                 const WCHAR* lpstrInitialDir) {
     OPENFILENAME ofn;
     WCHAR szFile[MAX_PATH];
     WCHAR szFilter[NUMLEXERS * 1024];
@@ -7010,7 +7012,7 @@ BOOL OpenFileDlg(HWND hwnd, LPWSTR lpstrFile, int cchFile,
 }
 
 BOOL SaveFileDlg(HWND hwnd, LPWSTR lpstrFile, int cchFile,
-                 LPCWSTR lpstrInitialDir) {
+                 const WCHAR* lpstrInitialDir) {
     OPENFILENAME ofn;
     WCHAR szNewFile[MAX_PATH];
     WCHAR szFilter[NUMLEXERS * 1024];
@@ -7509,7 +7511,7 @@ void SetNotifyIconTitle(HWND hwnd) {
     Shell_NotifyIcon(NIM_MODIFY, &nid);
 }
 
-void InstallFileWatching(LPCWSTR lpszFile) {
+void InstallFileWatching(const WCHAR* lpszFile) {
     WCHAR tchDirectory[MAX_PATH];
     HANDLE hFind;
 

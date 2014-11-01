@@ -17,7 +17,7 @@ extern WCHAR szIniFile[MAX_PATH];
     WritePrivateProfileString(lpSection, lpName, lpString, szIniFile)
 #define IniDeleteSection(lpSection)                                            \
     WritePrivateProfileSection(lpSection, NULL, szIniFile)
-__inline BOOL IniSetInt(LPCWSTR lpSection, LPCWSTR lpName, int i) {
+__inline BOOL IniSetInt(const WCHAR* lpSection, const WCHAR* lpName, int i) {
     WCHAR tch[32];
     wsprintf(tch, L"%i", i);
     return IniSetString(lpSection, lpName, tch);
@@ -26,11 +26,11 @@ __inline BOOL IniSetInt(LPCWSTR lpSection, LPCWSTR lpName, int i) {
     GetPrivateProfileSection(lpSection, lpBuf, cchBuf, szIniFile);
 #define SaveIniSection(lpSection, lpBuf)                                       \
     WritePrivateProfileSection(lpSection, lpBuf, szIniFile)
-int IniSectionGetString(LPCWSTR, LPCWSTR, LPCWSTR, WCHAR *, int);
-int IniSectionGetInt(LPCWSTR, LPCWSTR, int);
-BOOL IniSectionSetString(WCHAR *, LPCWSTR, LPCWSTR);
+int IniSectionGetString(const WCHAR*, const WCHAR*, const WCHAR*, WCHAR *, int);
+int IniSectionGetInt(const WCHAR*, const WCHAR*, int);
+BOOL IniSectionSetString(WCHAR *, const WCHAR*, const WCHAR*);
 
-inline BOOL IniSectionSetInt(WCHAR * lpCachedIniSection, LPCWSTR lpName,
+inline BOOL IniSectionSetInt(WCHAR * lpCachedIniSection, const WCHAR* lpName,
                                int i) {
     WCHAR tch[32];
     wsprintf(tch, L"%i", i);
@@ -62,10 +62,10 @@ BOOL BitmapMergeAlpha(HBITMAP, COLORREF);
 BOOL BitmapAlphaBlend(HBITMAP, COLORREF, BYTE);
 BOOL BitmapGrayScale(HBITMAP);
 BOOL VerifyContrast(COLORREF, COLORREF);
-BOOL IsFontAvailable(LPCWSTR);
+BOOL IsFontAvailable(const WCHAR*);
 
-BOOL SetWindowTitle(HWND, UINT, BOOL, UINT, LPCWSTR, int, BOOL, UINT, BOOL,
-                    LPCWSTR);
+BOOL SetWindowTitle(HWND, UINT, BOOL, UINT, const WCHAR*, int, BOOL, UINT, BOOL,
+                    const WCHAR*);
 void SetWindowTransparentMode(HWND, BOOL);
 
 void CenterDlgInParent(HWND);
@@ -116,15 +116,15 @@ int FormatString(WCHAR *, int, UINT, ...);
 void PathRelativeToApp(WCHAR *, WCHAR *, int, BOOL, BOOL, BOOL);
 void PathAbsoluteFromApp(WCHAR *, WCHAR *, int, BOOL);
 
-BOOL PathIsLnkFile(LPCWSTR);
-BOOL PathGetLnkPath(LPCWSTR, WCHAR *, int);
-BOOL PathIsLnkToDirectory(LPCWSTR, WCHAR *, int);
-BOOL PathCreateDeskLnk(LPCWSTR);
-BOOL PathCreateFavLnk(LPCWSTR, LPCWSTR, LPCWSTR);
+BOOL PathIsLnkFile(const WCHAR*);
+BOOL PathGetLnkPath(const WCHAR*, WCHAR *, int);
+BOOL PathIsLnkToDirectory(const WCHAR*, WCHAR *, int);
+BOOL PathCreateDeskLnk(const WCHAR*);
+BOOL PathCreateFavLnk(const WCHAR*, const WCHAR*, const WCHAR*);
 
-BOOL StrLTrim(WCHAR *, LPCWSTR);
+BOOL StrLTrim(WCHAR *, const WCHAR*);
 BOOL TrimString(WCHAR *);
-BOOL ExtractFirstArgument(LPCWSTR, WCHAR *, WCHAR *);
+BOOL ExtractFirstArgument(const WCHAR*, WCHAR *, WCHAR *);
 
 void PrepareFilterStr(WCHAR *);
 
@@ -134,7 +134,7 @@ void PathFixBackslashes(WCHAR *);
 void ExpandEnvironmentStringsEx(WCHAR *, DWORD);
 void PathCanonicalizeEx(WCHAR *);
 DWORD GetLongPathNameEx(WCHAR *, DWORD);
-DWORD_PTR SHGetFileInfo2(LPCWSTR, DWORD, SHFILEINFO *, UINT, UINT);
+DWORD_PTR SHGetFileInfo2(const WCHAR*, DWORD, SHFILEINFO *, UINT, UINT);
 
 int FormatNumberStr(WCHAR *);
 BOOL SetDlgItemIntEx(HWND, int, UINT);
@@ -163,12 +163,12 @@ typedef struct _mrulist {
 
 } MRULIST, *PMRULIST, *LPMRULIST;
 
-LPMRULIST MRU_Create(LPCWSTR, int, int);
+LPMRULIST MRU_Create(const WCHAR*, int, int);
 BOOL MRU_Destroy(LPMRULIST);
-BOOL MRU_Add(LPMRULIST, LPCWSTR);
-BOOL MRU_AddFile(LPMRULIST, LPCWSTR, BOOL, BOOL);
+BOOL MRU_Add(LPMRULIST, const WCHAR*);
+BOOL MRU_AddFile(LPMRULIST, const WCHAR*, BOOL, BOOL);
 BOOL MRU_Delete(LPMRULIST, int);
-BOOL MRU_DeleteFileFromStore(LPMRULIST, LPCWSTR);
+BOOL MRU_DeleteFileFromStore(LPMRULIST, const WCHAR*);
 BOOL MRU_Empty(LPMRULIST);
 int MRU_Enum(LPMRULIST, int, WCHAR *, int);
 BOOL MRU_Load(LPMRULIST);

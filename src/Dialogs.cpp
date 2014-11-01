@@ -121,7 +121,7 @@ int CALLBACK BFFCallBack(HWND hwnd, UINT umsg, LPARAM lParam, LPARAM lpData) {
 }
 
 BOOL GetDirectory(HWND hwndParent, int iTitle, WCHAR * pszFolder,
-                  LPCWSTR pszBase, BOOL bNewDialogStyle) {
+                  const WCHAR* pszBase, BOOL bNewDialogStyle) {
 
     BROWSEINFO bi;
     LPITEMIDLIST pidl;
@@ -261,7 +261,7 @@ RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 
             SendDlgItemMessage(hwnd, IDC_COMMANDLINE, EM_LIMITTEXT,
                                MAX_PATH - 1, 0);
-            SetDlgItemText(hwnd, IDC_COMMANDLINE, (LPCWSTR)lParam);
+            SetDlgItemText(hwnd, IDC_COMMANDLINE, (const WCHAR*)lParam);
             SHAutoComplete(GetDlgItem(hwnd, IDC_COMMANDLINE), SHACF_FILESYSTEM);
 
             CenterDlgInParent(hwnd);
@@ -389,7 +389,7 @@ RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
     return FALSE;
 }
 
-void RunDlg(HWND hwnd, LPCWSTR lpstrDefault) {
+void RunDlg(HWND hwnd, const WCHAR* lpstrDefault) {
 
     ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_RUN), hwnd,
                          RunDlgProc, (LPARAM)lpstrDefault);
@@ -545,7 +545,7 @@ OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
     return FALSE;
 }
 
-BOOL OpenWithDlg(HWND hwnd, LPCWSTR lpstrFile) {
+BOOL OpenWithDlg(HWND hwnd, const WCHAR* lpstrFile) {
     DLITEM dliOpenWith;
     dliOpenWith.mask = DLI_FILENAME;
 
@@ -799,7 +799,7 @@ AddToFavDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
     return FALSE;
 }
 
-BOOL AddToFavDlg(HWND hwnd, LPCWSTR lpszName, LPCWSTR lpszTarget) {
+BOOL AddToFavDlg(HWND hwnd, const WCHAR* lpszName, const WCHAR* lpszTarget) {
 
     INT_PTR iResult;
 
@@ -2011,7 +2011,7 @@ InfoBoxDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 
 extern WCHAR szIniFile[MAX_PATH];
 
-INT_PTR InfoBox(int iType, LPCWSTR lpstrSetting, int uidMessage, ...) {
+INT_PTR InfoBox(int iType, const WCHAR* lpstrSetting, int uidMessage, ...) {
 
     HWND hwnd;
     int idDlg = IDD_INFOBOX;

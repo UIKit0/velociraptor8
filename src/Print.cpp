@@ -40,7 +40,7 @@ void StatusUpdatePrintPage(int iPageNum) {
     UpdateWindow(gDoc->hwndStatus);
 }
 
-BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle, LPCWSTR pszPageFormat) {
+BOOL EditPrint(HWND hwnd, const WCHAR* pszDocTitle, const WCHAR* pszPageFormat) {
 
     // Don't print empty documents
     if (SendMessage(hwnd, SCI_GETLENGTH, 0, 0) == 0) {

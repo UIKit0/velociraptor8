@@ -15,8 +15,8 @@ See License.txt for details about distribution and modification.
 #include "resource.h"
 
 //  Manipulation of (cached) ini file sections
-int IniSectionGetString(LPCWSTR lpCachedIniSection, LPCWSTR lpName,
-    LPCWSTR lpDefault, WCHAR * lpReturnedString,
+int IniSectionGetString(const WCHAR* lpCachedIniSection, const WCHAR* lpName,
+    const WCHAR* lpDefault, WCHAR * lpReturnedString,
                         int cchReturnedString) {
     WCHAR *p = (WCHAR *)lpCachedIniSection;
     WCHAR tch[256];
@@ -39,7 +39,7 @@ int IniSectionGetString(LPCWSTR lpCachedIniSection, LPCWSTR lpName,
     return (lstrlen(lpReturnedString));
 }
 
-int IniSectionGetInt(LPCWSTR lpCachedIniSection, LPCWSTR lpName, int iDefault) {
+int IniSectionGetInt(const WCHAR* lpCachedIniSection, const WCHAR* lpName, int iDefault) {
     WCHAR *p = (WCHAR *)lpCachedIniSection;
     WCHAR tch[256];
     int ich;
@@ -63,8 +63,8 @@ int IniSectionGetInt(LPCWSTR lpCachedIniSection, LPCWSTR lpName, int iDefault) {
     return (iDefault);
 }
 
-BOOL IniSectionSetString(WCHAR * lpCachedIniSection, LPCWSTR lpName,
-                         LPCWSTR lpString) {
+BOOL IniSectionSetString(WCHAR * lpCachedIniSection, const WCHAR* lpName,
+                         const WCHAR* lpString) {
     WCHAR tch[32 + 512 * 3 + 32];
     WCHAR *p = lpCachedIniSection;
 
@@ -256,7 +256,7 @@ int CALLBACK EnumFontsProc(CONST LOGFONT *plf, CONST TEXTMETRIC *ptm,
     return FALSE;
 }
 
-BOOL IsFontAvailable(LPCWSTR lpszFontName) {
+BOOL IsFontAvailable(const WCHAR* lpszFontName) {
     BOOL fFound = FALSE;
 
     HDC hDC = GetDC(NULL);
@@ -269,9 +269,9 @@ BOOL IsFontAvailable(LPCWSTR lpszFontName) {
 BOOL bFreezeAppTitle = FALSE;
 
 BOOL SetWindowTitle(HWND hwnd, UINT uIDAppName, BOOL bIsElevated,
-                    UINT uIDUntitled, LPCWSTR lpszFile, int iFormat,
+                    UINT uIDUntitled, const WCHAR* lpszFile, int iFormat,
                     BOOL bModified, UINT uIDReadOnly, BOOL bReadOnly,
-                    LPCWSTR lpszExcerpt) {
+                    const WCHAR* lpszExcerpt) {
 
     WCHAR szUntitled[128];
     WCHAR szExcrptQuot[256];
@@ -628,7 +628,7 @@ void DeleteBitmapButton(HWND hwnd, int nCtlId) {
         ImageList_Destroy(bi.himl);
 }
 
-BOOL StatusSetText(HWND hwnd, UINT nPart, LPCWSTR lpszText) {
+BOOL StatusSetText(HWND hwnd, UINT nPart, const WCHAR* lpszText) {
     UINT uFlags = (nPart == 255) ? nPart | SBT_NOBORDERS : nPart;
     return (BOOL)SendMessage(hwnd, SB_SETTEXT, uFlags, (LPARAM)lpszText);
 }
@@ -656,7 +656,7 @@ BOOL StatusSetTextID(HWND hwnd, UINT nPart, UINT uID) {
     return (BOOL)SendMessage(hwnd, SB_SETTEXT, uFlags, (LPARAM)szText);
 }
 
-int StatusCalcPaneWidth(HWND hwnd, LPCWSTR lpsz) {
+int StatusCalcPaneWidth(HWND hwnd, const WCHAR* lpsz) {
     SIZE size;
     HDC hdc = GetDC(hwnd);
     HFONT hfont = (HFONT)SendMessage(hwnd, WM_GETFONT, 0, 0);
@@ -841,7 +841,7 @@ void PathAbsoluteFromApp(WCHAR * lpszSrc, WCHAR * lpszDest, int cchDest,
 
 //  Purpose: Determine wheter pszPath is a Windows Shell Link File by
 //           comparing the filename extension with L".lnk"
-BOOL PathIsLnkFile(LPCWSTR pszPath) {
+BOOL PathIsLnkFile(const WCHAR* pszPath) {
 
     // WCHAR *pszExt;
 
@@ -875,7 +875,7 @@ BOOL PathIsLnkFile(LPCWSTR pszPath) {
 }
 
 //  Purpose: Try to get the path to which a lnk-file is linked
-BOOL PathGetLnkPath(LPCWSTR pszLnkFile, LPWSTR pszResPath, int cchResPath) {
+BOOL PathGetLnkPath(const WCHAR* pszLnkFile, LPWSTR pszResPath, int cchResPath) {
 
     IShellLink *psl;
     WIN32_FIND_DATA fd;
@@ -915,7 +915,7 @@ BOOL PathGetLnkPath(LPCWSTR pszLnkFile, LPWSTR pszResPath, int cchResPath) {
 
 //  Purpose: Determine wheter pszPath is a Windows Shell Link File which
 //           refers to a directory
-BOOL PathIsLnkToDirectory(LPCWSTR pszPath, WCHAR * pszResPath, int cchResPath) {
+BOOL PathIsLnkToDirectory(const WCHAR* pszPath, WCHAR * pszResPath, int cchResPath) {
 
     WCHAR tchResPath[MAX_PATH];
 
@@ -937,7 +937,7 @@ BOOL PathIsLnkToDirectory(LPCWSTR pszPath, WCHAR * pszResPath, int cchResPath) {
 }
 
 //  Purpose: Modified to create a desktop link to Notepad2
-BOOL PathCreateDeskLnk(LPCWSTR pszDocument) {
+BOOL PathCreateDeskLnk(const WCHAR* pszDocument) {
 
     WCHAR tchExeFile[MAX_PATH];
     WCHAR tchDocTemp[MAX_PATH];
@@ -999,7 +999,7 @@ BOOL PathCreateDeskLnk(LPCWSTR pszDocument) {
 }
 
 //  Purpose: Modified to create a Notepad2 favorites link
-BOOL PathCreateFavLnk(LPCWSTR pszName, LPCWSTR pszTarget, LPCWSTR pszDir) {
+BOOL PathCreateFavLnk(const WCHAR* pszName, const WCHAR* pszTarget, const WCHAR* pszDir) {
 
     WCHAR tchLnkFileName[MAX_PATH];
 
@@ -1040,7 +1040,7 @@ BOOL PathCreateFavLnk(LPCWSTR pszName, LPCWSTR pszTarget, LPCWSTR pszDir) {
     return bSucceeded;
 }
 
-BOOL StrLTrim(WCHAR * pszSource, LPCWSTR pszTrimChars) {
+BOOL StrLTrim(WCHAR * pszSource, const WCHAR* pszTrimChars) {
     WCHAR * psz;
 
     if (!pszSource || !*pszSource)
@@ -1079,7 +1079,7 @@ BOOL TrimString(LPWSTR lpString) {
     return TRUE;
 }
 
-BOOL ExtractFirstArgument(LPCWSTR lpArgs, LPWSTR lpArg1, LPWSTR lpArg2) {
+BOOL ExtractFirstArgument(const WCHAR* lpArgs, LPWSTR lpArg1, LPWSTR lpArg2) {
 
     LPWSTR psz;
     BOOL bQuoted = FALSE;
@@ -1170,7 +1170,7 @@ DWORD GetLongPathNameEx(LPWSTR lpszPath, DWORD cchBuffer) {
 
 //  Return a default name when the file has been removed, and always append
 //  a filename extension
-DWORD_PTR SHGetFileInfo2(LPCWSTR pszPath, DWORD dwFileAttributes,
+DWORD_PTR SHGetFileInfo2(const WCHAR* pszPath, DWORD dwFileAttributes,
                          SHFILEINFO *psfi, UINT cbFileInfo, UINT uFlags) {
 
     if (PathFileExists(pszPath)) {
@@ -1256,7 +1256,7 @@ UINT CodePageFromCharSet(UINT uCharSet) {
         return (GetACP());
 }
 
-LPMRULIST MRU_Create(LPCWSTR pszRegKey, int iFlags, int iSize) {
+LPMRULIST MRU_Create(const WCHAR* pszRegKey, int iFlags, int iSize) {
 
     LPMRULIST pmru = (LPMRULIST)LocalAlloc(LPTR, sizeof(MRULIST));
     ZeroMemory(pmru, sizeof(MRULIST));
@@ -1278,7 +1278,7 @@ BOOL MRU_Destroy(LPMRULIST pmru) {
     return (1);
 }
 
-int MRU_Compare(LPMRULIST pmru, LPCWSTR psz1, LPCWSTR psz2) {
+int MRU_Compare(LPMRULIST pmru, const WCHAR* psz1, const WCHAR* psz2) {
 
     if (pmru->iFlags & MRU_NOCASE)
         return (lstrcmpi(psz1, psz2));
@@ -1286,7 +1286,7 @@ int MRU_Compare(LPMRULIST pmru, LPCWSTR psz1, LPCWSTR psz2) {
         return (lstrcmp(psz1, psz2));
 }
 
-BOOL MRU_Add(LPMRULIST pmru, LPCWSTR pszNew) {
+BOOL MRU_Add(LPMRULIST pmru, const WCHAR* pszNew) {
 
     int i;
     for (i = 0; i < pmru->iSize; i++) {
@@ -1302,7 +1302,7 @@ BOOL MRU_Add(LPMRULIST pmru, LPCWSTR pszNew) {
     return (1);
 }
 
-BOOL MRU_AddFile(LPMRULIST pmru, LPCWSTR pszFile, BOOL bRelativePath,
+BOOL MRU_AddFile(LPMRULIST pmru, const WCHAR* pszFile, BOOL bRelativePath,
                  BOOL bUnexpandMyDocs) {
 
     int i;
@@ -1355,7 +1355,7 @@ BOOL MRU_Delete(LPMRULIST pmru, int iIndex) {
     return (1);
 }
 
-BOOL MRU_DeleteFileFromStore(LPMRULIST pmru, LPCWSTR pszFile) {
+BOOL MRU_DeleteFileFromStore(LPMRULIST pmru, const WCHAR* pszFile) {
 
     int i = 0;
     LPMRULIST pmruStore;
@@ -1502,7 +1502,7 @@ BOOL MRU_MergeSave(LPMRULIST pmru, BOOL bAddFiles, BOOL bRelativePath,
 
 */
 
-typedef HTHEME(WINAPI *OpenThemeDataProc)(HWND hwnd, LPCWSTR pszClassList);
+typedef HTHEME(WINAPI *OpenThemeDataProc)(HWND hwnd, const WCHAR* pszClassList);
 typedef HRESULT(WINAPI *CloseThemeDataProc)(HTHEME hTheme);
 
 BOOL GetThemedDialogFont(LPWSTR lpFaceName, WORD *wSize) {

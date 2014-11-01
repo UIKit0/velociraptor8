@@ -19,7 +19,7 @@ typedef struct tagLV_ITEMDATA // lvid
 
 //==== DlInit() ===============================================================
 
-BOOL DirList_Init(HWND, LPCWSTR);
+BOOL DirList_Init(HWND, const WCHAR*);
 
 //==== DlDestroy() ============================================================
 
@@ -40,7 +40,7 @@ BOOL DirList_TerminateIconThread(HWND);
 #define DL_INCLHIDDEN 128
 #define DL_ALLOBJECTS (32 | 64 | 128)
 
-int DirList_Fill(HWND, LPCWSTR, DWORD, LPCWSTR, BOOL, BOOL, int, BOOL);
+int DirList_Fill(HWND, const WCHAR*, DWORD, const WCHAR*, BOOL, BOOL, int, BOOL);
 
 //==== DlIconThread() =========================================================
 
@@ -100,7 +100,7 @@ BOOL DirList_GetLongPathName(HWND, WCHAR *);
 
 //==== DlSelectItem() =========================================================
 
-BOOL DirList_SelectItem(HWND, LPCWSTR, LPCWSTR);
+BOOL DirList_SelectItem(HWND, const WCHAR*, const WCHAR*);
 
 //==== DlCreateFilter() and DlMatchFilter() ===================================
 
@@ -113,7 +113,7 @@ typedef struct tagDL_FILTER { // dlf
     BOOL bExcludeFilter;
 } DL_FILTER, *PDL_FILTER;
 
-void DirList_CreateFilter(PDL_FILTER, LPCWSTR, BOOL);
+void DirList_CreateFilter(PDL_FILTER, const WCHAR*, BOOL);
 
 BOOL DirList_MatchFilter(LPSHELLFOLDER, LPCITEMIDLIST, PDL_FILTER);
 
@@ -122,7 +122,7 @@ BOOL DirList_MatchFilter(LPSHELLFOLDER, LPCITEMIDLIST, PDL_FILTER);
 BOOL DriveBox_Init(HWND);
 int DriveBox_Fill(HWND);
 BOOL DriveBox_GetSelDrive(HWND, WCHAR *, int, BOOL);
-BOOL DriveBox_SelectDrive(HWND, LPCWSTR);
+BOOL DriveBox_SelectDrive(HWND, const WCHAR*);
 BOOL DriveBox_PropertyDlg(HWND);
 
 LRESULT DriveBox_DeleteItem(HWND, LPARAM);

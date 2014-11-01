@@ -5178,7 +5178,7 @@ EditLexer *__fastcall Style_SniffShebang(char *pchText) {
     return (NULL);
 }
 
-EditLexer *__fastcall Style_MatchLexer(LPCWSTR lpszMatch, BOOL bCheckNames) {
+EditLexer *__fastcall Style_MatchLexer(const WCHAR* lpszMatch, BOOL bCheckNames) {
     int i;
     WCHAR tch[256 + 16];
     WCHAR *p1, *p2;
@@ -5219,7 +5219,7 @@ extern int fNoHTMLGuess;
 extern int fNoCGIGuess;
 extern FILEVARS fvCurFile;
 
-void Style_SetLexerFromFile(HWND hwnd, LPCWSTR lpszFile) {
+void Style_SetLexerFromFile(HWND hwnd, const WCHAR* lpszFile) {
     LPWSTR lpszExt = PathFindExtension(lpszFile);
     BOOL bFound = FALSE;
     EditLexer *pLexNew = pLexArray[iDefaultLexer];
@@ -5339,7 +5339,7 @@ void Style_SetLexerFromFile(HWND hwnd, LPCWSTR lpszFile) {
     Style_SetLexer(hwnd, pLexNew);
 }
 
-void Style_SetLexerFromName(HWND hwnd, LPCWSTR lpszFile, LPCWSTR lpszName) {
+void Style_SetLexerFromName(HWND hwnd, const WCHAR* lpszFile, const WCHAR* lpszName) {
     EditLexer *pLexNew;
     if (pLexNew = Style_MatchLexer(lpszName, FALSE))
         Style_SetLexer(hwnd, pLexNew);
@@ -5410,7 +5410,7 @@ BOOL Style_GetOpenDlgFilterStr(LPWSTR lpszFilter, int cchFilter) {
     return TRUE;
 }
 
-BOOL Style_StrGetFont(LPCWSTR lpszStyle, LPWSTR lpszFont, int cchFont) {
+BOOL Style_StrGetFont(const WCHAR* lpszStyle, LPWSTR lpszFont, int cchFont) {
     WCHAR tch[256];
     WCHAR *p;
 
@@ -5434,7 +5434,7 @@ BOOL Style_StrGetFont(LPCWSTR lpszStyle, LPWSTR lpszFont, int cchFont) {
     return FALSE;
 }
 
-BOOL Style_StrGetFontQuality(LPCWSTR lpszStyle, LPWSTR lpszQuality,
+BOOL Style_StrGetFontQuality(const WCHAR* lpszStyle, LPWSTR lpszQuality,
                              int cchQuality) {
     WCHAR tch[256];
     WCHAR *p;
@@ -5454,7 +5454,7 @@ BOOL Style_StrGetFontQuality(LPCWSTR lpszStyle, LPWSTR lpszQuality,
     return FALSE;
 }
 
-BOOL Style_StrGetCharSet(LPCWSTR lpszStyle, int *i) {
+BOOL Style_StrGetCharSet(const WCHAR* lpszStyle, int *i) {
     WCHAR tch[256];
     WCHAR *p;
     int iValue;
@@ -5474,7 +5474,7 @@ BOOL Style_StrGetCharSet(LPCWSTR lpszStyle, int *i) {
     return FALSE;
 }
 
-BOOL Style_StrGetSize(LPCWSTR lpszStyle, int *i) {
+BOOL Style_StrGetSize(const WCHAR* lpszStyle, int *i) {
     WCHAR tch[256];
     WCHAR *p;
     int iValue;
@@ -5505,7 +5505,7 @@ BOOL Style_StrGetSize(LPCWSTR lpszStyle, int *i) {
     return FALSE;
 }
 
-BOOL Style_StrGetSizeStr(LPCWSTR lpszStyle, LPWSTR lpszSize, int cchSize) {
+BOOL Style_StrGetSizeStr(const WCHAR* lpszStyle, LPWSTR lpszSize, int cchSize) {
     WCHAR tch[256];
     WCHAR *p;
 
@@ -5520,7 +5520,7 @@ BOOL Style_StrGetSizeStr(LPCWSTR lpszStyle, LPWSTR lpszSize, int cchSize) {
     return FALSE;
 }
 
-BOOL Style_StrGetColor(BOOL bFore, LPCWSTR lpszStyle, int *rgb) {
+BOOL Style_StrGetColor(BOOL bFore, const WCHAR* lpszStyle, int *rgb) {
     WCHAR tch[256];
     WCHAR *p;
     int iValue;
@@ -5544,7 +5544,7 @@ BOOL Style_StrGetColor(BOOL bFore, LPCWSTR lpszStyle, int *rgb) {
     return FALSE;
 }
 
-BOOL Style_StrGetCase(LPCWSTR lpszStyle, int *i) {
+BOOL Style_StrGetCase(const WCHAR* lpszStyle, int *i) {
     WCHAR tch[256];
     WCHAR *p;
 
@@ -5564,7 +5564,7 @@ BOOL Style_StrGetCase(LPCWSTR lpszStyle, int *i) {
     return FALSE;
 }
 
-BOOL Style_StrGetAlpha(LPCWSTR lpszStyle, int *i) {
+BOOL Style_StrGetAlpha(const WCHAR* lpszStyle, int *i) {
     WCHAR tch[256];
     WCHAR *p;
     int iValue;
@@ -5788,7 +5788,7 @@ BOOL Style_SelectColor(HWND hwnd, BOOL bFore, LPWSTR lpszStyle, int cchStyle) {
     return TRUE;
 }
 
-void Style_SetStyles(HWND hwnd, int iStyle, LPCWSTR lpszStyle) {
+void Style_SetStyles(HWND hwnd, int iStyle, const WCHAR* lpszStyle) {
 
     WCHAR tch[256];
     WCHAR *p;
@@ -5846,7 +5846,7 @@ void Style_SetStyles(HWND hwnd, int iStyle, LPCWSTR lpszStyle) {
         SendMessage(hwnd, SCI_STYLESETCHARACTERSET, iStyle, (LPARAM)iValue);
 }
 
-void Style_SetFontQuality(HWND hwnd, LPCWSTR lpszStyle) {
+void Style_SetFontQuality(HWND hwnd, const WCHAR* lpszStyle) {
 
     WPARAM wQuality = SC_EFF_QUALITY_DEFAULT;
     WCHAR tch[32];

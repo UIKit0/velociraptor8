@@ -24,7 +24,7 @@ struct DLDATA {
 static const WCHAR* pDirListProp = L"DirListData";
 
 //  Initializes the DLDATA structure and sets up the listview control
-BOOL DirList_Init(HWND hwnd, LPCWSTR pszHeader) {
+BOOL DirList_Init(HWND hwnd, const WCHAR* pszHeader) {
 
     HIMAGELIST hil;
     SHFILEINFO shfi = { 0 };
@@ -136,8 +136,8 @@ BOOL DirList_TerminateIconThread(HWND hwnd) {
 }
 
 //  Snapshots a directory and displays the items in the listview control
-int DirList_Fill(HWND hwnd, LPCWSTR lpszDir, DWORD grfFlags,
-                 LPCWSTR lpszFileSpec, BOOL bExcludeFilter, BOOL bNoFadeHidden,
+int DirList_Fill(HWND hwnd, const WCHAR* lpszDir, DWORD grfFlags,
+                 const WCHAR* lpszFileSpec, BOOL bExcludeFilter, BOOL bNoFadeHidden,
                  int iSortFlags, BOOL fSortRev) {
 
     WCHAR wszDir[MAX_PATH];
@@ -343,7 +343,7 @@ DWORD WINAPI DirList_IconThread(LPVOID lpParam) {
                 NOERROR !=
                     lpshi->GetIconOf(lplvid->pidl, GIL_FORSHELL, &lvi.iImage)) {
                 pidl = IL_Create(lpdl->pidl, lpdl->cbidl, lplvid->pidl, 0);
-                SHGetFileInfo((LPCWSTR)pidl, 0, &shfi, sizeof(SHFILEINFO),
+                SHGetFileInfo((const WCHAR*)pidl, 0, &shfi, sizeof(SHFILEINFO),
                               SHGFI_PIDL | SHGFI_SYSICONINDEX |
                                   SHGFI_SMALLICON);
                 CoTaskMemFree(pidl);
@@ -677,8 +677,8 @@ BOOL DirList_GetLongPathName(HWND hwnd, WCHAR * lpszLongPath) {
 }
 
 //  Select specified item in the list
-BOOL DirList_SelectItem(HWND hwnd, LPCWSTR lpszDisplayName,
-                        LPCWSTR lpszFullPath) {
+BOOL DirList_SelectItem(HWND hwnd, const WCHAR* lpszDisplayName,
+                        const WCHAR* lpszFullPath) {
 #define LVIS_FLAGS LVIS_SELECTED | LVIS_FOCUSED
 
     WCHAR szShortPath[MAX_PATH];
@@ -722,7 +722,7 @@ BOOL DirList_SelectItem(HWND hwnd, LPCWSTR lpszDisplayName,
 }
 
 //  Create a valid DL_FILTER structure
-void DirList_CreateFilter(PDL_FILTER pdlf, LPCWSTR lpszFileSpec,
+void DirList_CreateFilter(PDL_FILTER pdlf, const WCHAR* lpszFileSpec,
                           BOOL bExcludeFilter) {
 
     WCHAR* p;
@@ -957,7 +957,7 @@ BOOL DriveBox_GetSelDrive(HWND hwnd, WCHAR * lpszDrive, int nDrive,
     return TRUE;
 }
 
-BOOL DriveBox_SelectDrive(HWND hwnd, LPCWSTR lpszPath) {
+BOOL DriveBox_SelectDrive(HWND hwnd, const WCHAR* lpszPath) {
 
     COMBOBOXEXITEM cbei;
     LPDC_ITEMDATA lpdcid;

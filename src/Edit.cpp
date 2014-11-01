@@ -1310,7 +1310,7 @@ static INT UTF8_mbslen(LPCSTR source, INT byte_length) {
     return wchar_length;
 }
 
-BOOL EditLoadFile(HWND hwnd, LPCWSTR pszFile, BOOL bSkipEncodingDetection,
+BOOL EditLoadFile(HWND hwnd, const WCHAR* pszFile, BOOL bSkipEncodingDetection,
                   int *iEncoding, int *iEOLMode, BOOL *pbUnicodeErr,
                   BOOL *pbFileTooBig) {
     HANDLE hFile;
@@ -1555,7 +1555,7 @@ BOOL EditLoadFile(HWND hwnd, LPCWSTR pszFile, BOOL bSkipEncodingDetection,
     return TRUE;
 }
 
-BOOL EditSaveFile(HWND hwnd, LPCWSTR pszFile, int iEncoding,
+BOOL EditSaveFile(HWND hwnd, const WCHAR* pszFile, int iEncoding,
                   BOOL *pbCancelDataLoss, BOOL bSaveCopy) {
     HANDLE hFile;
     BOOL bWriteSuccess;
@@ -2928,7 +2928,7 @@ void EditMoveDown(HWND hwnd) {
         MsgBox(MBWARN, IDS_SELRECT);
 }
 
-void EditModifyLines(HWND hwnd, LPCWSTR pwszPrefix, LPCWSTR pwszAppend) {
+void EditModifyLines(HWND hwnd, const WCHAR* pwszPrefix, const WCHAR* pwszAppend) {
     char mszPrefix1[256 * 3] = "";
     char mszPrefix2[256 * 3] = "";
     BOOL bPrefixNum = FALSE;
@@ -3513,7 +3513,7 @@ void EditAlignText(HWND hwnd, int nMode) {
         MsgBox(MBWARN, IDS_SELRECT);
 }
 
-void EditEncloseSelection(HWND hwnd, LPCWSTR pwszOpen, LPCWSTR pwszClose) {
+void EditEncloseSelection(HWND hwnd, const WCHAR* pwszOpen, const WCHAR* pwszClose) {
     char mszOpen[256 * 3] = "";
     char mszClose[256 * 3] = "";
     int mbcp;
@@ -3577,7 +3577,7 @@ void EditEncloseSelection(HWND hwnd, LPCWSTR pwszOpen, LPCWSTR pwszClose) {
         MsgBox(MBWARN, IDS_SELRECT);
 }
 
-void EditToggleLineComments(HWND hwnd, LPCWSTR pwszComment,
+void EditToggleLineComments(HWND hwnd, const WCHAR* pwszComment,
                             BOOL bInsertAtStart) {
     char mszComment[256 * 3] = "";
     int cchComment;
@@ -4473,7 +4473,7 @@ typedef struct _SORTLINE {
     WCHAR *pwszSortEntry;
 } SORTLINE;
 
-typedef int(__stdcall *FNSTRCMP)(LPCWSTR, LPCWSTR);
+typedef int(__stdcall *FNSTRCMP)(const WCHAR*, const WCHAR*);
 
 int CmpStd(const void *s1, const void *s2) {
     int cmp = StrCmp(((SORTLINE *)s1)->pwszSortEntry,

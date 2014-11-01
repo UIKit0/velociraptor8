@@ -4,9 +4,6 @@ See Readme.txt for more information about this source code.
 Please send me your comments to this work.
 */
 
-//==== Main Window ============================================================
-#define WC_NOTEPAD2 L"Notepad2"
-
 //==== Data Type for WM_COPYDATA ==============================================
 #define DATA_NOTEPAD2_PARAMS 0xFB10
 struct VeParams {
@@ -87,7 +84,7 @@ BOOL RelaunchElevated();
 void SnapToDefaultPos(HWND);
 void ShowNotifyIcon(HWND, BOOL);
 void SetNotifyIconTitle(HWND);
-void InstallFileWatching(LPCWSTR);
+void InstallFileWatching(const WCHAR*);
 void CALLBACK WatchTimerProc(HWND, UINT, UINT_PTR, DWORD);
 void CALLBACK PasteBoardTimer(HWND, UINT, UINT_PTR, DWORD);
 
@@ -95,22 +92,22 @@ void LoadSettings();
 void SaveSettings(BOOL);
 void ParseCommandLine();
 void LoadFlags();
-int CheckIniFile(WCHAR *, LPCWSTR);
-int CheckIniFileRedirect(WCHAR *, LPCWSTR);
+int CheckIniFile(WCHAR *, const WCHAR*);
+int CheckIniFileRedirect(WCHAR *, const WCHAR*);
 int FindIniFile();
 int TestIniFile();
 int CreateIniFile();
-int CreateIniFileEx(LPCWSTR);
+int CreateIniFileEx(const WCHAR*);
 
 void UpdateStatusbar();
 void UpdateToolbar();
 void UpdateLineNumberWidth();
 
-BOOL FileIO(BOOL, LPCWSTR, BOOL, int*, int*, BOOL*, BOOL*, BOOL*, BOOL);
-BOOL FileLoad(BOOL, BOOL, BOOL, BOOL, LPCWSTR);
+BOOL FileIO(BOOL, const WCHAR*, BOOL, int*, int*, BOOL*, BOOL*, BOOL*, BOOL);
+BOOL FileLoad(BOOL, BOOL, BOOL, BOOL, const WCHAR*);
 BOOL FileSave(BOOL, BOOL, BOOL, BOOL);
-BOOL OpenFileDlg(HWND, WCHAR *, int, LPCWSTR);
-BOOL SaveFileDlg(HWND, WCHAR *, int, LPCWSTR);
+BOOL OpenFileDlg(HWND, WCHAR *, int, const WCHAR*);
+BOOL SaveFileDlg(HWND, WCHAR *, int, const WCHAR*);
 
 LRESULT CALLBACK MainWndProc(HWND, UINT, WPARAM, LPARAM);
 LRESULT MsgCreate(HWND, WPARAM, LPARAM);
