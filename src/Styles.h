@@ -16,10 +16,9 @@ typedef struct _editstyle {
 
 } EDITSTYLE, *PEDITSTYLE;
 
-typedef struct _keywordlist {
+struct KeywordList {
     char* pszKeyWords[9];
-
-} KEYWORDLIST, *PKEYWORDLIST;
+};
 
 struct EditLexer {
     int iLexer;
@@ -27,7 +26,7 @@ struct EditLexer {
     WCHAR* pszName;
     WCHAR* pszDefExt;
     WCHAR szExtensions[128];
-    PKEYWORDLIST pKeyWords;
+    KeywordList* pKeyWords;
     EDITSTYLE Styles[];
 };
 

@@ -20,7 +20,7 @@ extern int iEncoding;
 
 #define MULTI_STYLE(a, b, c, d) ((a) | (b << 8) | (c << 16) | (d << 24))
 
-KEYWORDLIST KeyWords_NULL = { "", "", "", "", "", "", "", "", "" };
+KeywordList KeyWords_NULL = { "", "", "", "", "", "", "", "", "" };
 
 EditLexer lexDefault = {
     SCLEX_NULL, 63000, L"Default Text", L"txt; text; wtx; log; asc; doc", L"",
@@ -101,7 +101,7 @@ EditLexer lexDefault = {
     }
 };
 
-KEYWORDLIST KeyWords_HTML = {
+KeywordList KeyWords_HTML = {
     "!doctype ^aria- ^data- a abbr accept accept-charset accesskey acronym "
     "action address align alink "
     "alt and applet archive area article aside async audio autocomplete "
@@ -459,7 +459,7 @@ EditLexer lexHTML = { SCLEX_HTML, 63001, L"Web Source Code",
                                         //Identifier", L"", L"" },
                                         { -1, 00000, L"", L"", L"" } } };
 
-KEYWORDLIST KeyWords_XML = { "", "", "", "", "", "", "", "", "" };
+                                        KeywordList KeyWords_XML = { "", "", "", "", "", "", "", "", "" };
 
 EditLexer lexXML = {
     SCLEX_XML, 63002, L"XML Document",
@@ -496,7 +496,7 @@ EditLexer lexXML = {
       { -1, 00000, L"", L"", L"" } }
 };
 
-KEYWORDLIST KeyWords_CSS = {
+KeywordList KeyWords_CSS = {
     "alignment-adjust alignment-baseline animation animation-delay "
     "animation-direction animation-duration animation-fill-mode "
     "animation-iteration-count animation-name "
@@ -642,7 +642,7 @@ EditLexer lexCSS =
           L"bold; fore:#000000; back:#FFF1A8", L"" },
         { -1, 00000, L"", L"", L"" } } };
 
-KEYWORDLIST KeyWords_CPP = { "__abstract __alignof __asm __assume __based "
+KeywordList KeyWords_CPP = { "__abstract __alignof __asm __assume __based "
                              "__box __cdecl __declspec __delegate __event "
                              "__except __except__try __fastcall __finally "
                              "__forceinline __gc __hook __identifier "
@@ -691,7 +691,7 @@ EditLexer lexCPP = {
       { -1, 00000, L"", L"", L"" } }
 };
 
-KEYWORDLIST KeyWords_CS = {
+KeywordList KeyWords_CS = {
     "abstract add alias as ascending async await base bool break by byte case "
     "catch char checked "
     "class const continue decimal default delegate descending do double "
@@ -971,7 +971,7 @@ EditLexer lexCS = {
       { -1, 00000, L"", L"", L"" } }
 };
 
-KEYWORDLIST KeyWords_RC = {
+KeywordList KeyWords_RC = {
     "ACCELERATORS ALT AUTO3STATE AUTOCHECKBOX AUTORADIOBUTTON "
     "BEGIN BITMAP BLOCK BUTTON CAPTION CHARACTERISTICS CHECKBOX "
     "CLASS COMBOBOX CONTROL CTEXT CURSOR DEFPUSHBUTTON DIALOG "
@@ -1004,7 +1004,7 @@ EditLexer lexRC = {
       { -1, 00000, L"", L"", L"" } }
 };
 
-KEYWORDLIST KeyWords_MAK = { "", "", "", "", "", "", "", "", "" };
+KeywordList KeyWords_MAK = { "", "", "", "", "", "", "", "", "" };
 
 EditLexer lexMAK = {
     SCLEX_MAKEFILE, 63007, L"Makefiles", L"mak; make; mk; dsp; msc; msvc", L"",
@@ -1021,7 +1021,7 @@ EditLexer lexMAK = {
       { -1, 00000, L"", L"", L"" } }
 };
 
-KEYWORDLIST KeyWords_VBS = { "alias and as attribute begin boolean byref byte "
+KeywordList KeyWords_VBS = { "alias and as attribute begin boolean byref byte "
                              "byval call case class compare const continue "
                              "currency date declare dim do double each else "
                              "elseif empty end enum eqv erase error event exit "
@@ -1057,7 +1057,7 @@ EditLexer lexVBS = {
       { -1, 00000, L"", L"", L"" } }
 };
 
-KEYWORDLIST KeyWords_VB = { "addhandler addressof alias and andalso ansi any "
+KeywordList KeyWords_VB = { "addhandler addressof alias and andalso ansi any "
                             "as assembly auto boolean byref byte byval call "
                             "case catch cbool cbyte cchar cdate cdbl cdec char "
                             "cint class clng cobj compare const cshort csng "
@@ -1104,7 +1104,7 @@ EditLexer lexVB = {
       { -1, 00000, L"", L"", L"" } }
 };
 
-KEYWORDLIST KeyWords_JS = { "abstract boolean break byte case catch char class "
+KeywordList KeyWords_JS = { "abstract boolean break byte case catch char class "
                             "const continue debugger default delete do "
                             "double else enum export extends false final "
                             "finally float for function goto if implements "
@@ -1136,7 +1136,7 @@ EditLexer lexJS = {
       { -1, 00000, L"", L"", L"" } }
 };
 
-KEYWORDLIST KeyWords_JAVA = {
+KeywordList KeyWords_JAVA = {
     "@interface abstract assert boolean break byte case catch char class const "
     "continue default do double else enum extends final finally float for "
     "future "
@@ -1172,7 +1172,7 @@ EditLexer lexJAVA = {
       { -1, 00000, L"", L"", L"" } }
 };
 
-KEYWORDLIST KeyWords_PAS = {
+KeywordList KeyWords_PAS = {
     "absolute abstract alias and array as asm assembler begin break case cdecl "
     "class const constructor continue cppdecl default "
     "destructor dispose div do downto else end end. except exit export exports "
@@ -1217,7 +1217,7 @@ EditLexer lexPAS = {
       { -1, 00000, L"", L"", L"" } }
 };
 
-KEYWORDLIST KeyWords_ASM = {
+KeywordList KeyWords_ASM = {
     "aaa aad aam aas adc add and arpl bound bsf bsr bswap bt btc btr bts call "
     "cbw cdq cflush clc cld "
     "cli clts cmc cmova cmovae cmovb cmovbe cmovc cmove cmovg cmovge cmovl "
@@ -1416,7 +1416,7 @@ lexASM = { SCLEX_ASM, 63013, L"Assembly Script", L"asm", L"", &KeyWords_ASM,
              { SCE_ASM_REGISTER, 63208, L"Register", L"fore:#FF8000", L"" },
              { -1, 00000, L"", L"", L"" } } };
 
-KEYWORDLIST KeyWords_PL = { "__DATA__ __END__ __FILE__ __LINE__ __PACKAGE__ "
+KeywordList KeyWords_PL = { "__DATA__ __END__ __FILE__ __LINE__ __PACKAGE__ "
                             "abs accept alarm and atan2 AUTOLOAD BEGIN "
                             "bind binmode bless break caller chdir CHECK chmod "
                             "chomp chop chown chr chroot close closedir "
@@ -1522,7 +1522,7 @@ lexPL = { SCLEX_PERL, 63014, L"Perl Script", L"pl; pm; cgi; pod", L"",
             //L"", L"" },
             { -1, 00000, L"", L"", L"" } } };
 
-KEYWORDLIST KeyWords_INI = { "", "", "", "", "", "", "", "", "" };
+KeywordList KeyWords_INI = { "", "", "", "", "", "", "", "", "" };
 
 EditLexer lexINI = {
     SCLEX_PROPERTIES, 63015, L"Configuration Files",
@@ -1538,7 +1538,7 @@ EditLexer lexINI = {
       { -1, 00000, L"", L"", L"" } }
 };
 
-KEYWORDLIST KeyWords_BAT = {
+KeywordList KeyWords_BAT = {
     "arp assoc attrib bcdedit bootcfg break cacls call cd change chcp chdir "
     "chkdsk chkntfs choice cipher "
     "cleanmgr cls cmd cmdkey color com comp compact con convert copy country "
@@ -1577,7 +1577,7 @@ EditLexer lexBAT = {
       { -1, 00000, L"", L"", L"" } }
 };
 
-KEYWORDLIST KeyWords_DIFF = { "", "", "", "", "", "", "", "", "" };
+KeywordList KeyWords_DIFF = { "", "", "", "", "", "", "", "", "" };
 
 EditLexer lexDIFF = {
     SCLEX_DIFF, 63017, L"Diff Files", L"diff; patch", L"", &KeyWords_DIFF,
@@ -1598,7 +1598,7 @@ EditLexer lexDIFF = {
       { -1, 00000, L"", L"", L"" } }
 };
 
-KEYWORDLIST KeyWords_SQL = {
+KeywordList KeyWords_SQL = {
     "abort accessible action add after all alter analyze and as asc asensitive "
     "attach autoincrement "
     "before begin between bigint binary bit blob both by call cascade case "
@@ -1661,7 +1661,7 @@ EditLexer lexSQL = {
       { -1, 00000, L"", L"", L"" } }
 };
 
-KEYWORDLIST KeyWords_PY = {
+KeywordList KeyWords_PY = {
     "and as assert break class continue def del elif else except "
     "exec False finally for from global if import in is lambda None "
     "nonlocal not or pass print raise return True try while with yield",
@@ -1694,7 +1694,7 @@ EditLexer lexPY = {
       { -1, 00000, L"", L"", L"" } }
 };
 
-KEYWORDLIST KeyWords_CONF = {
+KeywordList KeyWords_CONF = {
     "acceptmutex acceptpathinfo accessconfig accessfilename action addalt "
     "addaltbyencoding addaltbytype addcharset adddefaultcharset "
     "adddescription addencoding addhandler addicon addiconbyencoding "
@@ -1808,7 +1808,7 @@ EditLexer lexCONF = {
       { -1, 00000, L"", L"", L"" } }
 };
 
-KEYWORDLIST KeyWords_PS = {
+KeywordList KeyWords_PS = {
     "begin break catch continue data do dynamicparam else elseif end exit "
     "filter finally for foreach "
     "from function if in local param private process return switch throw trap "
@@ -1941,7 +1941,7 @@ EditLexer lexPS = {
       { -1, 00000, L"", L"", L"" } }
 };
 
-KEYWORDLIST KeyWords_NSIS = {
+KeywordList KeyWords_NSIS = {
     "!addincludedir !addplugindir !appendfile !cd !define !delfile !echo !else "
     "!endif !error "
     "!execute !if !ifdef !ifmacrodef !ifmacrondef !ifndef !include "
@@ -2075,7 +2075,7 @@ EditLexer lexNSIS = {
       { -1, 00000, L"", L"", L"" } }
 };
 
-KEYWORDLIST KeyWords_INNO = {
+KeywordList KeyWords_INNO = {
     "code components custommessages dirs files icons ini installdelete "
     "langoptions languages messages "
     "registry run setup types tasks uninstalldelete uninstallrun _istool",
@@ -2166,7 +2166,7 @@ EditLexer lexINNO =
         //{ SCE_INNO_KEYWORD_USER, L"User Defined", L"", L"" },
         { -1, 00000, L"", L"", L"" } } };
 
-KEYWORDLIST KeyWords_RUBY = { "__FILE__ __LINE__ alias and begin break case "
+KeywordList KeyWords_RUBY = { "__FILE__ __LINE__ alias and begin break case "
                               "class def defined? do else elsif end ensure "
                               "false for in if module next nil not or redo "
                               "rescue retry return self super then true "
@@ -2205,7 +2205,7 @@ EditLexer lexRUBY =
           L"fore:#600000; back:#FFF0D8; eolfilled", L"" },
         { -1, 00000, L"", L"", L"" } } };
 
-KEYWORDLIST KeyWords_LUA = {
+KeywordList KeyWords_LUA = {
     "and break do else elseif end false for function goto if "
     "in local nil not or repeat return then true until while",
     // Basic Functions
@@ -2279,7 +2279,7 @@ EditLexer lexLUA = {
       { -1, 00000, L"", L"", L"" } }
 };
 
-KEYWORDLIST KeyWords_BASH = { "alias ar asa awk banner basename bash bc bdiff "
+KeywordList KeyWords_BASH = { "alias ar asa awk banner basename bash bc bdiff "
                               "break bunzip2 bzip2 cal calendar case cat "
                               "cc cd chmod cksum clear cmp col comm compress "
                               "continue cp cpio crypt csplit ctags cut date "
@@ -2330,7 +2330,7 @@ lexBASH = { SCLEX_BASH, 63259, L"Shell Script", L"sh", L"", &KeyWords_BASH,
                 L"fore:#008080", L"" },
               { -1, 00000, L"", L"", L"" } } };
 
-KEYWORDLIST KeyWords_TCL = {
+KeywordList KeyWords_TCL = {
     // TCL Keywords
     "after append array auto_execok auto_import auto_load auto_load_index "
     "auto_qualify beep "
@@ -2394,7 +2394,7 @@ EditLexer lexTCL = {
       { -1, 00000, L"", L"", L"" } }
 };
 
-KEYWORDLIST KeyWords_AU3 = {
+KeywordList KeyWords_AU3 = {
     "and byref case const continuecase continueloop default dim do else elseif "
     "endfunc endif "
     "endselect endswitch endwith enum exit exitloop false for func global if "
@@ -3720,7 +3720,7 @@ EditLexer lexANSI = {
       { -1, 00000, L"", L"", L"" } }
 };
 
-KEYWORDLIST KeyWords_AHK = {
+KeywordList KeyWords_AHK = {
     "break continue else exit exitapp gosub goto if ifequal ifexist ifgreater "
     "ifgreaterorequal "
     "ifinstring ifless iflessorequal ifmsgbox ifnotequal ifnotexist "
@@ -3978,7 +3978,7 @@ EditLexer lexAHK =
                               L"back:#FFC0C0", L"" },
                             { -1, 00000, L"", L"", L"" } } };
 
-KEYWORDLIST KeyWords_CMAKE = {
+KeywordList KeyWords_CMAKE = {
     "add_custom_command add_custom_target add_definitions add_dependencies "
     "add_executable add_library "
     "add_subdirectory add_test aux_source_directory build_command build_name "
@@ -4053,7 +4053,7 @@ EditLexer lexCmake = {
       { -1, 00000, L"", L"", L"" } }
 };
 
-KEYWORDLIST KeyWords_AVS = {
+KeywordList KeyWords_AVS = {
     "true false return global",
     "addborders alignedsplice amplify amplifydb animate applyrange assumebff "
     "assumefieldbased assumefps "
@@ -4218,7 +4218,7 @@ EditLexer lexAVS = {
       { -1, 00000, L"", L"", L"" } }
 };
 
-KEYWORDLIST KeyWords_MARKDOWN = { "", "", "", "", "", "", "", "", "" };
+KeywordList KeyWords_MARKDOWN = { "", "", "", "", "", "", "", "", "" };
 
 EditLexer lexMARKDOWN = {
     SCLEX_MARKDOWN, 63336, L"Markdown", L"md; markdown; mdown; mkdn; mkd", L"",
@@ -4253,7 +4253,7 @@ EditLexer lexMARKDOWN = {
       { -1, 00000, L"", L"", L"" } }
 };
 
-KEYWORDLIST KeyWords_YAML = { "y n yes no on off true false", "", "", "", "",
+KeywordList KeyWords_YAML = { "y n yes no on off true false", "", "", "", "",
                               "",                             "", "", "" };
 
 EditLexer lexYAML = {
@@ -4274,7 +4274,7 @@ EditLexer lexYAML = {
       { -1, 00000, L"", L"", L"" } }
 };
 
-KEYWORDLIST KeyWords_VHDL = {
+KeywordList KeyWords_VHDL = {
     "access after alias all architecture array assert attribute begin block "
     "body buffer bus case component configuration "
     "constant disconnect downto else elsif end entity exit file for function "
