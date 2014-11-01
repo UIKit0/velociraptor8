@@ -173,7 +173,7 @@ int cyFavoritesDlg;
 int xFindReplaceDlg;
 int yFindReplaceDlg;
 
-WCHAR* lpFileList[32];
+WCHAR* fileList[32];
 int cFileList = 0;
 int cchiFileList = 0;
 WCHAR* lpFileArg = NULL;
@@ -244,7 +244,7 @@ HINSTANCE g_hInstance;
 HANDLE g_hScintilla;
 UINT16 g_uWinVer;
 WCHAR g_wchAppUserModelID[32] = L"";
-WCHAR g_wchWorkingDirectory[MAX_PATH] = L"";
+WCHAR g_workingDirectory[MAX_PATH] = L"";
 
 #ifdef BOOKMARK_EDITION
 // Graphics for bookmark indicator
@@ -485,7 +485,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine,
     g_uWinVer = MAKEWORD(HIBYTE(g_uWinVer), LOBYTE(g_uWinVer));
 
     // Don't keep working directory locked
-    GetCurrentDirectoryW(dimof(g_wchWorkingDirectory), g_wchWorkingDirectory);
+    GetCurrentDirectoryW(dimof(g_workingDirectory), g_workingDirectory);
     GetModuleFileNameW(NULL, wchWorkingDirectory, dimof(wchWorkingDirectory));
     PathRemoveFileSpecW(wchWorkingDirectory);
     SetCurrentDirectoryW(wchWorkingDirectory);
@@ -2380,7 +2380,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
             sei.lpVerb = NULL;
             sei.lpFile = szModuleName;
             sei.lpParameters = szParameters;
-            sei.lpDirectory = g_wchWorkingDirectory;
+            sei.lpDirectory = g_workingDirectory;
             sei.nShow = SW_SHOWNORMAL;
 
             ShellExecuteEx(&sei);
@@ -6195,7 +6195,7 @@ void ParseCommandLine() {
                     -1 /*&& PathGetDriveNumber(g_wchWorkingDirectory) != -1*/) {
 
                 WCHAR wchPath[MAX_PATH];
-                lstrcpy(wchPath, g_wchWorkingDirectory);
+                lstrcpy(wchPath, g_workingDirectory);
                 PathStripToRoot(wchPath);
                 PathAppend(wchPath, lpFileArg);
                 lstrcpy(lpFileArg, wchPath);
@@ -6206,7 +6206,7 @@ void ParseCommandLine() {
             while (cFileList < 32 &&
                    ExtractFirstArgument(lp3, lpFileBuf, lp3)) {
                 PathQuoteSpaces(lpFileBuf);
-                lpFileList[cFileList++] = StrDup(lpFileBuf);
+                fileList[cFileList++] = StrDup(lpFileBuf);
             }
 
             bContinue = FALSE;
@@ -6731,7 +6731,7 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect,
     ExpandEnvironmentStringsEx(tch, dimof(tch));
 
     if (PathIsRelative(tch)) {
-        StrCpyN(szFileName, g_wchWorkingDirectory, dimof(szFileName));
+        StrCpyN(szFileName, g_workingDirectory, dimof(szFileName));
         PathAppend(szFileName, tch);
         if (!PathFileExists(szFileName)) {
             WCHAR wchFullPath[MAX_PATH];
@@ -6988,7 +6988,7 @@ BOOL OpenFileDlg(HWND hwnd, WCHAR* lpstrFile, int cchFile,
                 PathCanonicalize(tchInitialDir, tchModule);
             }
         } else
-            lstrcpy(tchInitialDir, g_wchWorkingDirectory);
+            lstrcpy(tchInitialDir, g_workingDirectory);
     }
 
     ZeroMemory(&ofn, sizeof(OPENFILENAME));
@@ -7037,7 +7037,7 @@ BOOL SaveFileDlg(HWND hwnd, WCHAR* lpstrFile, int cchFile,
             PathCanonicalize(tchInitialDir, tchModule);
         }
     } else
-        lstrcpy(tchInitialDir, g_wchWorkingDirectory);
+        lstrcpy(tchInitialDir, g_workingDirectory);
 
     ZeroMemory(&ofn, sizeof(OPENFILENAME));
     ofn.lStructSize = sizeof(OPENFILENAME);
@@ -7124,7 +7124,7 @@ BOOL ActivatePrevInst() {
                                                   sizeof(WCHAR));
 
         if (PathIsRelative(lpFileArg)) {
-            StrCpyN(tchTmp, g_wchWorkingDirectory, dimof(tchTmp));
+            StrCpyN(tchTmp, g_workingDirectory, dimof(tchTmp));
             PathAppend(tchTmp, lpFileArg);
             if (PathFileExists(tchTmp))
                 lstrcpy(lpFileArg, tchTmp);
@@ -7133,7 +7133,7 @@ BOOL ActivatePrevInst() {
                                NULL))
                     lstrcpy(lpFileArg, tchTmp);
                 else {
-                    StrCpyN(tchTmp, g_wchWorkingDirectory, dimof(tchTmp));
+                    StrCpyN(tchTmp, g_workingDirectory, dimof(tchTmp));
                     PathAppend(tchTmp, lpFileArg);
                     lstrcpy(lpFileArg, tchTmp);
                 }
@@ -7244,7 +7244,7 @@ BOOL ActivatePrevInst() {
                     lpFileArg, (DWORD)GlobalSize(lpFileArg) / sizeof(WCHAR));
 
                 if (PathIsRelative(lpFileArg)) {
-                    StrCpyN(tchTmp, g_wchWorkingDirectory, dimof(tchTmp));
+                    StrCpyN(tchTmp, g_workingDirectory, dimof(tchTmp));
                     PathAppend(tchTmp, lpFileArg);
                     if (PathFileExists(tchTmp))
                         lstrcpy(lpFileArg, tchTmp);
@@ -7314,57 +7314,57 @@ BOOL ActivatePrevInst() {
         return FALSE;
 }
 
+static void FreeFileList() {
+    for (int i = 0; i < cFileList; i++) {
+        LocalFree(fileList[i]);
+    }
+}
+
 BOOL RelaunchMultiInst() {
-
-    if (flagMultiFileArg == 2 && cFileList > 1) {
-
-        WCHAR *pwch;
-        int i = 0;
-        STARTUPINFO si;
-        PROCESS_INFORMATION pi;
-
-        WCHAR* lpCmdLineNew = StrDup(GetCommandLine());
-        WCHAR* lp1 = (WCHAR *)LocalAlloc(LPTR, sizeof(WCHAR) *
-                                                   (lstrlen(lpCmdLineNew) + 1));
-        WCHAR* lp2 = (WCHAR *)LocalAlloc(LPTR, sizeof(WCHAR) *
-                                                   (lstrlen(lpCmdLineNew) + 1));
-
-        StrTab2Space(lpCmdLineNew);
-        lstrcpy(lpCmdLineNew + cchiFileList, L"");
-
-        pwch = CharPrev(lpCmdLineNew, StrEnd(lpCmdLineNew));
-        while (*pwch == L' ' || *pwch == L'-' || *pwch == L'+') {
-            *pwch = L' ';
-            pwch = CharPrev(lpCmdLineNew, pwch);
-            if (i++ > 1)
-                cchiFileList--;
-        }
-
-        for (i = 0; i < cFileList; i++) {
-
-            lstrcpy(lpCmdLineNew + cchiFileList, L" /n - ");
-            lstrcat(lpCmdLineNew, lpFileList[i]);
-            LocalFree(lpFileList[i]);
-
-            ZeroMemory(&si, sizeof(STARTUPINFO));
-            si.cb = sizeof(STARTUPINFO);
-            ZeroMemory(&pi, sizeof(PROCESS_INFORMATION));
-
-            CreateProcess(NULL, lpCmdLineNew, NULL, NULL, FALSE, 0, NULL,
-                          g_wchWorkingDirectory, &si, &pi);
-        }
-        LocalFree(lpCmdLineNew);
-        LocalFree(lp1);
-        LocalFree(lp2);
-        GlobalFree(lpFileArg);
-
-        return TRUE;
-    } else {
-        for (int i = 0; i < cFileList; i++) {
-            LocalFree(lpFileList[i]);
-        }
+    bool shouldRelaunch = (flagMultiFileArg == 2) && (cFileList > 1);
+    if (!shouldRelaunch) {
+        FreeFileList();
         return FALSE;
     }
+
+    WCHAR *pwch;
+    int i = 0;
+
+    WCHAR* cmdLineNew = StrDupW(GetCommandLine());
+    WCHAR* lp1 = (WCHAR *)LocalAlloc(LPTR, sizeof(WCHAR) *
+        (lstrlen(cmdLineNew) + 1));
+    WCHAR* lp2 = (WCHAR *)LocalAlloc(LPTR, sizeof(WCHAR) *
+        (lstrlen(cmdLineNew) + 1));
+
+    StrTab2Space(cmdLineNew);
+    lstrcpy(cmdLineNew + cchiFileList, L"");
+
+    pwch = CharPrev(cmdLineNew, StrEnd(cmdLineNew));
+    while (*pwch == L' ' || *pwch == L'-' || *pwch == L'+') {
+        *pwch = L' ';
+        pwch = CharPrev(cmdLineNew, pwch);
+        if (i++ > 1)
+            cchiFileList--;
+    }
+
+    for (i = 0; i < cFileList; i++) {
+
+        lstrcpy(cmdLineNew + cchiFileList, L" /n - ");
+        lstrcat(cmdLineNew, fileList[i]);
+        LocalFree(fileList[i]);
+
+        STARTUPINFO si = { 0 };
+        si.cb = sizeof(STARTUPINFO);
+        PROCESS_INFORMATION pi = { 0 };
+        CreateProcessW(NULL, cmdLineNew, NULL, NULL, FALSE, 0, NULL,
+            g_workingDirectory, &si, &pi);
+    }
+    LocalFree(cmdLineNew);
+    LocalFree(lp1);
+    LocalFree(lp2);
+    GlobalFree(lpFileArg);
+
+    return TRUE;
 }
 
 BOOL RelaunchElevated() {
@@ -7399,7 +7399,7 @@ BOOL RelaunchElevated() {
             sei.lpVerb = L"runas";
             sei.lpFile = lpArg1;
             sei.lpParameters = lpArg2;
-            sei.lpDirectory = g_wchWorkingDirectory;
+            sei.lpDirectory = g_workingDirectory;
             sei.nShow = si.wShowWindow;
 
             ShellExecuteEx(&sei);
