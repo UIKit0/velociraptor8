@@ -14,7 +14,6 @@ See License.txt for details about distribution and modification.
 #include "resource.h"
 #include "version.h"
 
-extern HWND hwndMain;
 extern HINSTANCE g_hInstance;
 extern DWORD dwLastIOError;
 extern BOOL bSkipUnicodeDetection;
@@ -82,7 +81,7 @@ int MsgBox(int iType, UINT uIdMsg, ...) {
     }
 
     if (!(hwnd = GetFocus()))
-        hwnd = hwndMain;
+        hwnd = gDoc->hwndTopLevel;
 
     return MessageBoxEx(hwnd, szText, szTitle, MB_SETFOREGROUND | iIcon,
                         MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT));
@@ -2042,7 +2041,7 @@ INT_PTR InfoBox(int iType, const WCHAR* lpstrSetting, int uidMessage, ...) {
         idDlg = IDD_INFOBOX3;
 
     if (!(hwnd = GetFocus()))
-        hwnd = hwndMain;
+        hwnd = gDoc->hwndTopLevel;
 
     MessageBeep(MB_ICONEXCLAMATION);
 

@@ -16,7 +16,6 @@ See License.txt for details about distribution and modification.
 #include "resource.h"
 #include "SciCall.h"
 
-extern HWND hwndMain;
 extern HINSTANCE g_hInstance;
 // extern LPMALLOC  g_lpMalloc;
 extern DWORD dwLastIOError;
@@ -5484,7 +5483,7 @@ EditFindReplaceDlgProcW(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
                     break;
 
                 case IDACC_SAVEFIND:
-                    SendMessage(hwndMain, WM_COMMAND,
+                    SendMessage(gDoc->hwndTopLevel, WM_COMMAND,
                                 MAKELONG(IDM_EDIT_SAVEFIND, 1), 0);
                     lpefr =
                         (LPEDITFINDREPLACE)GetWindowLongPtr(hwnd, DWLP_USER);

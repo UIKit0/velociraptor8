@@ -23,6 +23,8 @@ struct VeParams {
 };
 
 struct Document {
+    // Note: eventually multiple Document instances will be associated with the same hwndTopLevel (tabs!)
+    HWND hwndTopLevel;
     HWND hwndEdit;
     HWND hwndEditFrame;
     HWND hwndStatus;

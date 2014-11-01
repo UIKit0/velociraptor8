@@ -20,7 +20,6 @@ See License.txt for details about distribution and modification.
 #include "Http.h"
 
 // Local and global Variables for Notepad2.c
-HWND hwndMain;
 HWND hwndNextCBChain;
 HWND hDlgFindReplace;
 
@@ -562,9 +561,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine,
     });
 #endif
 
-#if 1
+#if 0
     HttpGetAsync(AUTO_UPDATE_URL, [](HttpRsp* r) {
-        OutputDebugStringA("got data");
+        OutputDebugStringA("got data\n");
     });
 #endif
 
@@ -693,9 +692,10 @@ HWND InitInstance(HINSTANCE hInstance, LPSTR pszCmdLine, int nCmdShow) {
         }
     }
 
-    hwndMain = CreateWindowExW(0, fullWndClass, L"Velociraptor8",
+    HWND hwndMain = CreateWindowExW(0, fullWndClass, L"Velociraptor8",
                               WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN, wi.x, wi.y,
                               wi.cx, wi.cy, NULL, NULL, hInstance, NULL);
+    gDoc->hwndTopLevel = hwndMain;
 
     if (wi.max)
         nCmdShow = SW_SHOWMAXIMIZED;
@@ -1017,7 +1017,7 @@ MainWndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
 
             if (PathIsDirectory(szBuf)) {
                 WCHAR tchFile[MAX_PATH];
-                if (OpenFileDlg(hwndMain, tchFile, dimof(tchFile), szBuf))
+                if (OpenFileDlg(gDoc->hwndTopLevel, tchFile, dimof(tchFile), szBuf))
                     FileLoad(FALSE, FALSE, FALSE, FALSE, tchFile);
             } else
                 FileLoad(FALSE, FALSE, FALSE, FALSE, szBuf);
@@ -1053,7 +1053,7 @@ MainWndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
 
                     if (PathIsDirectory(&params->wchData)) {
                         WCHAR tchFile[MAX_PATH];
-                        if (OpenFileDlg(hwndMain, tchFile, dimof(tchFile),
+                        if (OpenFileDlg(gDoc->hwndTopLevel, tchFile, dimof(tchFile),
                                         &params->wchData))
                             bOpened =
                                 FileLoad(FALSE, FALSE, FALSE, FALSE, tchFile);
@@ -1085,7 +1085,7 @@ MainWndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
 
                         if (0 != params->flagSetEOLMode) {
                             flagSetEOLMode = params->flagSetEOLMode;
-                            SendMessage(hwndMain, WM_COMMAND,
+                            SendMessage(gDoc->hwndTopLevel, WM_COMMAND,
                                         MAKELONG(IDM_LINEENDINGS_CRLF +
                                                      flagSetEOLMode - 1,
                                                  1),
@@ -2232,6 +2232,8 @@ static void MenuNewWindow(HWND hwnd, bool isEmpty) {
 
 // WM_COMMAND
 LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
+    CrashIf(hwnd != gDoc->hwndTopLevel);
+
     WORD cmd = LOWORD(wParam);
     switch (cmd) {
 
@@ -2499,7 +2501,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
                     if (PathIsDirectory(tchSelItem)) {
                         WCHAR tchFile[MAX_PATH];
 
-                        if (OpenFileDlg(hwndMain, tchFile, dimof(tchFile),
+                        if (OpenFileDlg(gDoc->hwndTopLevel, tchFile, dimof(tchFile),
                                         tchSelItem))
                             FileLoad(TRUE, FALSE, FALSE, FALSE, tchFile);
                     } else
@@ -3990,7 +3992,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
                 // GetWindowPlacement
                 wndpl.length = sizeof(WINDOWPLACEMENT);
-                GetWindowPlacement(hwndMain, &wndpl);
+                GetWindowPlacement(gDoc->hwndTopLevel, &wndpl);
 
                 wi.x = wndpl.rcNormalPosition.left;
                 wi.y = wndpl.rcNormalPosition.top;
@@ -3998,7 +4000,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
                     wndpl.rcNormalPosition.right - wndpl.rcNormalPosition.left;
                 wi.cy =
                     wndpl.rcNormalPosition.bottom - wndpl.rcNormalPosition.top;
-                wi.max = (IsZoomed(hwndMain) ||
+                wi.max = (IsZoomed(gDoc->hwndTopLevel) ||
                           (wndpl.flags & WPF_RESTORETOMAXIMIZED));
 
                 wsprintf(tchPosX, L"%ix%i PosX", ResX, ResY);
@@ -4656,14 +4658,14 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
             int x, y, cx, cy, max;
 
             wndpl.length = sizeof(WINDOWPLACEMENT);
-            GetWindowPlacement(hwndMain, &wndpl);
+            GetWindowPlacement(gDoc->hwndTopLevel, &wndpl);
 
             x = wndpl.rcNormalPosition.left;
             y = wndpl.rcNormalPosition.top;
             cx = wndpl.rcNormalPosition.right - wndpl.rcNormalPosition.left;
             cy = wndpl.rcNormalPosition.bottom - wndpl.rcNormalPosition.top;
             max =
-                (IsZoomed(hwndMain) || (wndpl.flags & WPF_RESTORETOMAXIMIZED));
+                (IsZoomed(gDoc->hwndTopLevel) || (wndpl.flags & WPF_RESTORETOMAXIMIZED));
 
             wsprintf(wszWinPos, L"/pos %i,%i,%i,%i,%i", x, y, cx, cy, max);
 
@@ -5809,13 +5811,13 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 
         // GetWindowPlacement
         wndpl.length = sizeof(WINDOWPLACEMENT);
-        GetWindowPlacement(hwndMain, &wndpl);
+        GetWindowPlacement(gDoc->hwndTopLevel, &wndpl);
 
         wi.x = wndpl.rcNormalPosition.left;
         wi.y = wndpl.rcNormalPosition.top;
         wi.cx = wndpl.rcNormalPosition.right - wndpl.rcNormalPosition.left;
         wi.cy = wndpl.rcNormalPosition.bottom - wndpl.rcNormalPosition.top;
-        wi.max = (IsZoomed(hwndMain) || (wndpl.flags & WPF_RESTORETOMAXIMIZED));
+        wi.max = (IsZoomed(gDoc->hwndTopLevel) || (wndpl.flags & WPF_RESTORETOMAXIMIZED));
     }
 
     if (!IniGetInt(L"Settings2", L"StickyWindowPosition", 0)) {
@@ -6692,8 +6694,8 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect,
 
     if (bNew) {
         lstrcpy(szCurFile, L"");
-        SetDlgItemText(hwndMain, IDC_FILENAME, szCurFile);
-        SetDlgItemInt(hwndMain, IDC_REUSELOCK, GetTickCount(), FALSE);
+        SetDlgItemText(gDoc->hwndTopLevel, IDC_FILENAME, szCurFile);
+        SetDlgItemInt(gDoc->hwndTopLevel, IDC_REUSELOCK, GetTickCount(), FALSE);
         if (!fKeepTitleExcerpt)
             lstrcpy(szTitleExcerpt, L"");
         FileVars_Init(NULL, 0, &fvCurFile);
@@ -6711,7 +6713,7 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect,
                                                       : SC_CP_UTF8,
                     0);
         EditSetNewText(gDoc->hwndEdit, "", 0);
-        SetWindowTitle(hwndMain, uidsAppTitle, fIsElevated, IDS_UNTITLED,
+        SetWindowTitle(gDoc->hwndTopLevel, uidsAppTitle, fIsElevated, IDS_UNTITLED,
                        szCurFile, iPathNameFormat,
                        bModified || iEncoding != iOriginalEncoding,
                        IDS_READONLY, bReadOnly, szTitleExcerpt);
@@ -6725,7 +6727,7 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect,
     }
 
     if (!lpszFile || lstrlen(lpszFile) == 0) {
-        if (!OpenFileDlg(hwndMain, tch, dimof(tch), NULL))
+        if (!OpenFileDlg(gDoc->hwndTopLevel, tch, dimof(tch), NULL))
             return FALSE;
     } else
         lstrcpy(tch, lpszFile);
@@ -6789,8 +6791,8 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect,
 
     if (fSuccess) {
         lstrcpy(szCurFile, szFileName);
-        SetDlgItemText(hwndMain, IDC_FILENAME, szCurFile);
-        SetDlgItemInt(hwndMain, IDC_REUSELOCK, GetTickCount(), FALSE);
+        SetDlgItemText(gDoc->hwndTopLevel, IDC_FILENAME, szCurFile);
+        SetDlgItemInt(gDoc->hwndTopLevel, IDC_REUSELOCK, GetTickCount(), FALSE);
         if (!fKeepTitleExcerpt)
             lstrcpy(szTitleExcerpt, L"");
         if (!flagLexerSpecified) // flag will be cleared
@@ -6804,7 +6806,7 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect,
                     flagPortableMyDocs);
         if (flagUseSystemMRU == 2)
             SHAddToRecentDocs(SHARD_PATHW, szFileName);
-        SetWindowTitle(hwndMain, uidsAppTitle, fIsElevated, IDS_UNTITLED,
+        SetWindowTitle(gDoc->hwndTopLevel, uidsAppTitle, fIsElevated, IDS_UNTITLED,
                        szFileName, iPathNameFormat,
                        bModified || iEncoding != iOriginalEncoding,
                        IDS_READONLY, bReadOnly, szTitleExcerpt);
@@ -6822,7 +6824,7 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect,
                 EditJumpTo(gDoc->hwndEdit, -1, 0);
                 SendMessage(gDoc->hwndEdit, SCI_BEGINUNDOACTION, 0, 0);
                 SendMessage(gDoc->hwndEdit, SCI_NEWLINE, 0, 0);
-                SendMessage(hwndMain, WM_COMMAND,
+                SendMessage(gDoc->hwndTopLevel, WM_COMMAND,
                             MAKELONG(IDM_EDIT_INSERT_SHORTDATE, 1), 0);
                 EditJumpTo(gDoc->hwndEdit, -1, 0);
                 SendMessage(gDoc->hwndEdit, SCI_NEWLINE, 0, 0);
@@ -6887,7 +6889,7 @@ BOOL FileSave(BOOL bSaveAlways, BOOL bAsk, BOOL bSaveAs, BOOL bSaveCopy) {
         if (dwFileAttributes != INVALID_FILE_ATTRIBUTES)
             bReadOnly = (dwFileAttributes & FILE_ATTRIBUTE_READONLY);
         if (bReadOnly) {
-            SetWindowTitle(hwndMain, uidsAppTitle, fIsElevated, IDS_UNTITLED,
+            SetWindowTitle(gDoc->hwndTopLevel, uidsAppTitle, fIsElevated, IDS_UNTITLED,
                            szCurFile, iPathNameFormat,
                            bModified || iEncoding != iOriginalEncoding,
                            IDS_READONLY, bReadOnly, szTitleExcerpt);
@@ -6908,13 +6910,13 @@ BOOL FileSave(BOOL bSaveAlways, BOOL bAsk, BOOL bSaveAs, BOOL bSaveCopy) {
         } else
             lstrcpy(tchFile, szCurFile);
 
-        if (SaveFileDlg(hwndMain, tchFile, dimof(tchFile), tchInitialDir)) {
+        if (SaveFileDlg(gDoc->hwndTopLevel, tchFile, dimof(tchFile), tchInitialDir)) {
             if (fSuccess = FileIO(FALSE, tchFile, FALSE, &iEncoding, &iEOLMode,
                                   NULL, NULL, &bCancelDataLoss, bSaveCopy)) {
                 if (!bSaveCopy) {
                     lstrcpy(szCurFile, tchFile);
-                    SetDlgItemText(hwndMain, IDC_FILENAME, szCurFile);
-                    SetDlgItemInt(hwndMain, IDC_REUSELOCK, GetTickCount(),
+                    SetDlgItemText(gDoc->hwndTopLevel, IDC_FILENAME, szCurFile);
+                    SetDlgItemInt(gDoc->hwndTopLevel, IDC_REUSELOCK, GetTickCount(),
                                   FALSE);
                     if (!fKeepTitleExcerpt)
                         lstrcpy(szTitleExcerpt, L"");
@@ -6940,7 +6942,7 @@ BOOL FileSave(BOOL bSaveAlways, BOOL bAsk, BOOL bSaveAs, BOOL bSaveCopy) {
                         flagPortableMyDocs);
             if (flagUseSystemMRU == 2)
                 SHAddToRecentDocs(SHARD_PATHW, szCurFile);
-            SetWindowTitle(hwndMain, uidsAppTitle, fIsElevated, IDS_UNTITLED,
+            SetWindowTitle(gDoc->hwndTopLevel, uidsAppTitle, fIsElevated, IDS_UNTITLED,
                            szCurFile, iPathNameFormat,
                            bModified || iEncoding != iOriginalEncoding,
                            IDS_READONLY, bReadOnly, szTitleExcerpt);
@@ -6954,7 +6956,7 @@ BOOL FileSave(BOOL bSaveAlways, BOOL bAsk, BOOL bSaveAs, BOOL bSaveCopy) {
         if (lstrlen(szCurFile) != 0)
             lstrcpy(tchFile, szCurFile);
 
-        SetWindowTitle(hwndMain, uidsAppTitle, fIsElevated, IDS_UNTITLED,
+        SetWindowTitle(gDoc->hwndTopLevel, uidsAppTitle, fIsElevated, IDS_UNTITLED,
                        szCurFile, iPathNameFormat,
                        bModified || iEncoding != iOriginalEncoding,
                        IDS_READONLY, bReadOnly, szTitleExcerpt);
@@ -6962,7 +6964,7 @@ BOOL FileSave(BOOL bSaveAlways, BOOL bAsk, BOOL bSaveAs, BOOL bSaveCopy) {
         MsgBox(MBWARN, IDS_ERR_SAVEFILE, tchFile);
     }
 
-    return (fSuccess);
+    return fSuccess;
 }
 
 BOOL OpenFileDlg(HWND hwnd, WCHAR* lpstrFile, int cchFile,
@@ -7578,7 +7580,7 @@ WatchTimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime) {
             KillTimer(NULL, ID_WATCHTIMER);
             bRunningWatch = FALSE;
             dwChangeNotifyTime = 0;
-            SendMessage(hwndMain, WM_CHANGENOTIFY, 0, 0);
+            SendMessage(gDoc->hwndTopLevel, WM_CHANGENOTIFY, 0, 0);
         }
 
         // Check Change Notification Handle
@@ -7609,7 +7611,7 @@ WatchTimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime) {
                     KillTimer(NULL, ID_WATCHTIMER);
                     bRunningWatch = FALSE;
                     dwChangeNotifyTime = 0;
-                    SendMessage(hwndMain, WM_CHANGENOTIFY, 0, 0);
+                    SendMessage(gDoc->hwndTopLevel, WM_CHANGENOTIFY, 0, 0);
                 }
             } else
                 FindNextChangeNotification(hChangeHandle);
