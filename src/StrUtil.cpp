@@ -6,6 +6,10 @@ namespace str {
 size_t Len(const char *s) { return strlen(s); }
 size_t Len(const WCHAR *s) { return wcslen(s); }
 
+bool Eq(const char *s1, const char *s2) {
+    return strcmp(s1, s2) == 0;
+}
+
 bool EndsWith(const std::string &s, char c) {
     if (s.empty()) {
         return false;

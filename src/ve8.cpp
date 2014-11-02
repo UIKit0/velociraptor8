@@ -19,6 +19,7 @@ See License.txt for details about distribution and modification.
 #include "UITask.h"
 #include "Http.h"
 #include "Install.h"
+#include "Menu.h"
 
 // Local and global Variables for Notepad2.c
 HWND hwndNextCBChain;
@@ -589,7 +590,7 @@ BOOL InitApplication(HINSTANCE hInstance) {
     wc.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDR_MAINWND));
     wc.hCursor = LoadCursor(NULL, IDC_ARROW);
     wc.hbrBackground = (HBRUSH)(COLOR_3DFACE + 1);
-    wc.lpszMenuName = MAKEINTRESOURCE(IDR_MAINWND);
+    //wc.lpszMenuName = MAKEINTRESOURCE(IDR_MAINWND);
     wc.lpszClassName = fullWndClass;
 
     return RegisterClass(&wc);
@@ -680,6 +681,7 @@ HWND InitInstance(HINSTANCE hInstance, LPSTR pszCmdLine, int nCmdShow) {
         CreateWindowExW(0, fullWndClass, L"Velociraptor8", WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN,
                         wi.x, wi.y, wi.cx, wi.cy, NULL, NULL, hInstance, NULL);
     gDoc->hwndTopLevel = hwndMain;
+    SetMenu(hwndMain, BuildMainMenu());
 
     if (wi.max)
         nCmdShow = SW_SHOWMAXIMIZED;

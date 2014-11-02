@@ -1,0 +1,3 @@
+
+HMENU BuildMainMenu();
+
