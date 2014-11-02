@@ -12,4 +12,3 @@ bool IsRunningInstalled();
 bool IsRunningPortable();
 
 void Install();
-

@@ -591,7 +591,7 @@ BOOL InitApplication(HINSTANCE hInstance) {
     wc.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDR_MAINWND));
     wc.hCursor = LoadCursor(NULL, IDC_ARROW);
     wc.hbrBackground = (HBRUSH)(COLOR_3DFACE + 1);
-    //wc.lpszMenuName = MAKEINTRESOURCE(IDR_MAINWND);
+    // wc.lpszMenuName = MAKEINTRESOURCE(IDR_MAINWND);
     wc.lpszClassName = fullWndClass;
 
     return RegisterClass(&wc);
@@ -1114,7 +1114,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
                 (nID != IDC_TOOLBAR))
                 return DefWindowProc(hwnd, msg, wp, lp);
 
-            //hmenu = LoadMenu(g_hInstance, MAKEINTRESOURCE(IDR_POPUPMENU));
+            // hmenu = LoadMenu(g_hInstance, MAKEINTRESOURCE(IDR_POPUPMENU));
             hmenu = BuildPopupMenu();
             // SetMenuDefaultItem(GetSubMenu(hmenu,1),0,FALSE);
 
@@ -1272,7 +1272,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
             switch (lp) {
                 case WM_RBUTTONUP: {
 
-                    //HMENU hMenu = LoadMenu(g_hInstance, MAKEINTRESOURCE(IDR_POPUPMENU));
+                    // HMENU hMenu = LoadMenu(g_hInstance, MAKEINTRESOURCE(IDR_POPUPMENU));
                     HMENU hMenu = BuildPopupMenu();
                     HMENU hMenuPopup = GetSubMenu(hMenu, 2);
 
@@ -2155,13 +2155,12 @@ void MenuFileRevert() {
 
     WCHAR tchCurFile2[MAX_PATH];
 
-    int iCurPos = (int) SendMessage(gDoc->hwndScintilla, SCI_GETCURRENTPOS, 0, 0);
-    int iAnchorPos = (int) SendMessage(gDoc->hwndScintilla, SCI_GETANCHOR, 0, 0);
-    int iVisTopLine =
-        (int) SendMessage(gDoc->hwndScintilla, SCI_GETFIRSTVISIBLELINE, 0, 0);
-    int iDocTopLine = (int) SendMessage(gDoc->hwndScintilla, SCI_DOCLINEFROMVISIBLE,
-        (WPARAM) iVisTopLine, 0);
-    int iXOffset = (int) SendMessage(gDoc->hwndScintilla, SCI_GETXOFFSET, 0, 0);
+    int iCurPos = (int)SendMessage(gDoc->hwndScintilla, SCI_GETCURRENTPOS, 0, 0);
+    int iAnchorPos = (int)SendMessage(gDoc->hwndScintilla, SCI_GETANCHOR, 0, 0);
+    int iVisTopLine = (int)SendMessage(gDoc->hwndScintilla, SCI_GETFIRSTVISIBLELINE, 0, 0);
+    int iDocTopLine =
+        (int)SendMessage(gDoc->hwndScintilla, SCI_DOCLINEFROMVISIBLE, (WPARAM)iVisTopLine, 0);
+    int iXOffset = (int)SendMessage(gDoc->hwndScintilla, SCI_GETXOFFSET, 0, 0);
 
     if (bModified || iEncoding != iOriginalEncoding) {
         auto ret = MsgBox(MBOKCANCEL, IDS_ASK_REVERT);
@@ -2179,16 +2178,16 @@ void MenuFileRevert() {
         return;
     }
     char tch[5] = "";
-    SendMessage(gDoc->hwndScintilla, SCI_GETTEXT, 5, (LPARAM) tch);
+    SendMessage(gDoc->hwndScintilla, SCI_GETTEXT, 5, (LPARAM)tch);
     if (lstrcmpiA(tch, ".LOG") == 0) {
         return;
     }
     int iNewTopLine;
     SendMessage(gDoc->hwndScintilla, SCI_SETSEL, iAnchorPos, iCurPos);
-    SendMessage(gDoc->hwndScintilla, SCI_ENSUREVISIBLE, (WPARAM) iDocTopLine, 0);
-    iNewTopLine = (int) SendMessage(gDoc->hwndScintilla, SCI_GETFIRSTVISIBLELINE, 0, 0);
-    SendMessage(gDoc->hwndScintilla, SCI_LINESCROLL, 0, (LPARAM) iVisTopLine - iNewTopLine);
-    SendMessage(gDoc->hwndScintilla, SCI_SETXOFFSET, (WPARAM) iXOffset, 0);
+    SendMessage(gDoc->hwndScintilla, SCI_ENSUREVISIBLE, (WPARAM)iDocTopLine, 0);
+    iNewTopLine = (int)SendMessage(gDoc->hwndScintilla, SCI_GETFIRSTVISIBLELINE, 0, 0);
+    SendMessage(gDoc->hwndScintilla, SCI_LINESCROLL, 0, (LPARAM)iVisTopLine - iNewTopLine);
+    SendMessage(gDoc->hwndScintilla, SCI_SETXOFFSET, (WPARAM)iXOffset, 0);
 }
 
 // WM_COMMAND
