@@ -30,11 +30,11 @@ inline void CrashMe() {
 };
 #pragma warning(pop)
 
-#define CrashAlwaysIf(cond)                                                                                            \
-    do {                                                                                                               \
-        if (cond)                                                                                                      \
-            CrashMe();                                                                                                 \
-        __analysis_assume(!(cond));                                                                                    \
+#define CrashAlwaysIf(cond)                                                                        \
+    do {                                                                                           \
+        if (cond)                                                                                  \
+            CrashMe();                                                                             \
+        __analysis_assume(!(cond));                                                                \
     } while (0)
 
 #if defined(DEBUG) || defined(PRE_RELEASE)

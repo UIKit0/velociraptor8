@@ -15,8 +15,8 @@ See License.txt for details about distribution and modification.
 #include "resource.h"
 
 //  Manipulation of (cached) ini file sections
-int IniSectionGetString(const WCHAR *lpCachedIniSection, const WCHAR *lpName, const WCHAR *lpDefault,
-                        WCHAR *lpReturnedString, int cchReturnedString) {
+int IniSectionGetString(const WCHAR *lpCachedIniSection, const WCHAR *lpName,
+                        const WCHAR *lpDefault, WCHAR *lpReturnedString, int cchReturnedString) {
     WCHAR *p = (WCHAR *)lpCachedIniSection;
     WCHAR tch[256];
     int ich;
@@ -104,8 +104,9 @@ HRESULT PrivateSetCurrentProcessExplicitAppUserModelID(PCWSTR AppID) {
     if (lstrcmpi(AppID, L"(default)") == 0)
         return (S_OK);
 
-    pfnSetCurrentProcessExplicitAppUserModelID = (SetCurrentProcessExplicitAppUserModelIDProc)GetProcAddress(
-        GetModuleHandleA("shell32.dll"), "SetCurrentProcessExplicitAppUserModelID");
+    pfnSetCurrentProcessExplicitAppUserModelID =
+        (SetCurrentProcessExplicitAppUserModelIDProc)GetProcAddress(
+            GetModuleHandleA("shell32.dll"), "SetCurrentProcessExplicitAppUserModelID");
 
     if (pfnSetCurrentProcessExplicitAppUserModelID)
         return pfnSetCurrentProcessExplicitAppUserModelID(AppID);
@@ -150,9 +151,12 @@ BOOL BitmapMergeAlpha(HBITMAP hbmp, COLORREF crDest) {
             for (y = 0; y < bmp.bmHeight; y++) {
                 for (x = 0; x < bmp.bmWidth; x++) {
                     BYTE alpha = prgba[x].rgbReserved;
-                    prgba[x].rgbRed = ((prgba[x].rgbRed * alpha) + (GetRValue(crDest) * (255 - alpha))) >> 8;
-                    prgba[x].rgbGreen = ((prgba[x].rgbGreen * alpha) + (GetGValue(crDest) * (255 - alpha))) >> 8;
-                    prgba[x].rgbBlue = ((prgba[x].rgbBlue * alpha) + (GetBValue(crDest) * (255 - alpha))) >> 8;
+                    prgba[x].rgbRed =
+                        ((prgba[x].rgbRed * alpha) + (GetRValue(crDest) * (255 - alpha))) >> 8;
+                    prgba[x].rgbGreen =
+                        ((prgba[x].rgbGreen * alpha) + (GetGValue(crDest) * (255 - alpha))) >> 8;
+                    prgba[x].rgbBlue =
+                        ((prgba[x].rgbBlue * alpha) + (GetBValue(crDest) * (255 - alpha))) >> 8;
                     prgba[x].rgbReserved = 0xFF;
                 }
                 prgba = (RGBQUAD *)((LPBYTE)prgba + bmp.bmWidthBytes);
@@ -175,9 +179,12 @@ BOOL BitmapAlphaBlend(HBITMAP hbmp, COLORREF crDest, BYTE alpha) {
 
             for (y = 0; y < bmp.bmHeight; y++) {
                 for (x = 0; x < bmp.bmWidth; x++) {
-                    prgba[x].rgbRed = ((prgba[x].rgbRed * alpha) + (GetRValue(crDest) * (255 - alpha))) >> 8;
-                    prgba[x].rgbGreen = ((prgba[x].rgbGreen * alpha) + (GetGValue(crDest) * (255 - alpha))) >> 8;
-                    prgba[x].rgbBlue = ((prgba[x].rgbBlue * alpha) + (GetBValue(crDest) * (255 - alpha))) >> 8;
+                    prgba[x].rgbRed =
+                        ((prgba[x].rgbRed * alpha) + (GetRValue(crDest) * (255 - alpha))) >> 8;
+                    prgba[x].rgbGreen =
+                        ((prgba[x].rgbGreen * alpha) + (GetGValue(crDest) * (255 - alpha))) >> 8;
+                    prgba[x].rgbBlue =
+                        ((prgba[x].rgbBlue * alpha) + (GetBValue(crDest) * (255 - alpha))) >> 8;
                 }
                 prgba = (RGBQUAD *)((LPBYTE)prgba + bmp.bmWidthBytes);
             }
@@ -200,7 +207,10 @@ BOOL BitmapGrayScale(HBITMAP hbmp) {
             for (y = 0; y < bmp.bmHeight; y++) {
                 for (x = 0; x < bmp.bmWidth; x++) {
                     prgba[x].rgbRed = prgba[x].rgbGreen = prgba[x].rgbBlue =
-                        (((BYTE)((prgba[x].rgbRed * 38 + prgba[x].rgbGreen * 75 + prgba[x].rgbBlue * 15) >> 7) * 0x80) +
+                        (((BYTE)((prgba[x].rgbRed * 38 + prgba[x].rgbGreen * 75 +
+                                  prgba[x].rgbBlue * 15) >>
+                                 7) *
+                          0x80) +
                          (0xD0 * (255 - 0x80))) >>
                         8;
                 }
@@ -226,7 +236,8 @@ BOOL VerifyContrast(COLORREF cr1, COLORREF cr2) {
 }
 
 //  Test if a certain font is installed on the system
-int CALLBACK EnumFontsProc(CONST LOGFONT *plf, CONST TEXTMETRIC *ptm, DWORD FontType, LPARAM lParam) {
+int CALLBACK
+    EnumFontsProc(CONST LOGFONT *plf, CONST TEXTMETRIC *ptm, DWORD FontType, LPARAM lParam) {
     *((PBOOL)lParam) = TRUE;
     return FALSE;
 }
@@ -243,8 +254,9 @@ BOOL IsFontAvailable(const WCHAR *lpszFontName) {
 
 BOOL bFreezeAppTitle = FALSE;
 
-BOOL SetWindowTitle(HWND hwnd, UINT uIDAppName, BOOL bIsElevated, UINT uIDUntitled, const WCHAR *lpszFile, int iFormat,
-                    BOOL bModified, UINT uIDReadOnly, BOOL bReadOnly, const WCHAR *lpszExcerpt) {
+BOOL SetWindowTitle(HWND hwnd, UINT uIDAppName, BOOL bIsElevated, UINT uIDUntitled,
+                    const WCHAR *lpszFile, int iFormat, BOOL bModified, UINT uIDReadOnly,
+                    BOOL bReadOnly, const WCHAR *lpszExcerpt) {
 
     WCHAR szUntitled[128];
     WCHAR szExcrptQuot[256];
@@ -261,7 +273,8 @@ BOOL SetWindowTitle(HWND hwnd, UINT uIDAppName, BOOL bIsElevated, UINT uIDUntitl
     if (bFreezeAppTitle)
         return FALSE;
 
-    if (!GetString(uIDAppName, szAppName, dimof(szAppName)) || !GetString(uIDUntitled, szUntitled, dimof(szUntitled)))
+    if (!GetString(uIDAppName, szAppName, dimof(szAppName)) ||
+        !GetString(uIDUntitled, szUntitled, dimof(szUntitled)))
         return FALSE;
 
     if (bIsElevated) {
@@ -370,7 +383,8 @@ void CenterDlgInParent(HWND hDlg) {
     else
         y = rcParent.top + 60;
 
-    SetWindowPos(hDlg, NULL, max(xMin, min(xMax, x)), max(yMin, min(yMax, y)), 0, 0, SWP_NOZORDER | SWP_NOSIZE);
+    SetWindowPos(hDlg, NULL, max(xMin, min(xMax, x)), max(yMin, min(yMax, y)), 0, 0,
+                 SWP_NOZORDER | SWP_NOSIZE);
 }
 
 void GetDlgPos(HWND hDlg, LPINT xDlg, LPINT yDlg) {
@@ -418,7 +432,8 @@ void SetDlgPos(HWND hDlg, int xDlg, int yDlg) {
     x = rcParent.left + xDlg;
     y = rcParent.top + yDlg;
 
-    SetWindowPos(hDlg, NULL, max(xMin, min(xMax, x)), max(yMin, min(yMax, y)), 0, 0, SWP_NOZORDER | SWP_NOSIZE);
+    SetWindowPos(hDlg, NULL, max(xMin, min(xMax, x)), max(yMin, min(yMax, y)), 0, 0,
+                 SWP_NOZORDER | SWP_NOSIZE);
 }
 
 typedef struct _resizedlg {
@@ -459,14 +474,16 @@ void ResizeDlg_Init(HWND hwnd, int cxFrame, int cyFrame, int nIdGrip) {
     SetWindowLongPtr(hwnd, GWL_STYLE, GetWindowLongPtr(hwnd, GWL_STYLE) | WS_THICKFRAME);
     SetWindowPos(hwnd, NULL, 0, 0, 0, 0, SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
     GetMenuString(GetSystemMenu(GetParent(hwnd), FALSE), SC_SIZE, wch, dimof(wch), MF_BYCOMMAND);
-    InsertMenu(GetSystemMenu(hwnd, FALSE), SC_CLOSE, MF_BYCOMMAND | MF_STRING | MF_ENABLED, SC_SIZE, wch);
+    InsertMenu(GetSystemMenu(hwnd, FALSE), SC_CLOSE, MF_BYCOMMAND | MF_STRING | MF_ENABLED, SC_SIZE,
+               wch);
     InsertMenu(GetSystemMenu(hwnd, FALSE), SC_CLOSE, MF_BYCOMMAND | MF_SEPARATOR, 0, NULL);
 
     SetWindowLongPtr(GetDlgItem(hwnd, nIdGrip), GWL_STYLE,
-                     GetWindowLongPtr(GetDlgItem(hwnd, nIdGrip), GWL_STYLE) | SBS_SIZEGRIP | WS_CLIPSIBLINGS);
+                     GetWindowLongPtr(GetDlgItem(hwnd, nIdGrip), GWL_STYLE) | SBS_SIZEGRIP |
+                         WS_CLIPSIBLINGS);
     cGrip = GetSystemMetrics(SM_CXHTHUMB);
-    SetWindowPos(GetDlgItem(hwnd, nIdGrip), NULL, pm->cxClient - cGrip, pm->cyClient - cGrip, cGrip, cGrip,
-                 SWP_NOZORDER);
+    SetWindowPos(GetDlgItem(hwnd, nIdGrip), NULL, pm->cxClient - cGrip, pm->cyClient - cGrip, cGrip,
+                 cGrip, SWP_NOZORDER);
 }
 
 void ResizeDlg_Destroy(HWND hwnd, int *cxFrame, int *cyFrame) {
@@ -504,17 +521,19 @@ HDWP DeferCtlPos(HDWP hdwp, HWND hwndDlg, int nCtlId, int dx, int dy, UINT uFlag
     GetWindowRect(hwndCtl, &rc);
     MapWindowPoints(NULL, hwndDlg, (LPPOINT)&rc, 2);
     if (uFlags & SWP_NOSIZE)
-        return (DeferWindowPos(hdwp, hwndCtl, NULL, rc.left + dx, rc.top + dy, 0, 0, SWP_NOZORDER | SWP_NOSIZE));
+        return (DeferWindowPos(hdwp, hwndCtl, NULL, rc.left + dx, rc.top + dy, 0, 0,
+                               SWP_NOZORDER | SWP_NOSIZE));
     else
-        return (DeferWindowPos(hdwp, hwndCtl, NULL, 0, 0, rc.right - rc.left + dx, rc.bottom - rc.top + dy,
-                               SWP_NOZORDER | SWP_NOMOVE));
+        return (DeferWindowPos(hdwp, hwndCtl, NULL, 0, 0, rc.right - rc.left + dx,
+                               rc.bottom - rc.top + dy, SWP_NOZORDER | SWP_NOMOVE));
 }
 
 void MakeBitmapButton(HWND hwnd, int nCtlId, HINSTANCE hInstance, UINT uBmpId) {
     HWND hwndCtl = GetDlgItem(hwnd, nCtlId);
     BITMAP bmp;
     BUTTON_IMAGELIST bi;
-    HBITMAP hBmp = (HBITMAP)LoadImageW(hInstance, MAKEINTRESOURCE(uBmpId), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
+    HBITMAP hBmp = (HBITMAP)LoadImageW(hInstance, MAKEINTRESOURCE(uBmpId), IMAGE_BITMAP, 0, 0,
+                                       LR_CREATEDIBSECTION);
     GetObject(hBmp, sizeof(BITMAP), &bmp);
     bi.himl = ImageList_Create(bmp.bmWidth, bmp.bmHeight, ILC_COLOR32 | ILC_MASK, 1, 0);
     ImageList_AddMasked(bi.himl, hBmp, CLR_DEFAULT);
@@ -638,7 +657,8 @@ int Toolbar_GetButtons(HWND hwnd, int cmdBase, WCHAR *lpszButtons, int cchButton
     return (c);
 }
 
-int Toolbar_SetButtons(HWND hwnd, int cmdBase, const WCHAR *lpszButtons, const TBBUTTON *ptbb, int ctbb) {
+int Toolbar_SetButtons(HWND hwnd, int cmdBase, const WCHAR *lpszButtons, const TBBUTTON *ptbb,
+                       int ctbb) {
     WCHAR tchButtons[512];
     WCHAR *p;
     int i, c;
@@ -701,8 +721,8 @@ int FormatString(WCHAR *lpOutput, int nOutput, UINT uIdFormat, ...) {
     return lstrlen(lpOutput);
 }
 
-void PathRelativeToApp(WCHAR *lpszSrc, WCHAR *lpszDest, int cchDest, BOOL bSrcIsFile, BOOL bUnexpandEnv,
-                       BOOL bUnexpandMyDocs) {
+void PathRelativeToApp(WCHAR *lpszSrc, WCHAR *lpszDest, int cchDest, BOOL bSrcIsFile,
+                       BOOL bUnexpandEnv, BOOL bUnexpandMyDocs) {
 
     WCHAR wchAppPath[MAX_PATH];
     WCHAR wchWinDir[MAX_PATH];
@@ -814,7 +834,8 @@ BOOL PathGetLnkPath(const WCHAR *pszLnkFile, WCHAR *pszResPath, int cchResPath) 
     WIN32_FIND_DATA fd;
     BOOL bSucceeded = FALSE;
 
-    if (SUCCEEDED(CoCreateInstance(CLSID_ShellLink, NULL, CLSCTX_INPROC_SERVER, IID_IShellLinkW, (LPVOID *)&psl))) {
+    if (SUCCEEDED(CoCreateInstance(CLSID_ShellLink, NULL, CLSCTX_INPROC_SERVER, IID_IShellLinkW,
+                                   (LPVOID *)&psl))) {
         IPersistFile *ppf;
 
         if (SUCCEEDED(psl->QueryInterface(IID_IPersistFile, (void **)&ppf))) {
@@ -902,7 +923,8 @@ BOOL PathCreateDeskLnk(const WCHAR *pszDocument) {
     if (!SHGetNewLinkInfo(pszDocument, tchLinkDir, tchLnkFileName, &fMustCopy, SHGNLI_PREFIXNAME))
         return FALSE;
 
-    if (SUCCEEDED(CoCreateInstance(CLSID_ShellLink, NULL, CLSCTX_INPROC_SERVER, IID_IShellLink, (void **)&psl))) {
+    if (SUCCEEDED(CoCreateInstance(CLSID_ShellLink, NULL, CLSCTX_INPROC_SERVER, IID_IShellLink,
+                                   (void **)&psl))) {
         IPersistFile *ppf;
 
         if (SUCCEEDED(psl->QueryInterface(IID_IPersistFile, (void **)&ppf))) {
@@ -945,7 +967,8 @@ BOOL PathCreateFavLnk(const WCHAR *pszName, const WCHAR *pszTarget, const WCHAR 
     if (PathFileExists(tchLnkFileName))
         return FALSE;
 
-    if (SUCCEEDED(CoCreateInstance(CLSID_ShellLink, NULL, CLSCTX_INPROC_SERVER, IID_IShellLinkW, (void **)&psl))) {
+    if (SUCCEEDED(CoCreateInstance(CLSID_ShellLink, NULL, CLSCTX_INPROC_SERVER, IID_IShellLinkW,
+                                   (void **)&psl))) {
         IPersistFile *ppf;
 
         if (SUCCEEDED(psl->QueryInterface(IID_IPersistFile, (void **)&ppf))) {
@@ -1115,7 +1138,8 @@ DWORD GetLongPathNameEx(WCHAR *lpszPath, DWORD cchBuffer) {
 
 //  Return a default name when the file has been removed, and always append
 //  a filename extension
-DWORD_PTR SHGetFileInfo2(const WCHAR *pszPath, DWORD dwFileAttributes, SHFILEINFO *psfi, UINT cbFileInfo, UINT uFlags) {
+DWORD_PTR SHGetFileInfo2(const WCHAR *pszPath, DWORD dwFileAttributes, SHFILEINFO *psfi,
+                         UINT cbFileInfo, UINT uFlags) {
 
     if (PathFileExists(pszPath)) {
 
@@ -1124,8 +1148,8 @@ DWORD_PTR SHGetFileInfo2(const WCHAR *pszPath, DWORD dwFileAttributes, SHFILEINF
             StrCatBuff(psfi->szDisplayName, PathFindExtension(pszPath), dimof(psfi->szDisplayName));
         return (dw);
     } else {
-        DWORD_PTR dw =
-            SHGetFileInfo(pszPath, FILE_ATTRIBUTE_NORMAL, psfi, cbFileInfo, uFlags | SHGFI_USEFILEATTRIBUTES);
+        DWORD_PTR dw = SHGetFileInfo(pszPath, FILE_ATTRIBUTE_NORMAL, psfi, cbFileInfo,
+                                     uFlags | SHGFI_USEFILEATTRIBUTES);
         if (lstrlen(psfi->szDisplayName) < lstrlen(PathFindFileName(pszPath)))
             StrCatBuff(psfi->szDisplayName, PathFindExtension(pszPath), dimof(psfi->szDisplayName));
         return (dw);
@@ -1494,8 +1518,8 @@ BOOL DialogTemplate_IsDialogEx(const DLGTEMPLATE *pTemplate) {
 
 BOOL DialogTemplate_HasFont(const DLGTEMPLATE *pTemplate) {
 
-    return (DS_SETFONT &
-            (DialogTemplate_IsDialogEx(pTemplate) ? ((DLGTEMPLATEEX *)pTemplate)->style : pTemplate->style));
+    return (DS_SETFONT & (DialogTemplate_IsDialogEx(pTemplate) ? ((DLGTEMPLATEEX *)pTemplate)->style
+                                                               : pTemplate->style));
 }
 
 int DialogTemplate_FontAttrSize(BOOL bDialogEx) { return (int)sizeof(WORD) * (bDialogEx ? 3 : 1); }
@@ -1591,7 +1615,8 @@ DLGTEMPLATE *LoadThemedDialogTemplate(LPCTSTR lpDialogTemplateID, HINSTANCE hIns
     nCtrl = bDialogEx ? (WORD)((DLGTEMPLATEEX *)pTemplate)->cDlgItems : (WORD)pTemplate->cdit;
 
     if (cbNew != cbOld && nCtrl > 0)
-        MoveMemory(pNewControls, pOldControls, (size_t)(dwTemplateSize - (pOldControls - (BYTE *)pTemplate)));
+        MoveMemory(pNewControls, pOldControls,
+                   (size_t)(dwTemplateSize - (pOldControls - (BYTE *)pTemplate)));
 
     *(WORD *)pb = wFontSize;
     MoveMemory(pb + cbFontAttr, pbNew, (size_t)(cbNew - cbFontAttr));
@@ -1599,8 +1624,8 @@ DLGTEMPLATE *LoadThemedDialogTemplate(LPCTSTR lpDialogTemplateID, HINSTANCE hIns
     return (pTemplate);
 }
 
-INT_PTR ThemedDialogBoxParam(HINSTANCE hInstance, LPCTSTR lpTemplate, HWND hWndParent, DLGPROC lpDialogFunc,
-                             LPARAM dwInitParam) {
+INT_PTR ThemedDialogBoxParam(HINSTANCE hInstance, LPCTSTR lpTemplate, HWND hWndParent,
+                             DLGPROC lpDialogFunc, LPARAM dwInitParam) {
 
     INT_PTR ret;
     DLGTEMPLATE *pDlgTemplate;
@@ -1613,14 +1638,15 @@ INT_PTR ThemedDialogBoxParam(HINSTANCE hInstance, LPCTSTR lpTemplate, HWND hWndP
     return (ret);
 }
 
-HWND CreateThemedDialogParam(HINSTANCE hInstance, LPCTSTR lpTemplate, HWND hWndParent, DLGPROC lpDialogFunc,
-                             LPARAM dwInitParam) {
+HWND CreateThemedDialogParam(HINSTANCE hInstance, LPCTSTR lpTemplate, HWND hWndParent,
+                             DLGPROC lpDialogFunc, LPARAM dwInitParam) {
 
     HWND hwnd;
     DLGTEMPLATE *pDlgTemplate;
 
     pDlgTemplate = LoadThemedDialogTemplate(lpTemplate, hInstance);
-    hwnd = CreateDialogIndirectParam(hInstance, pDlgTemplate, hWndParent, lpDialogFunc, dwInitParam);
+    hwnd =
+        CreateDialogIndirectParam(hInstance, pDlgTemplate, hWndParent, lpDialogFunc, dwInitParam);
     if (pDlgTemplate)
         LocalFree(pDlgTemplate);
 

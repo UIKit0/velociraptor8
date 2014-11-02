@@ -8,17 +8,20 @@ extern HINSTANCE g_hInstance;
 extern UINT16 g_uWinVer;
 
 extern WCHAR szIniFile[MAX_PATH];
-#define IniGetString(lpSection, lpName, lpDefault, lpReturnedStr, nSize)                                               \
+#define IniGetString(lpSection, lpName, lpDefault, lpReturnedStr, nSize)                           \
     GetPrivateProfileString(lpSection, lpName, lpDefault, lpReturnedStr, nSize, szIniFile)
-#define IniGetInt(lpSection, lpName, nDefault) GetPrivateProfileInt(lpSection, lpName, nDefault, szIniFile)
-#define IniSetString(lpSection, lpName, lpString) WritePrivateProfileString(lpSection, lpName, lpString, szIniFile)
+#define IniGetInt(lpSection, lpName, nDefault)                                                     \
+    GetPrivateProfileInt(lpSection, lpName, nDefault, szIniFile)
+#define IniSetString(lpSection, lpName, lpString)                                                  \
+    WritePrivateProfileString(lpSection, lpName, lpString, szIniFile)
 #define IniDeleteSection(lpSection) WritePrivateProfileSection(lpSection, NULL, szIniFile)
 __inline BOOL IniSetInt(const WCHAR *lpSection, const WCHAR *lpName, int i) {
     WCHAR tch[32];
     wsprintf(tch, L"%i", i);
     return IniSetString(lpSection, lpName, tch);
 }
-#define LoadIniSection(lpSection, lpBuf, cchBuf) GetPrivateProfileSection(lpSection, lpBuf, cchBuf, szIniFile);
+#define LoadIniSection(lpSection, lpBuf, cchBuf)                                                   \
+    GetPrivateProfileSection(lpSection, lpBuf, cchBuf, szIniFile);
 #define SaveIniSection(lpSection, lpBuf) WritePrivateProfileSection(lpSection, lpBuf, szIniFile)
 int IniSectionGetString(const WCHAR *, const WCHAR *, const WCHAR *, WCHAR *, int);
 int IniSectionGetInt(const WCHAR *, const WCHAR *, int);
@@ -30,7 +33,9 @@ inline BOOL IniSectionSetInt(WCHAR *lpCachedIniSection, const WCHAR *lpName, int
     return IniSectionSetString(lpCachedIniSection, lpName, tch);
 }
 
-inline void BeginWaitCursor() { SendMessage(gDoc->hwndScintilla, SCI_SETCURSOR, (WPARAM)SC_CURSORWAIT, 0); }
+inline void BeginWaitCursor() {
+    SendMessage(gDoc->hwndScintilla, SCI_SETCURSOR, (WPARAM)SC_CURSORWAIT, 0);
+}
 
 inline void EndWaitCursor() {
     POINT pt;
@@ -80,9 +85,11 @@ int Toolbar_SetButtons(HWND, int, const WCHAR *, const TBBUTTON *, int);
 
 LRESULT SendWMSize(HWND);
 
-#define EnableCmd(hmenu, id, b) EnableMenuItem(hmenu, id, (b) ? MF_BYCOMMAND | MF_ENABLED : MF_BYCOMMAND | MF_GRAYED)
+#define EnableCmd(hmenu, id, b)                                                                    \
+    EnableMenuItem(hmenu, id, (b) ? MF_BYCOMMAND | MF_ENABLED : MF_BYCOMMAND | MF_GRAYED)
 
-#define CheckCmd(hmenu, id, b) CheckMenuItem(hmenu, id, (b) ? MF_BYCOMMAND | MF_CHECKED : MF_BYCOMMAND | MF_UNCHECKED)
+#define CheckCmd(hmenu, id, b)                                                                     \
+    CheckMenuItem(hmenu, id, (b) ? MF_BYCOMMAND | MF_CHECKED : MF_BYCOMMAND | MF_UNCHECKED)
 
 BOOL IsCmdEnabled(HWND, UINT);
 
@@ -179,7 +186,7 @@ typedef struct {
 
 BOOL GetThemedDialogFont(WCHAR *, WORD *);
 DLGTEMPLATE *LoadThemedDialogTemplate(LPCTSTR, HINSTANCE);
-#define ThemedDialogBox(hInstance, lpTemplate, hWndParent, lpDialogFunc)                                               \
+#define ThemedDialogBox(hInstance, lpTemplate, hWndParent, lpDialogFunc)                           \
     ThemedDialogBoxParam(hInstance, lpTemplate, hWndParent, lpDialogFunc, 0)
 INT_PTR ThemedDialogBoxParam(HINSTANCE, LPCTSTR, HWND, DLGPROC, LPARAM);
 HWND CreateThemedDialogParam(HINSTANCE, LPCTSTR, HWND, DLGPROC, LPARAM);

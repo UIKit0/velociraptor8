@@ -31,7 +31,8 @@ char *WstrToUtf8Buf(const WCHAR *s, char *bufOut, size_t cbBufOutSize) {
     if (cbNeeds >= cbBufOutSize) {
         bufOut = AllocMustN<char>(cbNeeds + 1);
     }
-    size_t res = (size_t)WideCharToMultiByte(CP_UTF8, 0, s, (int)str::Len(s), bufOut, (int)cbNeeds, NULL, NULL);
+    size_t res = (size_t)WideCharToMultiByte(CP_UTF8, 0, s, (int)str::Len(s), bufOut, (int)cbNeeds,
+                                             NULL, NULL);
     CrashIf(res > cbNeeds);
     bufOut[res] = '\0';
     return bufOut;

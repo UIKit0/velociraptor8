@@ -240,8 +240,8 @@ BOOL EditPrint(HWND hwnd, const WCHAR* pszDocTitle, const WCHAR* pszPageFormat) 
     }
 
     // Set print color mode
-    int printColorModes[5] = { SC_PRINT_NORMAL, SC_PRINT_INVERTLIGHT, SC_PRINT_BLACKONWHITE, SC_PRINT_COLOURONWHITE,
-                               SC_PRINT_COLOURONWHITEDEFAULTBG };
+    int printColorModes[5] = { SC_PRINT_NORMAL, SC_PRINT_INVERTLIGHT, SC_PRINT_BLACKONWHITE,
+                               SC_PRINT_COLOURONWHITE, SC_PRINT_COLOURONWHITEDEFAULTBG };
     SendMessage(hwnd, SCI_SETPRINTCOLOURMODE, printColorModes[iPrintColor], 0);
 
     // Set print zoom...
@@ -284,7 +284,8 @@ BOOL EditPrint(HWND hwnd, const WCHAR* pszDocTitle, const WCHAR* pszPageFormat) 
     pageNum = 1;
 
     while (lengthPrinted < lengthDoc) {
-        printPage = (!(pdlg.Flags & PD_PAGENUMS) || (pageNum >= pdlg.nFromPage) && (pageNum <= pdlg.nToPage));
+        printPage = (!(pdlg.Flags & PD_PAGENUMS) ||
+                     (pageNum >= pdlg.nFromPage) && (pageNum <= pdlg.nToPage));
 
         wsprintf(pageString, pszPageFormat, pageNum);
 
@@ -302,8 +303,8 @@ BOOL EditPrint(HWND hwnd, const WCHAR* pszDocTitle, const WCHAR* pszPageFormat) 
             SetBkColor(hdc, RGB(255, 255, 255));
             SelectObject(hdc, fontHeader);
             UINT ta = SetTextAlign(hdc, TA_BOTTOM);
-            RECT rcw = { frPrint.rc.left, frPrint.rc.top - headerLineHeight - headerLineHeight / 2, frPrint.rc.right,
-                         frPrint.rc.top - headerLineHeight / 2 };
+            RECT rcw = { frPrint.rc.left, frPrint.rc.top - headerLineHeight - headerLineHeight / 2,
+                         frPrint.rc.right, frPrint.rc.top - headerLineHeight / 2 };
             rcw.bottom = rcw.top + headerLineHeight;
 
             if (iPrintHeader < 3) {
@@ -316,7 +317,8 @@ BOOL EditPrint(HWND hwnd, const WCHAR* pszDocTitle, const WCHAR* pszPageFormat) 
                 SIZE sizeInfo;
                 SelectObject(hdc, fontFooter);
                 GetTextExtentPoint32(hdc, dateString, lstrlen(dateString), &sizeInfo);
-                ExtTextOut(hdc, frPrint.rc.right - 5 - sizeInfo.cx, frPrint.rc.top - headerLineHeight / 2,
+                ExtTextOut(hdc, frPrint.rc.right - 5 - sizeInfo.cx,
+                           frPrint.rc.top - headerLineHeight / 2,
                            /*ETO_OPAQUE*/ 0, &rcw, dateString, lstrlen(dateString), NULL);
             }
 
@@ -341,13 +343,15 @@ BOOL EditPrint(HWND hwnd, const WCHAR* pszDocTitle, const WCHAR* pszPageFormat) 
             SetBkColor(hdc, RGB(255, 255, 255));
             SelectObject(hdc, fontFooter);
             UINT ta = SetTextAlign(hdc, TA_TOP);
-            RECT rcw = { frPrint.rc.left, frPrint.rc.bottom + footerLineHeight / 2, frPrint.rc.right,
+            RECT rcw = { frPrint.rc.left, frPrint.rc.bottom + footerLineHeight / 2,
+                         frPrint.rc.right,
                          frPrint.rc.bottom + footerLineHeight + footerLineHeight / 2 };
 
             if (iPrintFooter == 0) {
                 SIZE sizeFooter;
                 GetTextExtentPoint32(hdc, pageString, lstrlen(pageString), &sizeFooter);
-                ExtTextOut(hdc, frPrint.rc.right - 5 - sizeFooter.cx, frPrint.rc.bottom + footerLineHeight / 2,
+                ExtTextOut(hdc, frPrint.rc.right - 5 - sizeFooter.cx,
+                           frPrint.rc.bottom + footerLineHeight / 2,
                            /*ETO_OPAQUE*/ 0, &rcw, pageString, lstrlen(pageString), NULL);
 
                 SetTextAlign(hdc, ta);
@@ -468,7 +472,8 @@ UINT_PTR CALLBACK PageSetupHook(HWND hwnd, UINT uiMsg, WPARAM wParam, LPARAM lPa
 }
 
 void EditPrintSetup(HWND hwnd) {
-    DLGTEMPLATE* pDlgTemplate = LoadThemedDialogTemplate(MAKEINTRESOURCE(IDD_PAGESETUP), g_hInstance);
+    DLGTEMPLATE* pDlgTemplate =
+        LoadThemedDialogTemplate(MAKEINTRESOURCE(IDD_PAGESETUP), g_hInstance);
 
     PAGESETUPDLG pdlg;
     ZeroMemory(&pdlg, sizeof(PAGESETUPDLG));

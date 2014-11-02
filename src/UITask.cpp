@@ -35,8 +35,8 @@ void Initialize() {
     RegisterClassEx(&wcex);
 
     CrashIf(gTaskDispatchHwnd);
-    gTaskDispatchHwnd = CreateWindow(uiTaskClassName, uiTaskWindowName, WS_OVERLAPPED, 0, 0, 0, 0, HWND_MESSAGE, NULL,
-                                     GetModuleHandle(NULL), NULL);
+    gTaskDispatchHwnd = CreateWindow(uiTaskClassName, uiTaskWindowName, WS_OVERLAPPED, 0, 0, 0, 0,
+                                     HWND_MESSAGE, NULL, GetModuleHandle(NULL), NULL);
 }
 
 void DrainQueue() {

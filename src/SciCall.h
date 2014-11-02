@@ -8,7 +8,9 @@ that we get the benefit of the compiler's type checking.
 
 extern HANDLE g_hScintilla;
 
-inline void InitScintillaHandle(HWND hwnd) { g_hScintilla = (HANDLE)SendMessageW(hwnd, SCI_GETDIRECTPOINTER, 0, 0); }
+inline void InitScintillaHandle(HWND hwnd) {
+    g_hScintilla = (HANDLE)SendMessageW(hwnd, SCI_GETDIRECTPOINTER, 0, 0);
+}
 
 class ScintillaWin;
 
@@ -21,27 +23,31 @@ extern "C" sptr_t __stdcall Scintilla_DirectFunction(ScintillaWin *, UINT, uptr_
 //  R: With an explicit return type
 //  V: No return type defined ("void"); defaults to SendMessage's LRESULT
 //  0-2: Number of parameters to define
-#define DeclareSciCallR0(fn, msg, ret)                                                                                 \
-                                                                                                                       \
+#define DeclareSciCallR0(fn, msg, ret)                                                             \
+                                                                                                   \
     __forceinline ret SciCall_##fn() { return ((ret)SciCall(SCI_##msg, 0, 0)); }
-#define DeclareSciCallR1(fn, msg, ret, type1, var1)                                                                    \
-                                                                                                                       \
-    __forceinline ret SciCall_##fn(type1 var1) { return ((ret)SciCall(SCI_##msg, (WPARAM)(var1), 0)); }
-#define DeclareSciCallR2(fn, msg, ret, type1, var1, type2, var2)                                                       \
-                                                                                                                       \
-    __forceinline ret SciCall_##fn(type1 var1, type2 var2) {                                                           \
-        return ((ret)SciCall(SCI_##msg, (WPARAM)(var1), (LPARAM)(var2)));                                              \
+#define DeclareSciCallR1(fn, msg, ret, type1, var1)                                                \
+                                                                                                   \
+    __forceinline ret SciCall_##fn(type1 var1) {                                                   \
+        return ((ret)SciCall(SCI_##msg, (WPARAM)(var1), 0));                                       \
     }
-#define DeclareSciCallV0(fn, msg)                                                                                      \
-                                                                                                                       \
+#define DeclareSciCallR2(fn, msg, ret, type1, var1, type2, var2)                                   \
+                                                                                                   \
+    __forceinline ret SciCall_##fn(type1 var1, type2 var2) {                                       \
+        return ((ret)SciCall(SCI_##msg, (WPARAM)(var1), (LPARAM)(var2)));                          \
+    }
+#define DeclareSciCallV0(fn, msg)                                                                  \
+                                                                                                   \
     __forceinline LRESULT SciCall_##fn() { return (SciCall(SCI_##msg, 0, 0)); }
-#define DeclareSciCallV1(fn, msg, type1, var1)                                                                         \
-                                                                                                                       \
-    __forceinline LRESULT SciCall_##fn(type1 var1) { return (SciCall(SCI_##msg, (WPARAM)(var1), 0)); }
-#define DeclareSciCallV2(fn, msg, type1, var1, type2, var2)                                                            \
-                                                                                                                       \
-    __forceinline LRESULT SciCall_##fn(type1 var1, type2 var2) {                                                       \
-        return (SciCall(SCI_##msg, (WPARAM)(var1), (LPARAM)(var2)));                                                   \
+#define DeclareSciCallV1(fn, msg, type1, var1)                                                     \
+                                                                                                   \
+    __forceinline LRESULT SciCall_##fn(type1 var1) {                                               \
+        return (SciCall(SCI_##msg, (WPARAM)(var1), 0));                                            \
+    }
+#define DeclareSciCallV2(fn, msg, type1, var1, type2, var2)                                        \
+                                                                                                   \
+    __forceinline LRESULT SciCall_##fn(type1 var1, type2 var2) {                                   \
+        return (SciCall(SCI_##msg, (WPARAM)(var1), (LPARAM)(var2)));                               \
     }
 
 //=============================================================================
@@ -146,10 +152,14 @@ inline void SetYCaretPolicy(HWND w, int policy, int slop) {
     SciNoRetCall<SCI_SETYCARETPOLICY, int, int>(w, policy, slop);
 }
 
-inline void SetSel(HWND w, int anchorPos, int currPos) { SciNoRetCall<SCI_SETSEL, int, int>(w, anchorPos, currPos); }
+inline void SetSel(HWND w, int anchorPos, int currPos) {
+    SciNoRetCall<SCI_SETSEL, int, int>(w, anchorPos, currPos);
+}
 
 inline int SciGetLineCount(HWND hwnd) { return SciRetCall<SCI_GETLINECOUNT, int>(hwnd); }
 
-inline void SciSetHScrollBar(HWND hwnd, bool visible) { SciNoRetCall<SCI_SETHSCROLLBAR, bool>(hwnd, visible); }
+inline void SciSetHScrollBar(HWND hwnd, bool visible) {
+    SciNoRetCall<SCI_SETHSCROLLBAR, bool>(hwnd, visible);
+}
 
 inline bool SciGetHScrollBar(HWND hwnd) { return SciRetCall<SCI_GETHSCROLLBAR, bool>(hwnd); }

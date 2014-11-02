@@ -8,7 +8,9 @@
 // whitespace
 #define USER_AGENT L"BaseHTTP"
 
-bool IsHttpRspOk(const HttpRsp *rsp) { return (rsp->error == ERROR_SUCCESS) && (rsp->httpStatusCode == 200); }
+bool IsHttpRspOk(const HttpRsp *rsp) {
+    return (rsp->error == ERROR_SUCCESS) && (rsp->httpStatusCode == 200);
+}
 
 // returns ERROR_SUCCESS or an error code
 static void HttpGet(const char *urlA, HttpRsp *rspOut) {
@@ -28,8 +30,8 @@ static void HttpGet(const char *urlA, HttpRsp *rspOut) {
         goto Error;
 
     DWORD headerBuffSize = sizeof(DWORD);
-    if (!HttpQueryInfoW(hReq, HTTP_QUERY_STATUS_CODE | HTTP_QUERY_FLAG_NUMBER, &rspOut->httpStatusCode, &headerBuffSize,
-                        NULL)) {
+    if (!HttpQueryInfoW(hReq, HTTP_QUERY_STATUS_CODE | HTTP_QUERY_FLAG_NUMBER,
+                        &rspOut->httpStatusCode, &headerBuffSize, NULL)) {
         goto Error;
     }
 
