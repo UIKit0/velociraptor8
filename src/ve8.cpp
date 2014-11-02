@@ -2218,9 +2218,9 @@ static void MenuFileReadOnly(HWND hwnd) {
         if (dwFileAttributes != INVALID_FILE_ATTRIBUTES)
             bReadOnly = (dwFileAttributes & FILE_ATTRIBUTE_READONLY);
 
-        SetWindowTitle(hwnd, uidsAppTitle, fIsElevated, IDS_UNTITLED, szCurFile,
-            iPathNameFormat, bModified || iEncoding != iOriginalEncoding,
-            IDS_READONLY, bReadOnly, szTitleExcerpt);
+        SetWindowTitle(hwnd, uidsAppTitle, fIsElevated, IDS_UNTITLED, szCurFile, iPathNameFormat,
+                       bModified || iEncoding != iOriginalEncoding, IDS_READONLY, bReadOnly,
+                       szTitleExcerpt);
     }
 }
 
@@ -2267,7 +2267,7 @@ static void MenuFileBrowse(HWND hwnd) {
     sei.nShow = SW_SHOWNORMAL;
     ShellExecuteEx(&sei);
 
-    if ((INT_PTR) sei.hInstApp < 32) {
+    if ((INT_PTR)sei.hInstApp < 32) {
         MsgBox(MBWARN, IDS_ERR_BROWSE);
     }
 }

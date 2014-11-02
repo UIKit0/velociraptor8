@@ -75,14 +75,10 @@ static bool InstallCopyFiles() {
     return true;
 }
 
-static bool InstallSetRegistryKeys() {
-    return true;
-}
+static bool InstallSetRegistryKeys() { return true; }
 
 // adds our bin directory to %PATH%
-static bool AddSelfToPath() {
-    return true;
-}
+static bool AddSelfToPath() { return true; }
 
 void Install() {
     if (!InstallCopyFiles()) {
@@ -98,4 +94,3 @@ void Install() {
     }
     // TODO(kjk): relaunch the installed version
 }
-
