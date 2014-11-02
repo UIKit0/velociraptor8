@@ -13,12 +13,12 @@ See License.txt for details about distribution and modification
 
 int MsgBox(int, UINT, ...);
 void DisplayCmdLineHelp();
-BOOL GetDirectory(HWND, int, WCHAR *, const WCHAR*, BOOL);
+BOOL GetDirectory(HWND, int, WCHAR *, const WCHAR *, BOOL);
 INT_PTR CALLBACK AboutDlgProc(HWND, UINT, WPARAM, LPARAM);
-void RunDlg(HWND, const WCHAR*);
-BOOL OpenWithDlg(HWND, const WCHAR*);
+void RunDlg(HWND, const WCHAR *);
+BOOL OpenWithDlg(HWND, const WCHAR *);
 BOOL FavoritesDlg(HWND, WCHAR *);
-BOOL AddToFavDlg(HWND, const WCHAR*, const WCHAR*);
+BOOL AddToFavDlg(HWND, const WCHAR *, const WCHAR *);
 BOOL FileMRUDlg(HWND, WCHAR *);
 BOOL ChangeNotifyDlg(HWND);
 BOOL ColumnWrapDlg(HWND, UINT, int *);
@@ -29,4 +29,4 @@ BOOL SelectDefEncodingDlg(HWND, int *);
 BOOL SelectEncodingDlg(HWND, int *);
 BOOL RecodeDlg(HWND, int *);
 BOOL SelectDefLineEndingDlg(HWND, int *);
-INT_PTR InfoBox(int, const WCHAR*, int, ...);
+INT_PTR InfoBox(int, const WCHAR *, int, ...);

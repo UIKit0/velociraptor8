@@ -1,16 +1,8 @@
 #include "Common.h"
 #include "WinUtil.h"
 
-static WCHAR* knownCursorIds [] = {
-    IDC_ARROW,
-    IDC_IBEAM,
-    IDC_HAND,
-    IDC_SIZEALL,
-    IDC_SIZEWE,
-    IDC_SIZENS,
-    IDC_NO,
-    IDC_CROSS
-};
+static WCHAR* knownCursorIds[] = { IDC_ARROW,  IDC_IBEAM,  IDC_HAND, IDC_SIZEALL,
+                                   IDC_SIZEWE, IDC_SIZENS, IDC_NO,   IDC_CROSS };
 
 static HCURSOR cachedCursors[dimof(knownCursorIds)] = {};
 
@@ -30,11 +22,9 @@ HCURSOR GetCursor(WCHAR* id) {
     return cachedCursors[cursorIdx];
 }
 
-void SetCursor(WCHAR* id) {
-    SetCursor(GetCursor(id));
-}
+void SetCursor(WCHAR* id) { SetCursor(GetCursor(id)); }
 
-void FillWndClassEx(WNDCLASSEX& wcex, const WCHAR *clsName, WNDPROC wndproc) {
+void FillWndClassEx(WNDCLASSEX& wcex, const WCHAR* clsName, WNDPROC wndproc) {
     ZeroMemory(&wcex, sizeof(WNDCLASSEX));
     wcex.cbSize = sizeof(WNDCLASSEX);
     wcex.style = CS_HREDRAW | CS_VREDRAW;

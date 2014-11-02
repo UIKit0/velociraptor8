@@ -44,14 +44,14 @@ typedef struct _editfindreplace {
 #define SORT_COLUMN 128
 
 HWND EditCreate(HWND);
-void EditSetNewText(HWND, char*, DWORD);
+void EditSetNewText(HWND, char *, DWORD);
 BOOL EditConvertText(HWND, UINT, UINT, BOOL);
 BOOL EditSetNewEncoding(HWND, int, int, BOOL, BOOL);
-char* EditGetClipboardText(HWND);
+char *EditGetClipboardText(HWND);
 BOOL EditCopyAppend(HWND);
-int EditDetectEOLMode(HWND, char*, DWORD);
-BOOL EditLoadFile(HWND, const WCHAR*, BOOL, int*, int*, BOOL*, BOOL*);
-BOOL EditSaveFile(HWND, const WCHAR*, int, BOOL*, BOOL);
+int EditDetectEOLMode(HWND, char *, DWORD);
+BOOL EditLoadFile(HWND, const WCHAR *, BOOL, int *, int *, BOOL *, BOOL *);
+BOOL EditSaveFile(HWND, const WCHAR *, int, BOOL *, BOOL);
 
 void EditInvertCase(HWND);
 void EditTitleCase(HWND);
@@ -70,10 +70,10 @@ void EditSpacesToTabs(HWND, int, BOOL);
 
 void EditMoveUp(HWND);
 void EditMoveDown(HWND);
-void EditModifyLines(HWND, const WCHAR*, const WCHAR*);
+void EditModifyLines(HWND, const WCHAR *, const WCHAR *);
 void EditAlignText(HWND, int);
-void EditEncloseSelection(HWND, const WCHAR*, const WCHAR*);
-void EditToggleLineComments(HWND, const WCHAR*, BOOL);
+void EditEncloseSelection(HWND, const WCHAR *, const WCHAR *);
+void EditToggleLineComments(HWND, const WCHAR *, BOOL);
 void EditPadWithSpaces(HWND, BOOL, BOOL);
 void EditStripFirstCharacter(HWND);
 void EditStripLastCharacter(HWND);
@@ -100,9 +100,9 @@ BOOL EditLinenumDlg(HWND);
 BOOL EditModifyLinesDlg(HWND, WCHAR *, WCHAR *);
 BOOL EditEncloseSelectionDlg(HWND, WCHAR *, WCHAR *);
 BOOL EditInsertTagDlg(HWND, WCHAR *, WCHAR *);
-BOOL EditSortDlg(HWND, int*);
-BOOL EditAlignDlg(HWND, int*);
-BOOL EditPrint(HWND, const WCHAR*, const WCHAR*);
+BOOL EditSortDlg(HWND, int *);
+BOOL EditAlignDlg(HWND, int *);
+BOOL EditPrint(HWND, const WCHAR *, const WCHAR *);
 void EditPrintSetup(HWND);
 void EditPrintInit();
 void EditMarkAll(HWND, int, BOOL, BOOL);
@@ -117,9 +117,7 @@ extern int g_DOSEncoding;
 #define NCP_UNICODE_REVERSE 16
 #define NCP_UNICODE_BOM 32
 #define NCP_8BIT 64
-#define NCP_INTERNAL                                                           \
-    (NCP_DEFAULT | NCP_UTF8 | NCP_UTF8_SIGN | NCP_UNICODE |                    \
-     NCP_UNICODE_REVERSE | NCP_UNICODE_BOM)
+#define NCP_INTERNAL (NCP_DEFAULT | NCP_UTF8 | NCP_UTF8_SIGN | NCP_UNICODE | NCP_UNICODE_REVERSE | NCP_UNICODE_BOM)
 #define NCP_RECODE 128
 #define CPI_NONE -1
 #define CPI_DEFAULT 0
@@ -138,7 +136,7 @@ extern int g_DOSEncoding;
 typedef struct _np2encoding {
     UINT uFlags;
     UINT uCodePage;
-    char* pszParseNames;
+    char *pszParseNames;
     int idsName;
     WCHAR wchLabel[32];
 } NP2ENCODING;
@@ -146,17 +144,17 @@ typedef struct _np2encoding {
 void Encoding_InitDefaults();
 int Encoding_MapIniSetting(BOOL, int);
 void Encoding_GetLabel(int);
-int Encoding_MatchW(const WCHAR*);
-int Encoding_MatchA(char*);
+int Encoding_MatchW(const WCHAR *);
+int Encoding_MatchA(char *);
 BOOL Encoding_IsValid(int);
 void Encoding_AddToListView(HWND, int, BOOL);
-BOOL Encoding_GetFromListView(HWND, int*);
+BOOL Encoding_GetFromListView(HWND, int *);
 void Encoding_AddToComboboxEx(HWND, int, BOOL);
-BOOL Encoding_GetFromComboboxEx(HWND, int*);
+BOOL Encoding_GetFromComboboxEx(HWND, int *);
 
-BOOL IsUnicode(const char*, int, LPBOOL, LPBOOL);
-BOOL IsUTF8(const char*, int);
-BOOL IsUTF7(const char*, int);
+BOOL IsUnicode(const char *, int, LPBOOL, LPBOOL);
+BOOL IsUTF8(const char *, int);
+BOOL IsUTF7(const char *, int);
 
 // void SciInitThemes(HWND);
 // LRESULT CALLBACK SciThemedWndProc(HWND,UINT,WPARAM,LPARAM);
@@ -185,10 +183,10 @@ typedef struct _filevars {
 
 } FILEVARS, *LPFILEVARS;
 
-BOOL FileVars_Init(char*, DWORD, LPFILEVARS);
+BOOL FileVars_Init(char *, DWORD, LPFILEVARS);
 BOOL FileVars_Apply(HWND, LPFILEVARS);
-BOOL FileVars_ParseInt(char*, char*, int*);
-BOOL FileVars_ParseStr(char*, char*, char*, int);
+BOOL FileVars_ParseInt(char *, char *, int *);
+BOOL FileVars_ParseStr(char *, char *, char *, int);
 BOOL FileVars_IsUTF8(LPFILEVARS);
 BOOL FileVars_IsNonUTF8(LPFILEVARS);
 BOOL FileVars_IsValidEncoding(LPFILEVARS);

@@ -19,23 +19,22 @@
 #include <memory>
 #include <functional>
 
-#define dimof(X)    (sizeof(X) / sizeof((X)[0]))
+#define dimof(X) (sizeof(X) / sizeof((X)[0]))
 #define CSTRLEN(s) (dimof(s) - 1)
 
 #pragma warning(push)
-#pragma warning(disable                                                        \
-                : 6011) // silence /analyze: de-referencing a NULL pointer
+#pragma warning(disable : 6011) // silence /analyze: de-referencing a NULL pointer
 inline void CrashMe() {
     char *s = nullptr;
     *s = 0;
 };
 #pragma warning(pop)
 
-#define CrashAlwaysIf(cond)                                                    \
-    do {                                                                       \
-        if (cond)                                                              \
-            CrashMe();                                                         \
-        __analysis_assume(!(cond));                                            \
+#define CrashAlwaysIf(cond)                                                                                            \
+    do {                                                                                                               \
+        if (cond)                                                                                                      \
+            CrashMe();                                                                                                 \
+        __analysis_assume(!(cond));                                                                                    \
     } while (0)
 
 #if defined(DEBUG) || defined(PRE_RELEASE)

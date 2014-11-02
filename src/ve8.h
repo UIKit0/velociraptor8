@@ -27,7 +27,8 @@ struct VeParams {
 };
 
 struct Document {
-    // Note: eventually multiple Document instances will be associated with the same hwndTopLevel (tabs!)
+    // Note: eventually multiple Document instances will be associated with the
+    // same hwndTopLevel (tabs!)
     HWND hwndTopLevel;
     HWND hwndScintilla;
     HWND hwndEditFrame;
@@ -39,15 +40,13 @@ struct Document {
 extern Document *gDoc;
 
 //==== Toolbar Style ==========================================================
-#define WS_TOOLBAR                                                             \
-    (WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | TBSTYLE_TOOLTIPS |              \
-     TBSTYLE_FLAT | TBSTYLE_ALTDRAG | TBSTYLE_LIST | CCS_NODIVIDER |           \
-     CCS_NOPARENTALIGN | CCS_ADJUSTABLE)
+#define WS_TOOLBAR                                                                                                     \
+    (WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | TBSTYLE_TOOLTIPS | TBSTYLE_FLAT | TBSTYLE_ALTDRAG | TBSTYLE_LIST |      \
+     CCS_NODIVIDER | CCS_NOPARENTALIGN | CCS_ADJUSTABLE)
 
 //==== ReBar Style ============================================================
-#define WS_REBAR                                                               \
-    (WS_CHILD | WS_CLIPCHILDREN | WS_BORDER | RBS_VARHEIGHT |                  \
-     RBS_BANDBORDERS | CCS_NODIVIDER | CCS_NOPARENTALIGN)
+#define WS_REBAR                                                                                                       \
+    (WS_CHILD | WS_CLIPCHILDREN | WS_BORDER | RBS_VARHEIGHT | RBS_BANDBORDERS | CCS_NODIVIDER | CCS_NOPARENTALIGN)
 
 //==== Ids ====================================================================
 #define IDC_STATUSBAR 0xFB00
@@ -90,7 +89,7 @@ BOOL RelaunchElevated();
 void SnapToDefaultPos(HWND);
 void ShowNotifyIcon(HWND, BOOL);
 void SetNotifyIconTitle(HWND);
-void InstallFileWatching(const WCHAR*);
+void InstallFileWatching(const WCHAR *);
 void CALLBACK WatchTimerProc(HWND, UINT, UINT_PTR, DWORD);
 void CALLBACK PasteBoardTimer(HWND, UINT, UINT_PTR, DWORD);
 
@@ -98,22 +97,22 @@ void LoadSettings();
 void SaveSettings(BOOL);
 void ParseCommandLine();
 void LoadFlags();
-int CheckIniFile(WCHAR *, const WCHAR*);
-int CheckIniFileRedirect(WCHAR *, const WCHAR*);
+int CheckIniFile(WCHAR *, const WCHAR *);
+int CheckIniFileRedirect(WCHAR *, const WCHAR *);
 int FindIniFile();
 int TestIniFile();
 int CreateIniFile();
-int CreateIniFileEx(const WCHAR*);
+int CreateIniFileEx(const WCHAR *);
 
 void UpdateStatusbar();
 void UpdateToolbar();
 void UpdateLineNumberWidth();
 
-BOOL FileIO(BOOL, const WCHAR*, BOOL, int*, int*, BOOL*, BOOL*, BOOL*, BOOL);
-BOOL FileLoad(BOOL, BOOL, BOOL, BOOL, const WCHAR*);
+BOOL FileIO(BOOL, const WCHAR *, BOOL, int *, int *, BOOL *, BOOL *, BOOL *, BOOL);
+BOOL FileLoad(BOOL, BOOL, BOOL, BOOL, const WCHAR *);
 BOOL FileSave(BOOL, BOOL, BOOL, BOOL);
-BOOL OpenFileDlg(HWND, WCHAR *, int, const WCHAR*);
-BOOL SaveFileDlg(HWND, WCHAR *, int, const WCHAR*);
+BOOL OpenFileDlg(HWND, WCHAR *, int, const WCHAR *);
+BOOL SaveFileDlg(HWND, WCHAR *, int, const WCHAR *);
 
 LRESULT CALLBACK MainWndProc(HWND, UINT, WPARAM, LPARAM);
 LRESULT MsgCreate(HWND, WPARAM, LPARAM);

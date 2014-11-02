@@ -18,7 +18,7 @@ void NormalizePathInPlace(WCHAR *src, size_t srcCchSize) {
 }
 // http://msdn.microsoft.com/en-us/library/windows/desktop/ms683197(v=vs.85).aspx
 static std::string GetExePath() {
-    WCHAR buf[1024*4];
+    WCHAR buf[1024 * 4];
     // it's full path, not name
     DWORD bufCchSize = dimof(buf);
     DWORD ret = GetModuleFileNameW(NULL, buf, bufCchSize);
@@ -40,11 +40,11 @@ static std::string GetKnownFolderPathXp(int nFolder) {
     return WstrToUtf8Str(buf);
 }
 
-// TODO: make it GetLocalAppDir(const char *add1 = NULL, const char *add2 = NULL, const char *add3 = NULL)
-// so that GetInstallationBaseDir() is just return GetLocalAppDir("velociraptor8")
-std::string GetLocalAppDir() {
-    return GetKnownFolderPathXp(CSIDL_LOCAL_APPDATA);
-}
+// TODO: make it GetLocalAppDir(const char *add1 = NULL, const char *add2 =
+// NULL, const char *add3 = NULL)
+// so that GetInstallationBaseDir() is just return
+// GetLocalAppDir("velociraptor8")
+std::string GetLocalAppDir() { return GetKnownFolderPathXp(CSIDL_LOCAL_APPDATA); }
 
 std::string GetInstallationBaseDir() {
     auto path = GetLocalAppDir();
@@ -68,6 +68,4 @@ bool IsRunningInstalled() {
     return pos == 0;
 }
 
-bool IsRunnignPortable() {
-    return !IsRunningInstalled();
-}
+bool IsRunnignPortable() { return !IsRunningInstalled(); }

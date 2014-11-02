@@ -7,7 +7,7 @@ void Join(std::string& sInOut, const std::string& s2) {
     if (!str::EndsWith(sInOut, '\\')) {
         sInOut.append(1, '\\');
     }
-    const char *s2c = s2.c_str();
+    const char* s2c = s2.c_str();
     size_t s2cLen = s2.size();
     if (*s2c == '\\') {
         s2c++;

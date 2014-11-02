@@ -8,42 +8,33 @@ extern HINSTANCE g_hInstance;
 extern UINT16 g_uWinVer;
 
 extern WCHAR szIniFile[MAX_PATH];
-#define IniGetString(lpSection, lpName, lpDefault, lpReturnedStr, nSize)       \
-    GetPrivateProfileString(lpSection, lpName, lpDefault, lpReturnedStr,       \
-                            nSize, szIniFile)
-#define IniGetInt(lpSection, lpName, nDefault)                                 \
-    GetPrivateProfileInt(lpSection, lpName, nDefault, szIniFile)
-#define IniSetString(lpSection, lpName, lpString)                              \
-    WritePrivateProfileString(lpSection, lpName, lpString, szIniFile)
-#define IniDeleteSection(lpSection)                                            \
-    WritePrivateProfileSection(lpSection, NULL, szIniFile)
-__inline BOOL IniSetInt(const WCHAR* lpSection, const WCHAR* lpName, int i) {
+#define IniGetString(lpSection, lpName, lpDefault, lpReturnedStr, nSize)                                               \
+    GetPrivateProfileString(lpSection, lpName, lpDefault, lpReturnedStr, nSize, szIniFile)
+#define IniGetInt(lpSection, lpName, nDefault) GetPrivateProfileInt(lpSection, lpName, nDefault, szIniFile)
+#define IniSetString(lpSection, lpName, lpString) WritePrivateProfileString(lpSection, lpName, lpString, szIniFile)
+#define IniDeleteSection(lpSection) WritePrivateProfileSection(lpSection, NULL, szIniFile)
+__inline BOOL IniSetInt(const WCHAR *lpSection, const WCHAR *lpName, int i) {
     WCHAR tch[32];
     wsprintf(tch, L"%i", i);
     return IniSetString(lpSection, lpName, tch);
 }
-#define LoadIniSection(lpSection, lpBuf, cchBuf)                               \
-    GetPrivateProfileSection(lpSection, lpBuf, cchBuf, szIniFile);
-#define SaveIniSection(lpSection, lpBuf)                                       \
-    WritePrivateProfileSection(lpSection, lpBuf, szIniFile)
-int IniSectionGetString(const WCHAR*, const WCHAR*, const WCHAR*, WCHAR *, int);
-int IniSectionGetInt(const WCHAR*, const WCHAR*, int);
-BOOL IniSectionSetString(WCHAR *, const WCHAR*, const WCHAR*);
+#define LoadIniSection(lpSection, lpBuf, cchBuf) GetPrivateProfileSection(lpSection, lpBuf, cchBuf, szIniFile);
+#define SaveIniSection(lpSection, lpBuf) WritePrivateProfileSection(lpSection, lpBuf, szIniFile)
+int IniSectionGetString(const WCHAR *, const WCHAR *, const WCHAR *, WCHAR *, int);
+int IniSectionGetInt(const WCHAR *, const WCHAR *, int);
+BOOL IniSectionSetString(WCHAR *, const WCHAR *, const WCHAR *);
 
-inline BOOL IniSectionSetInt(WCHAR * lpCachedIniSection, const WCHAR* lpName,
-                               int i) {
+inline BOOL IniSectionSetInt(WCHAR *lpCachedIniSection, const WCHAR *lpName, int i) {
     WCHAR tch[32];
     wsprintf(tch, L"%i", i);
     return IniSectionSetString(lpCachedIniSection, lpName, tch);
 }
 
-inline void BeginWaitCursor() {
-    SendMessage(gDoc->hwndScintilla, SCI_SETCURSOR, (WPARAM)SC_CURSORWAIT, 0);
-}
+inline void BeginWaitCursor() { SendMessage(gDoc->hwndScintilla, SCI_SETCURSOR, (WPARAM)SC_CURSORWAIT, 0); }
 
 inline void EndWaitCursor() {
     POINT pt;
-    SendMessage(gDoc->hwndScintilla, SCI_SETCURSOR, (WPARAM) SC_CURSORNORMAL, 0);
+    SendMessage(gDoc->hwndScintilla, SCI_SETCURSOR, (WPARAM)SC_CURSORNORMAL, 0);
     GetCursorPos(&pt);
     SetCursorPos(pt.x, pt.y);
 }
@@ -62,10 +53,9 @@ BOOL BitmapMergeAlpha(HBITMAP, COLORREF);
 BOOL BitmapAlphaBlend(HBITMAP, COLORREF, BYTE);
 BOOL BitmapGrayScale(HBITMAP);
 BOOL VerifyContrast(COLORREF, COLORREF);
-BOOL IsFontAvailable(const WCHAR*);
+BOOL IsFontAvailable(const WCHAR *);
 
-BOOL SetWindowTitle(HWND, UINT, BOOL, UINT, const WCHAR*, int, BOOL, UINT, BOOL,
-                    const WCHAR*);
+BOOL SetWindowTitle(HWND, UINT, BOOL, UINT, const WCHAR *, int, BOOL, UINT, BOOL, const WCHAR *);
 void SetWindowTransparentMode(HWND, BOOL);
 
 void CenterDlgInParent(HWND);
@@ -90,18 +80,13 @@ int Toolbar_SetButtons(HWND, int, const WCHAR *, const TBBUTTON *, int);
 
 LRESULT SendWMSize(HWND);
 
-#define EnableCmd(hmenu, id, b)                                                \
-    EnableMenuItem(hmenu, id,                                                  \
-                   (b) ? MF_BYCOMMAND | MF_ENABLED : MF_BYCOMMAND | MF_GRAYED)
+#define EnableCmd(hmenu, id, b) EnableMenuItem(hmenu, id, (b) ? MF_BYCOMMAND | MF_ENABLED : MF_BYCOMMAND | MF_GRAYED)
 
-#define CheckCmd(hmenu, id, b)                                                 \
-    CheckMenuItem(hmenu, id, (b) ? MF_BYCOMMAND | MF_CHECKED                   \
-                                 : MF_BYCOMMAND | MF_UNCHECKED)
+#define CheckCmd(hmenu, id, b) CheckMenuItem(hmenu, id, (b) ? MF_BYCOMMAND | MF_CHECKED : MF_BYCOMMAND | MF_UNCHECKED)
 
 BOOL IsCmdEnabled(HWND, UINT);
 
-#define GetString(id, buf, cchBufMax)                                          \
-    LoadStringW(g_hInstance, id, buf, cchBufMax)
+#define GetString(id, buf, cchBufMax) LoadStringW(g_hInstance, id, buf, cchBufMax)
 
 /*
 inline int GetString(UINT id, WCHAR *buf, int cchBufMax) {
@@ -116,15 +101,15 @@ int FormatString(WCHAR *, int, UINT, ...);
 void PathRelativeToApp(WCHAR *, WCHAR *, int, BOOL, BOOL, BOOL);
 void PathAbsoluteFromApp(WCHAR *, WCHAR *, int, BOOL);
 
-BOOL PathIsLnkFile(const WCHAR*);
-BOOL PathGetLnkPath(const WCHAR*, WCHAR *, int);
-BOOL PathIsLnkToDirectory(const WCHAR*, WCHAR *, int);
-BOOL PathCreateDeskLnk(const WCHAR*);
-BOOL PathCreateFavLnk(const WCHAR*, const WCHAR*, const WCHAR*);
+BOOL PathIsLnkFile(const WCHAR *);
+BOOL PathGetLnkPath(const WCHAR *, WCHAR *, int);
+BOOL PathIsLnkToDirectory(const WCHAR *, WCHAR *, int);
+BOOL PathCreateDeskLnk(const WCHAR *);
+BOOL PathCreateFavLnk(const WCHAR *, const WCHAR *, const WCHAR *);
 
-BOOL StrLTrim(WCHAR *, const WCHAR*);
+BOOL StrLTrim(WCHAR *, const WCHAR *);
 BOOL TrimString(WCHAR *);
-BOOL ExtractFirstArgument(const WCHAR*, WCHAR *, WCHAR *);
+BOOL ExtractFirstArgument(const WCHAR *, WCHAR *, WCHAR *);
 
 void PrepareFilterStr(WCHAR *);
 
@@ -134,14 +119,13 @@ void PathFixBackslashes(WCHAR *);
 void ExpandEnvironmentStringsEx(WCHAR *, DWORD);
 void PathCanonicalizeEx(WCHAR *);
 DWORD GetLongPathNameEx(WCHAR *, DWORD);
-DWORD_PTR SHGetFileInfo2(const WCHAR*, DWORD, SHFILEINFO *, UINT, UINT);
+DWORD_PTR SHGetFileInfo2(const WCHAR *, DWORD, SHFILEINFO *, UINT, UINT);
 
 int FormatNumberStr(WCHAR *);
 BOOL SetDlgItemIntEx(HWND, int, UINT);
 
 #define MBCSToWChar(c, a, w, i) MultiByteToWideChar(c, 0, a, -1, w, i)
-#define WCharToMBCS(c, w, a, i)                                                \
-    WideCharToMultiByte(c, 0, w, -1, a, i, NULL, NULL)
+#define WCharToMBCS(c, w, a, i) WideCharToMultiByte(c, 0, w, -1, a, i, NULL, NULL)
 
 UINT GetDlgItemTextA2W(UINT, HWND, int, LPSTR, int);
 UINT SetDlgItemTextA2W(UINT, HWND, int, LPSTR);
@@ -159,16 +143,16 @@ typedef struct _mrulist {
     WCHAR szRegKey[256];
     int iFlags;
     int iSize;
-    WCHAR * pszItems[MRU_MAXITEMS];
+    WCHAR *pszItems[MRU_MAXITEMS];
 
 } MRULIST, *PMRULIST, *LPMRULIST;
 
-LPMRULIST MRU_Create(const WCHAR*, int, int);
+LPMRULIST MRU_Create(const WCHAR *, int, int);
 BOOL MRU_Destroy(LPMRULIST);
-BOOL MRU_Add(LPMRULIST, const WCHAR*);
-BOOL MRU_AddFile(LPMRULIST, const WCHAR*, BOOL, BOOL);
+BOOL MRU_Add(LPMRULIST, const WCHAR *);
+BOOL MRU_AddFile(LPMRULIST, const WCHAR *, BOOL, BOOL);
 BOOL MRU_Delete(LPMRULIST, int);
-BOOL MRU_DeleteFileFromStore(LPMRULIST, const WCHAR*);
+BOOL MRU_DeleteFileFromStore(LPMRULIST, const WCHAR *);
 BOOL MRU_Empty(LPMRULIST);
 int MRU_Enum(LPMRULIST, int, WCHAR *, int);
 BOOL MRU_Load(LPMRULIST);
@@ -195,7 +179,7 @@ typedef struct {
 
 BOOL GetThemedDialogFont(WCHAR *, WORD *);
 DLGTEMPLATE *LoadThemedDialogTemplate(LPCTSTR, HINSTANCE);
-#define ThemedDialogBox(hInstance, lpTemplate, hWndParent, lpDialogFunc)       \
+#define ThemedDialogBox(hInstance, lpTemplate, hWndParent, lpDialogFunc)                                               \
     ThemedDialogBoxParam(hInstance, lpTemplate, hWndParent, lpDialogFunc, 0)
 INT_PTR ThemedDialogBoxParam(HINSTANCE, LPCTSTR, HWND, DLGPROC, LPARAM);
 HWND CreateThemedDialogParam(HINSTANCE, LPCTSTR, HWND, DLGPROC, LPARAM);
