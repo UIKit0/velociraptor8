@@ -33,3 +33,13 @@ void FillWndClassEx(WNDCLASSEX& wcex, const WCHAR* clsName, WNDPROC wndproc) {
     wcex.lpszClassName = clsName;
     wcex.lpfnWndProc = wndproc;
 }
+
+void EnableMenu(HMENU m, UINT id) {
+    BOOL ret = EnableMenuItem(m, id, MF_BYCOMMAND | MF_ENABLED);
+    CrashIf(ret == -1);
+}
+
+void DisableMenu(HMENU m, UINT id) {
+    BOOL ret = EnableMenuItem(m, id, MF_BYCOMMAND | MF_GRAYED);
+    CrashIf(ret == -1);
+}

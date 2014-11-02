@@ -21,6 +21,7 @@ See License.txt for details about distribution and modification.
 #include "Install.h"
 #include "Menu.h"
 #include "Install.h"
+#include "WinUtil.h"
 
 // Local and global Variables for Notepad2.c
 HWND hwndNextCBChain;
@@ -682,16 +683,24 @@ HWND InitInstance(HINSTANCE hInstance, LPSTR pszCmdLine, int nCmdShow) {
         CreateWindowExW(0, fullWndClass, L"Velociraptor8", WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN,
                         wi.x, wi.y, wi.cx, wi.cy, NULL, NULL, hInstance, NULL);
     gDoc->hwndTopLevel = hwndMain;
-    SetMenu(hwndMain, BuildMainMenu());
-
-    if (wi.max)
+    auto mainMenu = BuildMainMenu();
+    SetMenu(hwndMain, mainMenu);
+    if (IsRunningInstalled()) {
+        // TODO(kjk): remove instead?
+        // TODO(kjk): should this be in menu.cpp?
+        DisableMenu(mainMenu, IDM_INSTALL);
+    }
+    if (wi.max) {
         nCmdShow = SW_SHOWMAXIMIZED;
+    }
 
-    if ((bAlwaysOnTop || flagAlwaysOnTop == 2) && flagAlwaysOnTop != 1)
+    if ((bAlwaysOnTop || flagAlwaysOnTop == 2) && flagAlwaysOnTop != 1) {
         SetWindowPos(hwndMain, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+    }
 
-    if (bTransparentMode)
+    if (bTransparentMode) {
         SetWindowTransparentMode(hwndMain, TRUE);
+    }
 
     // Current file information -- moved in front of ShowWindow()
     FileLoad(TRUE, TRUE, FALSE, FALSE, L"");
@@ -704,9 +713,9 @@ HWND InitInstance(HINSTANCE hInstance, LPSTR pszCmdLine, int nCmdShow) {
         ShowNotifyIcon(hwndMain, TRUE);
     }
 
-    // Source Encoding
-    if (lpEncodingArg)
+    if (lpEncodingArg) {
         iSrcEncoding = Encoding_MatchW(lpEncodingArg);
+    }
 
     // Pathname parameter
     if (lpFileArg /*&& !flagNewFromClipboard*/) {
@@ -771,20 +780,17 @@ HWND InitInstance(HINSTANCE hInstance, LPSTR pszCmdLine, int nCmdShow) {
         }
     }
 
-    // Encoding
     if (0 != flagSetEncoding) {
         SendMessage(hwndMain, WM_COMMAND, MAKELONG(IDM_ENCODING_ANSI + flagSetEncoding - 1, 1), 0);
         flagSetEncoding = 0;
     }
 
-    // EOL mode
     if (0 != flagSetEOLMode) {
         SendMessage(hwndMain, WM_COMMAND, MAKELONG(IDM_LINEENDINGS_CRLF + flagSetEOLMode - 1, 1),
                     0);
         flagSetEOLMode = 0;
     }
 
-    // Match Text
     if (flagMatchText && lpMatchArg) {
         if (lstrlen(lpMatchArg) && SendMessage(gDoc->hwndScintilla, SCI_GETLENGTH, 0, 0)) {
 
@@ -840,8 +846,9 @@ HWND InitInstance(HINSTANCE hInstance, LPSTR pszCmdLine, int nCmdShow) {
     }
 
     // If start as tray icon, set current filename as tooltip
-    if (flagStartAsTrayIcon)
+    if (flagStartAsTrayIcon) {
         SetNotifyIconTitle(hwndMain);
+    }
 
     UpdateToolbar();
     UpdateStatusbar();
@@ -1814,14 +1821,14 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
     int i, i2;
     HMENU hmenu = (HMENU)wParam;
 
-    i = lstrlen(szCurFile);
-    EnableCmd(hmenu, IDM_FILE_REVERT, i);
-    EnableCmd(hmenu, IDM_FILE_LAUNCH, i);
-    EnableCmd(hmenu, IDM_FILE_PROPERTIES, i);
-    EnableCmd(hmenu, IDM_FILE_CREATELINK, i);
-    EnableCmd(hmenu, IDM_FILE_ADDTOFAV, i);
+    BOOL hasFile = (*szCurFile != 0);
+    EnableCmd(hmenu, IDM_FILE_REVERT, hasFile);
+    EnableCmd(hmenu, IDM_FILE_LAUNCH, hasFile);
+    EnableCmd(hmenu, IDM_FILE_PROPERTIES, hasFile);
+    EnableCmd(hmenu, IDM_FILE_CREATELINK, hasFile);
+    EnableCmd(hmenu, IDM_FILE_ADDTOFAV, hasFile);
 
-    EnableCmd(hmenu, IDM_FILE_READONLY, i);
+    EnableCmd(hmenu, IDM_FILE_READONLY, hasFile);
     CheckCmd(hmenu, IDM_FILE_READONLY, bReadOnly);
 
     // EnableCmd(hmenu,IDM_ENCODING_UNICODEREV,!bReadOnly);
@@ -1833,7 +1840,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
     // EnableCmd(hmenu,IDM_LINEENDINGS_LF,!bReadOnly);
     // EnableCmd(hmenu,IDM_LINEENDINGS_CR,!bReadOnly);
 
-    EnableCmd(hmenu, IDM_ENCODING_RECODE, i);
+    EnableCmd(hmenu, IDM_ENCODING_RECODE, hasFile);
 
     if (mEncoding[iEncoding].uFlags & NCP_UNICODE_REVERSE)
         i = IDM_ENCODING_UNICODEREV;

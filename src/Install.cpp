@@ -70,6 +70,32 @@ bool IsRunningInstalled() {
 
 bool IsRunnignPortable() { return !IsRunningInstalled(); }
 
-void Install() {
-    // TODO(kjk): write me
+static bool InstallCopyFiles() {
+    // TODO(kjk): kill processes that match the path we're writing to
+    return true;
 }
+
+static bool InstallSetRegistryKeys() {
+    return true;
+}
+
+// adds our bin directory to %PATH%
+static bool AddSelfToPath() {
+    return true;
+}
+
+void Install() {
+    if (!InstallCopyFiles()) {
+        // TODO(kjk): show error message or crash
+        return;
+    }
+    if (!InstallSetRegistryKeys()) {
+        return;
+        // TODO(kjk): show error message or crash
+    }
+    if (!AddSelfToPath()) {
+        return;
+    }
+    // TODO(kjk): relaunch the installed version
+}
+
