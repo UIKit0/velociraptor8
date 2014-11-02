@@ -1,6 +1,8 @@
 #include "Common.h"
 #include "Install.h"
 #include "PathUtil.h"
+// Maybe: not ideal, decouple this via SetAppDirName() instead of APP_DIR_NAME
+#include "ve8.h"
 
 // http://msdn.microsoft.com/en-us/library/windows/desktop/bb773569(v=vs.85).aspx
 // TODO: on win8 use PathCchCanonicalize or PathCchCanonicalizeEx
@@ -46,7 +48,7 @@ std::string GetLocalAppDir() {
 
 std::string GetInstallationBaseDir() {
     auto path = GetLocalAppDir();
-    path::Join(path, "velociraptor8"); // TODO: use ve8 for shorter paths?
+    path::Join(path, APP_DIR_NAME);
     return path;
 }
 
