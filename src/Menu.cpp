@@ -345,3 +345,40 @@ static HMENU AppendToMenu(HMENU m, MenuDef *menuDef) {
 HMENU BuildMainMenu() {
     return AppendToMenu(CreateMenu(), menuDefMain);
 }
+
+static MenuDef menuDefPopup1 [] = {
+    { "&Undo", IDM_EDIT_UNDO, nullptr },
+    { "&Redo", IDM_EDIT_REDO, nullptr },
+    { SEPARATOR, 0, nullptr },
+    { "Cu&t", IDM_EDIT_CUT, nullptr },
+    { "&Copy", IDM_EDIT_COPY, nullptr },
+    { "&Paste", IDM_EDIT_PASTE, nullptr },
+    { "Cl&ear", IDM_EDIT_CLEAR, nullptr },
+    { SEPARATOR, 0, nullptr },
+    { "&Select All", IDM_EDIT_SELECTALL, nullptr },
+    { nullptr, 0, nullptr }
+};
+
+static MenuDef menuDefPopup2 [] = {
+    { "Show &Toolbar", IDM_VIEW_TOOLBAR, nullptr },
+    { "&Customize Toolbar...", IDM_VIEW_CUSTOMIZETB, nullptr },
+    { "Show &Statusbar", IDM_VIEW_STATUSBAR, nullptr },
+    { nullptr, 0, nullptr }
+};
+
+static MenuDef menuDefPopup3 [] = {
+    { "Open velociraptor8", IDM_TRAY_RESTORE, nullptr },
+    { "Exit velociraptor8", IDM_TRAY_EXIT, nullptr },
+    { nullptr, 0, nullptr }
+};
+
+static MenuDef menuDefPopup [] = {
+    { "+", 0, menuDefPopup1 },
+    { "+", 0, menuDefPopup2 },
+    { "+", 0, menuDefPopup3 },
+    { nullptr, 0, nullptr }
+};
+
+HMENU BuildPopupMenu() {
+    return AppendToMenu(CreateMenu(), menuDefPopup);
+}

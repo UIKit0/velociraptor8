@@ -1113,7 +1113,8 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
                 (nID != IDC_TOOLBAR))
                 return DefWindowProc(hwnd, msg, wp, lp);
 
-            hmenu = LoadMenu(g_hInstance, MAKEINTRESOURCE(IDR_POPUPMENU));
+            //hmenu = LoadMenu(g_hInstance, MAKEINTRESOURCE(IDR_POPUPMENU));
+            hmenu = BuildPopupMenu();
             // SetMenuDefaultItem(GetSubMenu(hmenu,1),0,FALSE);
 
             pt.x = (int)(short) LOWORD(lp);
@@ -1270,7 +1271,8 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
             switch (lp) {
                 case WM_RBUTTONUP: {
 
-                    HMENU hMenu = LoadMenu(g_hInstance, MAKEINTRESOURCE(IDR_POPUPMENU));
+                    //HMENU hMenu = LoadMenu(g_hInstance, MAKEINTRESOURCE(IDR_POPUPMENU));
+                    HMENU hMenu = BuildPopupMenu();
                     HMENU hMenuPopup = GetSubMenu(hMenu, 2);
 
                     POINT pt;

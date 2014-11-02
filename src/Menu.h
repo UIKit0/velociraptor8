@@ -1,3 +1,4 @@
 
 HMENU BuildMainMenu();
+HMENU BuildPopupMenu();
 
