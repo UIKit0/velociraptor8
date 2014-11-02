@@ -2148,7 +2148,7 @@ static void MenuNewWindow(HWND hwnd, bool isEmpty) {
     ShellExecuteEx(&sei);
 }
 
-void MenuFileRevert() {
+static void MenuFileRevert() {
     if (0 == *szCurFile) {
         return;
     }
@@ -2190,190 +2190,181 @@ void MenuFileRevert() {
     SendMessage(gDoc->hwndScintilla, SCI_SETXOFFSET, (WPARAM)iXOffset, 0);
 }
 
+static void MenuFileReadOnly(HWND hwnd) {
+    // bReadOnly = (bReadOnly) ? FALSE : TRUE;
+    // SendMessage(gDoc->hwndScintilla,SCI_SETREADONLY,bReadOnly,0);
+    // UpdateToolbar();
+    // UpdateStatusbar();
+    if (lstrlen(szCurFile)) {
+        DWORD dwFileAttributes = GetFileAttributes(szCurFile);
+        if (dwFileAttributes != INVALID_FILE_ATTRIBUTES) {
+            if (bReadOnly)
+                dwFileAttributes = (dwFileAttributes & ~FILE_ATTRIBUTE_READONLY);
+            else
+                dwFileAttributes |= FILE_ATTRIBUTE_READONLY;
+            if (!SetFileAttributes(szCurFile, dwFileAttributes))
+                MsgBox(MBWARN, IDS_READONLY_MODIFY, szCurFile);
+        } else
+            MsgBox(MBWARN, IDS_READONLY_MODIFY, szCurFile);
+
+        dwFileAttributes = GetFileAttributes(szCurFile);
+        if (dwFileAttributes != INVALID_FILE_ATTRIBUTES)
+            bReadOnly = (dwFileAttributes & FILE_ATTRIBUTE_READONLY);
+
+        SetWindowTitle(hwnd, uidsAppTitle, fIsElevated, IDS_UNTITLED, szCurFile,
+            iPathNameFormat, bModified || iEncoding != iOriginalEncoding,
+            IDS_READONLY, bReadOnly, szTitleExcerpt);
+    }
+}
+
+static void MenuFileBrowse(HWND hwnd) {
+    WCHAR tchParam[MAX_PATH + 4] = L"";
+    WCHAR tchExeFile[MAX_PATH + 4];
+    WCHAR tchTemp[MAX_PATH + 4];
+
+    if (!IniGetString(L"Settings2", L"filebrowser.exe", L"", tchTemp, dimof(tchTemp))) {
+        if (!SearchPath(NULL, L"metapath.exe", NULL, dimof(tchExeFile), tchExeFile, NULL)) {
+            GetModuleFileName(NULL, tchExeFile, dimof(tchExeFile));
+            PathRemoveFileSpec(tchExeFile);
+            PathAppend(tchExeFile, L"metapath.exe");
+        }
+    } else {
+        ExtractFirstArgument(tchTemp, tchExeFile, tchParam);
+        if (PathIsRelative(tchExeFile)) {
+            if (!SearchPath(NULL, tchExeFile, NULL, dimof(tchTemp), tchTemp, NULL)) {
+                GetModuleFileName(NULL, tchTemp, dimof(tchTemp));
+                PathRemoveFileSpec(tchTemp);
+                PathAppend(tchTemp, tchExeFile);
+                lstrcpy(tchExeFile, tchTemp);
+            }
+        }
+    }
+
+    if (lstrlen(tchParam) && lstrlen(szCurFile))
+        StrCatBuff(tchParam, L" ", dimof(tchParam));
+
+    if (lstrlen(szCurFile)) {
+        lstrcpy(tchTemp, szCurFile);
+        PathQuoteSpaces(tchTemp);
+        StrCatBuff(tchParam, tchTemp, dimof(tchParam));
+    }
+
+    SHELLEXECUTEINFO sei = { 0 };
+    sei.cbSize = sizeof(SHELLEXECUTEINFO);
+    sei.fMask = SEE_MASK_FLAG_NO_UI | /*SEE_MASK_NOZONECHECKS*/ 0x00800000;
+    sei.hwnd = hwnd;
+    sei.lpVerb = NULL;
+    sei.lpFile = tchExeFile;
+    sei.lpParameters = tchParam;
+    sei.lpDirectory = NULL;
+    sei.nShow = SW_SHOWNORMAL;
+    ShellExecuteEx(&sei);
+
+    if ((INT_PTR) sei.hInstApp < 32) {
+        MsgBox(MBWARN, IDS_ERR_BROWSE);
+    }
+}
+
+static void MenuFileLaunch(HWND hwnd) {
+    WCHAR wchDirectory[MAX_PATH] = L"";
+
+    if (!lstrlen(szCurFile)) {
+        return;
+    }
+
+    if (bSaveBeforeRunningTools && !FileSave(FALSE, TRUE, FALSE, FALSE)) {
+        return;
+    }
+
+    if (lstrlen(szCurFile)) {
+        lstrcpy(wchDirectory, szCurFile);
+        PathRemoveFileSpec(wchDirectory);
+    }
+
+    SHELLEXECUTEINFO sei = { 0 };
+    sei.cbSize = sizeof(SHELLEXECUTEINFO);
+    sei.fMask = 0;
+    sei.hwnd = hwnd;
+    sei.lpVerb = NULL;
+    sei.lpFile = szCurFile;
+    sei.lpParameters = NULL;
+    sei.lpDirectory = wchDirectory;
+    sei.nShow = SW_SHOWNORMAL;
+    ShellExecuteEx(&sei);
+}
+
+static void MenuFileRun(HWND hwnd) {
+    WCHAR tchCmdLine[MAX_PATH + 4];
+    if (bSaveBeforeRunningTools && !FileSave(FALSE, TRUE, FALSE, FALSE)) {
+        return;
+    }
+    lstrcpy(tchCmdLine, szCurFile);
+    PathQuoteSpaces(tchCmdLine);
+    RunDlg(hwnd, tchCmdLine);
+}
+
+static void MenuFilePrint() {
+    SHFILEINFO shfi = { 0 };
+    WCHAR *pszTitle;
+    WCHAR tchUntitled[32];
+    WCHAR tchPageFmt[32];
+
+    if (lstrlen(szCurFile)) {
+        SHGetFileInfo2(szCurFile, 0, &shfi, sizeof(SHFILEINFO), SHGFI_DISPLAYNAME);
+        pszTitle = shfi.szDisplayName;
+    } else {
+        GetString(IDS_UNTITLED, tchUntitled, dimof(tchUntitled));
+        pszTitle = tchUntitled;
+    }
+
+    GetString(IDS_PRINT_PAGENUM, tchPageFmt, dimof(tchPageFmt));
+
+    if (!EditPrint(gDoc->hwndScintilla, pszTitle, tchPageFmt)) {
+        MsgBox(MBWARN, IDS_PRINT_ERROR, pszTitle);
+    }
+}
+
 // WM_COMMAND
 LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
     CrashIf(hwnd != gDoc->hwndTopLevel);
 
     WORD cmd = LOWORD(wParam);
+    if (IDM_FILE_NEW == cmd) {
+        FileLoad(FALSE, TRUE, FALSE, FALSE, L"");
+    } else if (IDM_FILE_OPEN == cmd) {
+        FileLoad(FALSE, FALSE, FALSE, FALSE, L"");
+    } else if (IDM_FILE_REVERT == cmd) {
+        MenuFileRevert();
+    } else if (IDM_FILE_SAVE == cmd) {
+        FileSave(TRUE, FALSE, FALSE, FALSE);
+    } else if (IDM_FILE_SAVEAS == cmd) {
+        FileSave(TRUE, FALSE, TRUE, FALSE);
+    } else if (IDM_FILE_SAVECOPY == cmd) {
+        FileSave(TRUE, FALSE, TRUE, TRUE);
+    } else if (IDM_FILE_READONLY == cmd) {
+        MenuFileReadOnly(hwnd);
+    } else if (IDM_FILE_BROWSE == cmd) {
+        MenuFileBrowse(hwnd);
+    } else if (IDM_FILE_NEWWINDOW == cmd) {
+        MenuNewWindow(hwnd, false);
+    } else if (IDM_FILE_NEWWINDOW2 == cmd) {
+        MenuNewWindow(hwnd, true);
+    } else if (IDM_FILE_LAUNCH == cmd) {
+        MenuFileLaunch(hwnd);
+    } else if (IDM_FILE_RUN == cmd) {
+        MenuFileRun(hwnd);
+    } else if (IDM_FILE_PAGESETUP == cmd) {
+        EditPrintSetup(gDoc->hwndScintilla);
+    } else if (IDM_FILE_PRINT == cmd) {
+        MenuFilePrint();
+    }
+
     switch (cmd) {
-
-        case IDM_FILE_NEW:
-            FileLoad(FALSE, TRUE, FALSE, FALSE, L"");
-            break;
-
-        case IDM_FILE_OPEN:
-            FileLoad(FALSE, FALSE, FALSE, FALSE, L"");
-            break;
-
-        case IDM_FILE_REVERT: {
-            MenuFileRevert();
-        } break;
-
-        case IDM_FILE_SAVE:
-            FileSave(TRUE, FALSE, FALSE, FALSE);
-            break;
-
-        case IDM_FILE_SAVEAS:
-            FileSave(TRUE, FALSE, TRUE, FALSE);
-            break;
-
-        case IDM_FILE_SAVECOPY:
-            FileSave(TRUE, FALSE, TRUE, TRUE);
-            break;
-
-        case IDM_FILE_READONLY:
-            // bReadOnly = (bReadOnly) ? FALSE : TRUE;
-            // SendMessage(gDoc->hwndScintilla,SCI_SETREADONLY,bReadOnly,0);
-            // UpdateToolbar();
-            // UpdateStatusbar();
-            if (lstrlen(szCurFile)) {
-                DWORD dwFileAttributes = GetFileAttributes(szCurFile);
-                if (dwFileAttributes != INVALID_FILE_ATTRIBUTES) {
-                    if (bReadOnly)
-                        dwFileAttributes = (dwFileAttributes & ~FILE_ATTRIBUTE_READONLY);
-                    else
-                        dwFileAttributes |= FILE_ATTRIBUTE_READONLY;
-                    if (!SetFileAttributes(szCurFile, dwFileAttributes))
-                        MsgBox(MBWARN, IDS_READONLY_MODIFY, szCurFile);
-                } else
-                    MsgBox(MBWARN, IDS_READONLY_MODIFY, szCurFile);
-
-                dwFileAttributes = GetFileAttributes(szCurFile);
-                if (dwFileAttributes != INVALID_FILE_ATTRIBUTES)
-                    bReadOnly = (dwFileAttributes & FILE_ATTRIBUTE_READONLY);
-
-                SetWindowTitle(hwnd, uidsAppTitle, fIsElevated, IDS_UNTITLED, szCurFile,
-                               iPathNameFormat, bModified || iEncoding != iOriginalEncoding,
-                               IDS_READONLY, bReadOnly, szTitleExcerpt);
-            }
-            break;
-
-        case IDM_FILE_BROWSE: {
-            SHELLEXECUTEINFO sei;
-            WCHAR tchParam[MAX_PATH + 4] = L"";
-            WCHAR tchExeFile[MAX_PATH + 4];
-            WCHAR tchTemp[MAX_PATH + 4];
-
-            if (!IniGetString(L"Settings2", L"filebrowser.exe", L"", tchTemp, dimof(tchTemp))) {
-                if (!SearchPath(NULL, L"metapath.exe", NULL, dimof(tchExeFile), tchExeFile, NULL)) {
-                    GetModuleFileName(NULL, tchExeFile, dimof(tchExeFile));
-                    PathRemoveFileSpec(tchExeFile);
-                    PathAppend(tchExeFile, L"metapath.exe");
-                }
-            } else {
-                ExtractFirstArgument(tchTemp, tchExeFile, tchParam);
-                if (PathIsRelative(tchExeFile)) {
-                    if (!SearchPath(NULL, tchExeFile, NULL, dimof(tchTemp), tchTemp, NULL)) {
-                        GetModuleFileName(NULL, tchTemp, dimof(tchTemp));
-                        PathRemoveFileSpec(tchTemp);
-                        PathAppend(tchTemp, tchExeFile);
-                        lstrcpy(tchExeFile, tchTemp);
-                    }
-                }
-            }
-
-            if (lstrlen(tchParam) && lstrlen(szCurFile))
-                StrCatBuff(tchParam, L" ", dimof(tchParam));
-
-            if (lstrlen(szCurFile)) {
-                lstrcpy(tchTemp, szCurFile);
-                PathQuoteSpaces(tchTemp);
-                StrCatBuff(tchParam, tchTemp, dimof(tchParam));
-            }
-
-            ZeroMemory(&sei, sizeof(SHELLEXECUTEINFO));
-
-            sei.cbSize = sizeof(SHELLEXECUTEINFO);
-            sei.fMask = SEE_MASK_FLAG_NO_UI | /*SEE_MASK_NOZONECHECKS*/ 0x00800000;
-            sei.hwnd = hwnd;
-            sei.lpVerb = NULL;
-            sei.lpFile = tchExeFile;
-            sei.lpParameters = tchParam;
-            sei.lpDirectory = NULL;
-            sei.nShow = SW_SHOWNORMAL;
-
-            ShellExecuteEx(&sei);
-
-            if ((INT_PTR)sei.hInstApp < 32)
-                MsgBox(MBWARN, IDS_ERR_BROWSE);
-        } break;
-
-        case IDM_FILE_NEWWINDOW:
-        case IDM_FILE_NEWWINDOW2: {
-            auto isEmpty = (cmd == IDM_FILE_NEWWINDOW2);
-            MenuNewWindow(hwnd, isEmpty);
-        } break;
-
-        case IDM_FILE_LAUNCH: {
-            SHELLEXECUTEINFO sei;
-            WCHAR wchDirectory[MAX_PATH] = L"";
-
-            if (!lstrlen(szCurFile))
-                break;
-
-            if (bSaveBeforeRunningTools && !FileSave(FALSE, TRUE, FALSE, FALSE))
-                break;
-
-            if (lstrlen(szCurFile)) {
-                lstrcpy(wchDirectory, szCurFile);
-                PathRemoveFileSpec(wchDirectory);
-            }
-
-            ZeroMemory(&sei, sizeof(SHELLEXECUTEINFO));
-
-            sei.cbSize = sizeof(SHELLEXECUTEINFO);
-            sei.fMask = 0;
-            sei.hwnd = hwnd;
-            sei.lpVerb = NULL;
-            sei.lpFile = szCurFile;
-            sei.lpParameters = NULL;
-            sei.lpDirectory = wchDirectory;
-            sei.nShow = SW_SHOWNORMAL;
-
-            ShellExecuteEx(&sei);
-        } break;
-
-        case IDM_FILE_RUN: {
-            WCHAR tchCmdLine[MAX_PATH + 4];
-
-            if (bSaveBeforeRunningTools && !FileSave(FALSE, TRUE, FALSE, FALSE))
-                break;
-
-            lstrcpy(tchCmdLine, szCurFile);
-            PathQuoteSpaces(tchCmdLine);
-
-            RunDlg(hwnd, tchCmdLine);
-        } break;
-
         case IDM_FILE_OPENWITH:
             if (bSaveBeforeRunningTools && !FileSave(FALSE, TRUE, FALSE, FALSE))
                 break;
             OpenWithDlg(hwnd, szCurFile);
             break;
-
-        case IDM_FILE_PAGESETUP:
-            EditPrintSetup(gDoc->hwndScintilla);
-            break;
-
-        case IDM_FILE_PRINT: {
-            SHFILEINFO shfi;
-            WCHAR *pszTitle;
-            WCHAR tchUntitled[32];
-            WCHAR tchPageFmt[32];
-
-            if (lstrlen(szCurFile)) {
-                SHGetFileInfo2(szCurFile, 0, &shfi, sizeof(SHFILEINFO), SHGFI_DISPLAYNAME);
-                pszTitle = shfi.szDisplayName;
-            } else {
-                GetString(IDS_UNTITLED, tchUntitled, dimof(tchUntitled));
-                pszTitle = tchUntitled;
-            }
-
-            GetString(IDS_PRINT_PAGENUM, tchPageFmt, dimof(tchPageFmt));
-
-            if (!EditPrint(gDoc->hwndScintilla, pszTitle, tchPageFmt))
-                MsgBox(MBWARN, IDS_PRINT_ERROR, pszTitle);
-        } break;
 
         case IDM_FILE_PROPERTIES: {
             SHELLEXECUTEINFO sei;
