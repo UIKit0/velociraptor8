@@ -1378,7 +1378,8 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wp, LPARAM lp) {
     CREATESTRUCTW* cs = (CREATESTRUCTW*) lp;
     HINSTANCE hInstance = cs->hInstance;
 
-    (void)IsRunningInstalled();
+    //(void)IsRunningInstalled();
+    (void) GetInstallationBinDir();
 
     CrashIf(gDoc);
     gDoc = AllocMust<Document>();

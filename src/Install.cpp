@@ -1,5 +1,6 @@
 #include "Common.h"
 #include "Install.h"
+#include "PathUtil.h"
 
 // http://msdn.microsoft.com/en-us/library/windows/desktop/bb773569(v=vs.85).aspx
 // TODO: on win8 use PathCchCanonicalize or PathCchCanonicalizeEx
@@ -29,22 +30,39 @@ static std::string GetExePath() {
 }
 
 // http://msdn.microsoft.com/en-us/library/windows/desktop/bb762181(v=vs.85).aspx
-// TODO: deprecated, on Vista+ use SHGetSpecialFolderPath
 static std::string GetKnownFolderPathXp(int nFolder) {
     WCHAR buf[MAX_PATH];
+    // TODO: on Vista+ use SHGetSpecialFolderPath, SHGetFolderPath is deprecated
     HRESULT hr = SHGetFolderPath(NULL, nFolder, NULL, SHGFP_TYPE_DEFAULT, buf);
     CrashIf(hr != S_OK);
     return WstrToUtf8Str(buf);
 }
 
+// TODO: make it GetLocalAppDir(const char *add1 = NULL, const char *add2 = NULL, const char *add3 = NULL)
+// so that GetInstallationBaseDir() is just return GetLocalAppDir("velociraptor8")
 std::string GetLocalAppDir() {
     return GetKnownFolderPathXp(CSIDL_LOCAL_APPDATA);
 }
 
+std::string GetInstallationBaseDir() {
+    auto path = GetLocalAppDir();
+    path::Join(path, "velociraptor8"); // TODO: use ve8 for shorter paths?
+    return path;
+}
+
+std::string GetInstallationBinDir() {
+    auto path = GetInstallationBaseDir();
+    path::Join(path, "bin");
+    return path;
+}
+
+// we consider the program installed if the exe is in the installation
+// directory
 bool IsRunningInstalled() {
     auto exePath = GetExePath();
-    auto appDir = GetLocalAppDir();
-    auto pos = exePath.find(appDir);
+    auto binDir = GetInstallationBinDir();
+    // Maybe: compare for equality?
+    auto pos = exePath.find(binDir);
     return pos == 0;
 }
 

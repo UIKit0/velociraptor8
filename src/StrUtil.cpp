@@ -6,7 +6,23 @@ namespace str {
 size_t Len(const char *s) { return strlen(s); }
 size_t Len(const WCHAR *s) { return wcslen(s); }
 
+bool EndsWith(const std::string& s, char c) {
+    if (s.empty()) {
+        return false;
+    }
+    char last = s.at(s.size() - 1);
+    return last == c;
 }
+
+bool StartsWith(const std::string& s, char c) {
+    if (s.empty()) {
+        return false;
+    }
+    char first = s.at(0);
+    return first == c;
+}
+
+} // namespace str
 
 // returns either bufOut or newly allocated 
 char *WstrToUtf8Buf(const WCHAR *s, char *bufOut, size_t cbBufOutSize) {

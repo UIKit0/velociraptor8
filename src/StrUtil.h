@@ -3,8 +3,10 @@ namespace str {
 
 size_t Len(const char *s);
 size_t Len(const WCHAR *s);
+bool EndsWith(const std::string& s, char c);
+bool StartsWith(const std::string& s, char c);
 
-}
+} // namespace str
 
 char *WstrToUtf8Buf(const WCHAR *s, char *buf, size_t bufCbLen);
 WCHAR *Utf8ToWstrBuf(const char *s, WCHAR *buf, size_t bufCchLen);
