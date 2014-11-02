@@ -51,13 +51,13 @@
     <ClCompile Include="Install.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="PathUtil.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Menu.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Translations.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FileUtil.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -107,13 +107,13 @@
     <ClInclude Include="Install.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="PathUtil.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Menu.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Translations.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FileUtil.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

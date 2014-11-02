@@ -1,21 +1,9 @@
 #include "Common.h"
 #include "Install.h"
-#include "PathUtil.h"
+#include "FileUtil.h"
 // Maybe: not ideal, decouple this via SetAppDirName() instead of APP_DIR_NAME
 #include "ve8.h"
 
-// http://msdn.microsoft.com/en-us/library/windows/desktop/bb773569(v=vs.85).aspx
-// TODO: on win8 use PathCchCanonicalize or PathCchCanonicalizeEx
-void NormalizePathInPlace(WCHAR *src, size_t srcCchSize) {
-    // TODO: make it work even if srcCchSize is < MAX_PATH
-    CrashIf(srcCchSize < MAX_PATH);
-    WCHAR buf[MAX_PATH];
-    BOOL ok = PathCanonicalizeW(buf, src);
-    if (!ok) {
-        return;
-    }
-    memcpy(src, buf, sizeof(buf));
-}
 // http://msdn.microsoft.com/en-us/library/windows/desktop/ms683197(v=vs.85).aspx
 static std::string GetExePath() {
     WCHAR buf[1024 * 4];
@@ -27,7 +15,7 @@ static std::string GetExePath() {
     CrashIf(ret == bufCchSize);
     // post XP error is indicated by GetLastError()
     CrashIfLastError();
-    NormalizePathInPlace(buf, dimof(buf));
+    path::NormalizeInPlace(buf, dimof(buf));
     return WstrToUtf8Str(buf);
 }
 
@@ -69,14 +57,18 @@ bool IsRunningInstalled() {
 
 bool IsRunnignPortable() { return !IsRunningInstalled(); }
 
+static std::string GetInstalledExePath() {
+    return GetLocalAppDir(APP_DIR_NAME, BIN_DIR_NAME, EXE_NAME);
+}
+
 static bool InstallCopyFiles() {
     // TODO(kjk): kill processes that match the path we're writing to
     auto exePath = GetExePath();
-    auto dstPath = GetLocalAppDir(APP_DIR_NAME, BIN_DIR_NAME, EXE_NAME);
-    if (!path::CreateDirForFile(dstPath)) {
+    auto dstPath = GetInstalledExePath();
+    if (!dir::CreateForFile(dstPath)) {
         return false;
     }
-    return path::FileCopy(dstPath, exePath);
+    return file::Copy(dstPath, exePath);
 }
 
 static bool InstallSetRegistryKeys() { return true; }
@@ -84,7 +76,20 @@ static bool InstallSetRegistryKeys() { return true; }
 // adds our bin directory to %PATH%
 static bool AddSelfToPath() { return true; }
 
+bool CanInstall() {
+    if (IsRunningInstalled()) {
+        return false;
+    }
+    auto path(GetInstalledExePath());
+    if (file::Exists(path)) {
+        // TODO(kjk): allow installation if my version > installed version
+        return false;
+    }
+    return true;
+}
+
 void Install() {
+    CrashIf(!CanInstall());
     if (!InstallCopyFiles()) {
         // TODO(kjk): show error message or crash
         return;

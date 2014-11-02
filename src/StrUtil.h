@@ -36,6 +36,8 @@ class AutoUtf8ToWstr {
 
   public:
     AutoUtf8ToWstr(const char *s) { res = Utf8ToWstrBuf(s, buf, dimof(buf)); }
+    // Maybe: optimize-out strlen
+    AutoUtf8ToWstr(const std::string& s) { res = Utf8ToWstrBuf(s.c_str(), buf, dimof(buf)); }
     ~AutoUtf8ToWstr() {
         if (res != buf)
             free(res);

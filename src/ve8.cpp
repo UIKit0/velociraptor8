@@ -22,7 +22,7 @@ See License.txt for details about distribution and modification.
 #include "Menu.h"
 #include "Install.h"
 #include "WinUtil.h"
-#include "PathUtil.h"
+#include "FileUtil.h"
 
 // Local and global Variables for Notepad2.c
 HWND hwndNextCBChain;
@@ -704,8 +704,9 @@ HWND InitInstance(HINSTANCE hInstance, LPSTR pszCmdLine, int nCmdShow) {
     gDoc->hwndTopLevel = hwndMain;
     auto mainMenu = BuildMainMenu();
     SetMenu(hwndMain, mainMenu);
-    if (IsRunningInstalled()) {
-        // TODO(kjk): remove instead?
+
+    if (!CanInstall()) {
+        // TODO(kjk): remove the menu item instead of graying it out?
         // TODO(kjk): should this be in menu.cpp?
         DisableMenu(mainMenu, IDM_INSTALL);
     }

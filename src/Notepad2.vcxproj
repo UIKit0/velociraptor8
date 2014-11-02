@@ -378,7 +378,7 @@
     <ClCompile Include="Http.cpp" />
     <ClCompile Include="Install.cpp" />
     <ClCompile Include="Menu.cpp" />
-    <ClCompile Include="PathUtil.cpp" />
+    <ClCompile Include="FileUtil.cpp" />
     <ClCompile Include="Translations.cpp" />
     <ClCompile Include="ve8.cpp" />
     <ClCompile Include="Print.cpp" />
@@ -396,7 +396,7 @@
     <ClInclude Include="Http.h" />
     <ClInclude Include="Install.h" />
     <ClInclude Include="Menu.h" />
-    <ClInclude Include="PathUtil.h" />
+    <ClInclude Include="FileUtil.h" />
     <ClInclude Include="SciCall.h" />
     <ClInclude Include="StrUtil.h" />
     <ClInclude Include="Styles.h" />
