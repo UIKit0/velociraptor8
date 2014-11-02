@@ -20,6 +20,7 @@ See License.txt for details about distribution and modification.
 #include "Http.h"
 #include "Install.h"
 #include "Menu.h"
+#include "Install.h"
 
 // Local and global Variables for Notepad2.c
 HWND hwndNextCBChain;
@@ -2147,6 +2148,49 @@ static void MenuNewWindow(HWND hwnd, bool isEmpty) {
     ShellExecuteEx(&sei);
 }
 
+void MenuFileRevert() {
+    if (0 == *szCurFile) {
+        return;
+    }
+
+    WCHAR tchCurFile2[MAX_PATH];
+
+    int iCurPos = (int) SendMessage(gDoc->hwndScintilla, SCI_GETCURRENTPOS, 0, 0);
+    int iAnchorPos = (int) SendMessage(gDoc->hwndScintilla, SCI_GETANCHOR, 0, 0);
+    int iVisTopLine =
+        (int) SendMessage(gDoc->hwndScintilla, SCI_GETFIRSTVISIBLELINE, 0, 0);
+    int iDocTopLine = (int) SendMessage(gDoc->hwndScintilla, SCI_DOCLINEFROMVISIBLE,
+        (WPARAM) iVisTopLine, 0);
+    int iXOffset = (int) SendMessage(gDoc->hwndScintilla, SCI_GETXOFFSET, 0, 0);
+
+    if (bModified || iEncoding != iOriginalEncoding) {
+        auto ret = MsgBox(MBOKCANCEL, IDS_ASK_REVERT);
+        if (ret != IDOK) {
+            return;
+        }
+    }
+    lstrcpy(tchCurFile2, szCurFile);
+    iWeakSrcEncoding = iEncoding;
+    auto ok = FileLoad(TRUE, FALSE, TRUE, FALSE, tchCurFile2);
+    if (!ok) {
+        return;
+    }
+    if (SendMessageW(gDoc->hwndScintilla, SCI_GETLENGTH, 0, 0) < 4) {
+        return;
+    }
+    char tch[5] = "";
+    SendMessage(gDoc->hwndScintilla, SCI_GETTEXT, 5, (LPARAM) tch);
+    if (lstrcmpiA(tch, ".LOG") == 0) {
+        return;
+    }
+    int iNewTopLine;
+    SendMessage(gDoc->hwndScintilla, SCI_SETSEL, iAnchorPos, iCurPos);
+    SendMessage(gDoc->hwndScintilla, SCI_ENSUREVISIBLE, (WPARAM) iDocTopLine, 0);
+    iNewTopLine = (int) SendMessage(gDoc->hwndScintilla, SCI_GETFIRSTVISIBLELINE, 0, 0);
+    SendMessage(gDoc->hwndScintilla, SCI_LINESCROLL, 0, (LPARAM) iVisTopLine - iNewTopLine);
+    SendMessage(gDoc->hwndScintilla, SCI_SETXOFFSET, (WPARAM) iXOffset, 0);
+}
+
 // WM_COMMAND
 LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
     CrashIf(hwnd != gDoc->hwndTopLevel);
@@ -2163,43 +2207,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
             break;
 
         case IDM_FILE_REVERT: {
-            if (lstrlen(szCurFile)) {
-
-                WCHAR tchCurFile2[MAX_PATH];
-
-                int iCurPos = (int)SendMessage(gDoc->hwndScintilla, SCI_GETCURRENTPOS, 0, 0);
-                int iAnchorPos = (int)SendMessage(gDoc->hwndScintilla, SCI_GETANCHOR, 0, 0);
-                int iVisTopLine =
-                    (int)SendMessage(gDoc->hwndScintilla, SCI_GETFIRSTVISIBLELINE, 0, 0);
-                int iDocTopLine = (int)SendMessage(gDoc->hwndScintilla, SCI_DOCLINEFROMVISIBLE,
-                                                   (WPARAM)iVisTopLine, 0);
-                int iXOffset = (int)SendMessage(gDoc->hwndScintilla, SCI_GETXOFFSET, 0, 0);
-
-                if ((bModified || iEncoding != iOriginalEncoding) &&
-                    MsgBox(MBOKCANCEL, IDS_ASK_REVERT) != IDOK)
-                    return 0;
-
-                lstrcpy(tchCurFile2, szCurFile);
-
-                iWeakSrcEncoding = iEncoding;
-                if (FileLoad(TRUE, FALSE, TRUE, FALSE, tchCurFile2)) {
-                    if (SendMessage(gDoc->hwndScintilla, SCI_GETLENGTH, 0, 0) >= 4) {
-                        char tch[5] = "";
-                        SendMessage(gDoc->hwndScintilla, SCI_GETTEXT, 5, (LPARAM)tch);
-                        if (lstrcmpiA(tch, ".LOG") != 0) {
-                            int iNewTopLine;
-                            SendMessage(gDoc->hwndScintilla, SCI_SETSEL, iAnchorPos, iCurPos);
-                            SendMessage(gDoc->hwndScintilla, SCI_ENSUREVISIBLE, (WPARAM)iDocTopLine,
-                                        0);
-                            iNewTopLine = (int)SendMessage(gDoc->hwndScintilla,
-                                                           SCI_GETFIRSTVISIBLELINE, 0, 0);
-                            SendMessage(gDoc->hwndScintilla, SCI_LINESCROLL, 0,
-                                        (LPARAM)iVisTopLine - iNewTopLine);
-                            SendMessage(gDoc->hwndScintilla, SCI_SETXOFFSET, (WPARAM)iXOffset, 0);
-                        }
-                    }
-                }
-            }
+            MenuFileRevert();
         } break;
 
         case IDM_FILE_SAVE:
@@ -3995,6 +4003,10 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
         case IDM_HELP_ABOUT:
             ThemedDialogBox(g_hInstance, MAKEINTRESOURCE(IDD_ABOUT), hwnd, AboutDlgProc);
+            break;
+
+        case IDM_INSTALL:
+            Install();
             break;
 
         case IDM_WEBSITE:

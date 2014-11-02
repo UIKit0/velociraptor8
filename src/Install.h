@@ -10,3 +10,6 @@ std::string GetInstallationBaseDir();
 
 bool IsRunningInstalled();
 bool IsRunningPortable();
+
+void Install();
+

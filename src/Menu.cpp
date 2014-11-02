@@ -305,6 +305,7 @@ static MenuDef menuDefSettings [] = {
 static MenuDef menuDefHelp [] = {
     { "&About...\tF1", IDM_HELP_ABOUT, nullptr },
     { "&Website", IDM_WEBSITE, nullptr },
+    { "Install", IDM_INSTALL, nullptr },
     { nullptr, 0, nullptr }
 };
 

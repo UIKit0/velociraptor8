@@ -69,3 +69,7 @@ bool IsRunningInstalled() {
 }
 
 bool IsRunnignPortable() { return !IsRunningInstalled(); }
+
+void Install() {
+    // TODO(kjk): write me
+}
