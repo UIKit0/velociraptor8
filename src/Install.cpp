@@ -40,21 +40,20 @@ static std::string GetKnownFolderPathXp(int nFolder) {
     return WstrToUtf8Str(buf);
 }
 
-// TODO: make it GetLocalAppDir(const char *add1 = NULL, const char *add2 =
-// NULL, const char *add3 = NULL)
-// so that GetInstallationBaseDir() is just return
-// GetLocalAppDir("velociraptor8")
-std::string GetLocalAppDir() { return GetKnownFolderPathXp(CSIDL_LOCAL_APPDATA); }
-
-std::string GetInstallationBaseDir() {
-    auto path = GetLocalAppDir();
-    path::Join(path, APP_DIR_NAME);
-    return path;
-}
-
-std::string GetInstallationBinDir() {
-    auto path = GetInstallationBaseDir();
-    path::Join(path, "bin");
+static std::string GetLocalAppDir(const char *p1 = NULL, const char *p2 = NULL, const char *p3 = NULL, const char *p4 = NULL) {
+    std::string path(GetKnownFolderPathXp(CSIDL_LOCAL_APPDATA));
+    if (p1 != NULL) {
+        path::Join(path, p1);
+    }
+    if (p2 != NULL) {
+        path::Join(path, p2);
+    }
+    if (p3 != NULL) {
+        path::Join(path, p3);
+    }
+    if (p4 != NULL) {
+        path::Join(path, p4);
+    }
     return path;
 }
 
@@ -62,8 +61,8 @@ std::string GetInstallationBinDir() {
 // directory
 bool IsRunningInstalled() {
     auto exePath = GetExePath();
-    auto binDir = GetInstallationBinDir();
-    // Maybe: compare for equality?
+    auto binDir = GetLocalAppDir(APP_DIR_NAME, BIN_DIR_NAME);
+    // Maybe: get the full binary path and compare for equality?
     auto pos = exePath.find(binDir);
     return pos == 0;
 }
@@ -72,7 +71,12 @@ bool IsRunnignPortable() { return !IsRunningInstalled(); }
 
 static bool InstallCopyFiles() {
     // TODO(kjk): kill processes that match the path we're writing to
-    return true;
+    auto exePath = GetExePath();
+    auto dstPath = GetLocalAppDir(APP_DIR_NAME, BIN_DIR_NAME, EXE_NAME);
+    if (!path::CreateDirForFile(dstPath)) {
+        return false;
+    }
+    return path::FileCopy(dstPath, exePath);
 }
 
 static bool InstallSetRegistryKeys() { return true; }

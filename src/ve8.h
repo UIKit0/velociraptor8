@@ -7,6 +7,8 @@ Please send me your comments to this work.
 #define SETTINGS_FILE_NAME L"ve8.ini"
 // when installed our files are under %LOCALAPPDATA%\APP_DIR_NAME
 #define APP_DIR_NAME "ve8"
+#define BIN_DIR_NAME "bin"
+#define EXE_NAME "ve8.exe"
 
 //==== Data Type for WM_COPYDATA ==============================================
 #define DATA_NOTEPAD2_PARAMS 0xFB10

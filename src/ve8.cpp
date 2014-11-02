@@ -22,6 +22,7 @@ See License.txt for details about distribution and modification.
 #include "Menu.h"
 #include "Install.h"
 #include "WinUtil.h"
+#include "PathUtil.h"
 
 // Local and global Variables for Notepad2.c
 HWND hwndNextCBChain;
@@ -459,6 +460,36 @@ static bool CheckWinVer() {
     return false;
 }
 
+static void TestGetDir() {
+    std::string s("c:\\foo\\bar\\and.txt");
+    OutputDebugStringA(path::GetDir(s).c_str());
+    s = "";
+    OutputDebugStringA(path::GetDir(s).c_str());
+    s = "foo/bar.txt";
+    OutputDebugStringA(path::GetDir(s).c_str());
+    s = "foo";
+    OutputDebugStringA(path::GetDir(s).c_str());
+}
+
+static void TestUiTask() {
+    // example of using uitask::Post()
+    uitask::Post([] {
+        OutputDebugStringA("hello2");
+    });
+}
+
+static void TestHttpGet() {
+    HttpGetAsync(AUTO_UPDATE_URL, [](HttpRsp* r) {
+        OutputDebugStringA("got data\n");
+    });
+}
+
+static void AdHocTest() {
+    //TestUiTask();
+    //TestHttpGet();
+    //TestGetDir();
+}
+
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nCmdShow) {
     MSG msg;
     HWND hwnd;
@@ -542,19 +573,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, in
     hAccMain = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDR_MAINWND));
     hAccFindReplace = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDR_ACCFINDREPLACE));
 
-#if 0
-    // example of using uitask::Post()
-    uitask::Post([] {
-        OutputDebugStringA("hello2");
-    });
-#endif
-
-#if 0
-    HttpGetAsync(AUTO_UPDATE_URL, [](HttpRsp* r) {
-        OutputDebugStringA("got data\n");
-    });
-#endif
-
+    AdHocTest();
     while (GetMessage(&msg, NULL, 0, 0)) {
         if (IsWindow(hDlgFindReplace) &&
             (msg.hwnd == hDlgFindReplace || IsChild(hDlgFindReplace, msg.hwnd)))
@@ -1337,7 +1356,6 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wp, LPARAM lp) {
     HINSTANCE hInstance = cs->hInstance;
 
     //(void)IsRunningInstalled();
-    (void)GetInstallationBinDir();
 
     CrashIf(gDoc);
     gDoc = AllocMust<Document>();
