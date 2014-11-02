@@ -8,9 +8,10 @@ bool StartsWith(const std::string &s, char c);
 
 } // namespace str
 
-char *WstrToUtf8Buf(const WCHAR *s, char *buf, size_t bufCbLen);
-WCHAR *Utf8ToWstrBuf(const char *s, WCHAR *buf, size_t bufCchLen);
+char *WstrToUtf8Buf(const WCHAR *s, char *bufOut, size_t cchBufOutSize);
+WCHAR *Utf8ToWstrBuf(const char *s, WCHAR *bufOut, size_t cchBufOutSize);
 WCHAR *Utf8ToWstr(const char *s);
+void Utf8ToWstrBuf2(const char *s, WCHAR *bufOut, size_t cchBufOutSize);
 
 // TODO: allow optimizing by specifying size of s
 std::string WstrToUtf8Str(const WCHAR *s);

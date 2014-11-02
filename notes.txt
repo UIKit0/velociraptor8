@@ -1,0 +1,2 @@
+before less unicode:
+-rwxr-xr-x 1 kkowalczyk None 1746944 Nov  1 21:03 ./bin/VS2013/Release_x86/ve8.exe

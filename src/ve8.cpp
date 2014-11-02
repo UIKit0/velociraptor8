@@ -65,6 +65,11 @@ TBBUTTON tbbMainWnd[] = { { 0, IDT_FILE_NEW, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0,
 
 WCHAR szIniFile[MAX_PATH] = L"";
 WCHAR szIniFile2[MAX_PATH] = L"";
+
+WCHAR *GetInitFile() {
+    return szIniFile;
+}
+
 BOOL bSaveSettings;
 BOOL bSaveRecentFiles;
 BOOL bSaveFindReplace;

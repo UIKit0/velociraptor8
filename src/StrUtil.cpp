@@ -38,6 +38,14 @@ char *WstrToUtf8Buf(const WCHAR *s, char *bufOut, size_t cbBufOutSize) {
     return bufOut;
 }
 
+// if can't fit converted s into buf, will crash
+// TODO: make it put truncated data
+void Utf8ToWstrBuf2(const char *s, WCHAR *bufOut, size_t cchBufOutSize) {
+    size_t res = (size_t) MultiByteToWideChar(CP_UTF8, 0, s, -1, bufOut, cchBufOutSize);
+    CrashIf(res >= cchBufOutSize);
+    bufOut[res] = 0;
+}
+
 WCHAR *Utf8ToWstrBuf(const char *s, WCHAR *bufOut, size_t cchBufOutSize) {
     size_t cchNeeds = (size_t)MultiByteToWideChar(CP_UTF8, 0, s, -1, NULL, 0);
     if (cchNeeds >= cchBufOutSize) {

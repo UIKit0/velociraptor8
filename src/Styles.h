@@ -10,10 +10,9 @@ typedef struct _editstyle {
         UINT8 iStyle8[4];
     };
     int rid;
-    WCHAR *pszName;
-    WCHAR *pszDefault;
-    WCHAR szValue[128];
-
+    char *pszName;
+    char *pszDefault;
+    char szValue[128];
 } EDITSTYLE, *PEDITSTYLE;
 
 struct KeywordList {
@@ -23,8 +22,8 @@ struct KeywordList {
 struct EditLexer {
     int iLexer;
     int rid;
-    WCHAR *pszName;
-    WCHAR *pszDefExt;
+    char *pszName;
+    char *pszDefExt;
     WCHAR szExtensions[128];
     KeywordList *pKeyWords;
     EDITSTYLE Styles[];
@@ -54,14 +53,10 @@ BOOL Style_GetOpenDlgFilterStr(WCHAR *, int);
 BOOL Style_StrGetFont(const WCHAR *, WCHAR *, int);
 BOOL Style_StrGetFontQuality(const WCHAR *, WCHAR *, int);
 BOOL Style_StrGetCharSet(const WCHAR *, int *);
-BOOL Style_StrGetSize(const WCHAR *, int *);
 BOOL Style_StrGetSizeStr(const WCHAR *, WCHAR *, int);
-BOOL Style_StrGetColor(BOOL, const WCHAR *, int *);
 BOOL Style_StrGetCase(const WCHAR *, int *);
-BOOL Style_StrGetAlpha(const WCHAR *, int *);
 BOOL Style_SelectFont(HWND, WCHAR *, int, BOOL);
 BOOL Style_SelectColor(HWND, BOOL, WCHAR *, int);
-void Style_SetStyles(HWND, int, const WCHAR *);
 void Style_SetFontQuality(HWND, const WCHAR *);
 void Style_GetCurrentLexerName(WCHAR *, int);
 int Style_GetLexerIconId(EditLexer *);

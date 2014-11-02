@@ -7,22 +7,39 @@ See License.txt for details about distribution and modification.
 extern HINSTANCE g_hInstance;
 extern UINT16 g_uWinVer;
 
-extern WCHAR szIniFile[MAX_PATH];
-#define IniGetString(lpSection, lpName, lpDefault, lpReturnedStr, nSize)                           \
-    GetPrivateProfileString(lpSection, lpName, lpDefault, lpReturnedStr, nSize, szIniFile)
-#define IniGetInt(lpSection, lpName, nDefault)                                                     \
-    GetPrivateProfileInt(lpSection, lpName, nDefault, szIniFile)
-#define IniSetString(lpSection, lpName, lpString)                                                  \
-    WritePrivateProfileString(lpSection, lpName, lpString, szIniFile)
-#define IniDeleteSection(lpSection) WritePrivateProfileSection(lpSection, NULL, szIniFile)
-__inline BOOL IniSetInt(const WCHAR *lpSection, const WCHAR *lpName, int i) {
+// in ve8.cpp
+WCHAR *GetIniFile();
+
+inline DWORD IniGetString(const WCHAR *lpSection, const WCHAR *lpName, const WCHAR* lpDefault, 
+    WCHAR *lpReturnedStr, DWORD nSize) {
+    return GetPrivateProfileStringW(lpSection, lpName, lpDefault, lpReturnedStr, nSize, GetIniFile());
+}
+
+inline UINT IniGetInt(const WCHAR *lpSection, const WCHAR *lpName, INT nDefault) {
+    return GetPrivateProfileIntW(lpSection, lpName, nDefault, GetIniFile());
+}
+
+inline BOOL IniSetString(const WCHAR *lpSection, const WCHAR *lpName, const WCHAR *lpString) {
+    return WritePrivateProfileStringW(lpSection, lpName, lpString, GetIniFile());
+}
+inline BOOL IniDeleteSection(const WCHAR *lpSection) {
+    return WritePrivateProfileSectionW(lpSection, NULL, GetIniFile());
+}
+
+inline BOOL IniSetInt(const WCHAR *lpSection, const WCHAR *lpName, int i) {
     WCHAR tch[32];
     wsprintf(tch, L"%i", i);
     return IniSetString(lpSection, lpName, tch);
 }
-#define LoadIniSection(lpSection, lpBuf, cchBuf)                                                   \
-    GetPrivateProfileSection(lpSection, lpBuf, cchBuf, szIniFile);
-#define SaveIniSection(lpSection, lpBuf) WritePrivateProfileSection(lpSection, lpBuf, szIniFile)
+
+inline DWORD LoadIniSection(const WCHAR *lpSection, WCHAR *lpBuf, DWORD cchBuf) {
+    return GetPrivateProfileSectionW(lpSection, lpBuf, cchBuf, GetIniFile());
+}
+
+inline BOOL SaveIniSection(const WCHAR *lpSection, WCHAR *lpBuf) {
+    return WritePrivateProfileSectionW(lpSection, lpBuf, GetIniFile());
+}
+
 int IniSectionGetString(const WCHAR *, const WCHAR *, const WCHAR *, WCHAR *, int);
 int IniSectionGetInt(const WCHAR *, const WCHAR *, int);
 BOOL IniSectionSetString(WCHAR *, const WCHAR *, const WCHAR *);
