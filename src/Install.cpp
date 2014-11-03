@@ -229,3 +229,8 @@ void Install() {
     }
     // TODO(kjk): relaunch the installed version
 }
+
+// called when /uninstall cmd-line arg is given
+void Uninstall() {
+
+}

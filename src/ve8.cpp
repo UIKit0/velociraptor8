@@ -293,6 +293,7 @@ int flagQuietCreate = 0;
 int flagUseSystemMRU = 0;
 int flagRelaunchElevated = 0;
 int flagDisplayHelp = 0;
+int flagUninstall = 0;
 
 //  Folding Functions
 typedef enum { EXPAND = 1, SNIFF = 0, FOLD = -1 } FOLD_ACTION;
@@ -521,6 +522,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, in
     Encoding_InitDefaults();
 
     ParseCommandLine();
+    if (flagUninstall) {
+        Uninstall();
+        return 0;
+    }
     FindIniFile();
     TestIniFile();
     CreateIniFile();
@@ -5602,7 +5607,7 @@ void ParseCommandLine() {
     BOOL bIsFileArg = FALSE;
     BOOL bIsNotepadReplacement = FALSE;
 
-    WCHAR *lpCmdLine = GetCommandLine();
+    WCHAR *lpCmdLine = GetCommandLineW();
 
     if (lstrlen(lpCmdLine) == 0)
         return;
@@ -5649,13 +5654,15 @@ void ParseCommandLine() {
                 flagSetEncoding = IDM_ENCODING_UTF8SIGN - IDM_ENCODING_ANSI + 1;
 
             // EOL Mode
-            else if (lstrcmpi(lp1, L"CRLF") == 0 || lstrcmpi(lp1, L"CR+LF") == 0)
+            else if (lstrcmpiW(lp1, L"CRLF") == 0 || lstrcmpi(lp1, L"CR+LF") == 0)
                 flagSetEOLMode = IDM_LINEENDINGS_CRLF - IDM_LINEENDINGS_CRLF + 1;
-            else if (lstrcmpi(lp1, L"LF") == 0)
+            else if (lstrcmpiW(lp1, L"LF") == 0)
                 flagSetEOLMode = IDM_LINEENDINGS_LF - IDM_LINEENDINGS_CRLF + 1;
-            else if (lstrcmpi(lp1, L"CR") == 0)
+            else if (lstrcmpiW(lp1, L"CR") == 0)
                 flagSetEOLMode = IDM_LINEENDINGS_CR - IDM_LINEENDINGS_CRLF + 1;
-
+            else if (lstrcmpiW(lp1, L"uninstall") == 0) {
+                flagUninstall = 1;
+            }
             // Shell integration
             else if (StrCmpNI(lp1, L"appid=", CSTRLEN(L"appid=")) == 0) {
                 StrCpyN(g_wchAppUserModelID, lp1 + CSTRLEN(L"appid="), dimof(g_wchAppUserModelID));
