@@ -250,6 +250,11 @@ bool CanInstall() {
     if (IsRunningInstalled()) {
         return false;
     }
+    // don't install if running as elevated as I think it can mess up
+    // file permissions and stuff
+    if (IsElevated()) {
+        return false;
+    }
     auto path(GetInstalledExePath());
     if (file::Exists(path)) {
         // TODO(kjk): allow installation if my version > installed version

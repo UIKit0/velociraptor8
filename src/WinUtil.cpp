@@ -168,6 +168,7 @@ bool CreateRegKey(HKEY keySub, const char *keyName) {
     return true;
 }
 
+// http://msdn.microsoft.com/en-us/library/windows/desktop/ms725497(v=vs.85).aspx
 void BroadcastEnvRegistryChanged() {
     DWORD result;
     UINT flags = SMTO_BLOCK | SMTO_ABORTIFHUNG | SMTO_NOTIMEOUTIFNOTHUNG;
