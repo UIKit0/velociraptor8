@@ -53,12 +53,46 @@ bool EndsWith(const std::string &s, char c) {
     return c == LastChar(s);
 }
 
-bool StartsWith(const std::string &s, char c) {
+/* return true if 'str' starts with 'txt', NOT case-sensitive */
+static bool StartsWithI(const char *str, const char *txt) {
+    if (str == txt)
+        return true;
+    if (!str || !txt)
+        return false;
+    return 0 == _strnicmp(str, txt, str::Len(txt));
+}
+
+static bool StartsWith(const std::string &s, char c) {
     if (s.empty()) {
         return false;
     }
     char first = s.at(0);
     return first == c;
+}
+
+const char *FindI(const char *s, const char *toFind) {
+    if (!s || !toFind) {
+        return nullptr;
+    }
+
+    char first = (char) tolower(*toFind);
+    if (!first)
+        return s;
+    while (*s) {
+        char c = (char) tolower(*s);
+        if (c == first) {
+            if (str::StartsWithI(s, toFind)) {
+                return s;
+            }
+        }
+        s++;
+    }
+    return nullptr;
+}
+
+bool ContainsI(const std::string& s, const std::string& toFind) {
+    const char *found = FindI(s.c_str(), toFind.c_str());
+    return found != nullptr;
 }
 
 std::string FmtV(const char *fmt, va_list args) {

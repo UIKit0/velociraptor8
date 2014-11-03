@@ -87,11 +87,59 @@ bool CreateShortcut(const std::string& shortcutPath, const std::string& exePath)
     return SUCCEEDED(hr);
 }
 
+bool ReadRegStr(HKEY keySub, const std::string& keyName, const std::string& valName, std::string& valOut) {
+    AutoUtf8ToWstr keyNameW(keyName);
+    AutoUtf8ToWstr valNameW(valName);
+
+    WCHAR *val = NULL;
+    REGSAM access = KEY_READ;
+    HKEY hKey;
+TryAgainWOW64:
+    LONG res = RegOpenKeyExW(keySub, keyNameW.Get(), 0, access, &hKey);
+    if (ERROR_SUCCESS == res) {
+        DWORD valLen;
+        res = RegQueryValueExW(hKey, valNameW.Get(), NULL, NULL, NULL, &valLen);
+        if (ERROR_SUCCESS == res) {
+            val = AllocMustN<WCHAR>(valLen / sizeof(WCHAR) + 1);
+            res = RegQueryValueExW(hKey, valNameW.Get(), NULL, NULL, (LPBYTE) val, &valLen);
+            if (ERROR_SUCCESS != res) {
+                free(val);
+                val = NULL;
+            }
+        }
+        RegCloseKey(hKey);
+    }
+    if (ERROR_FILE_NOT_FOUND == res && HKEY_LOCAL_MACHINE == keySub && KEY_READ == access) {
+        // try the (non-)64-bit key as well, as HKLM\Software is not shared between 32-bit and
+        // 64-bit applications per http://msdn.microsoft.com/en-us/library/aa384253(v=vs.85).aspx
+#ifdef _WIN64
+        access = KEY_READ | KEY_WOW64_32KEY;
+#else
+        access = KEY_READ | KEY_WOW64_64KEY;
+#endif
+        goto TryAgainWOW64;
+    }
+    if (!val) {
+        return false;
+    }
+    AutoWstrToUtf8 valUtf(val);
+    valOut.assign(valUtf.Get());
+    return true;
+}
+
 bool WriteRegStr(HKEY keySub, const char *keyName, const char *valName, const char *value) {
     AutoUtf8ToWstr keyNameW(keyName);
     AutoUtf8ToWstr valNameW(valName);
     AutoUtf8ToWstr valueW(value);
     LSTATUS res = SHSetValueW(keySub, keyNameW, valNameW, REG_SZ, (const void *) valueW, (DWORD) (str::Len(valueW) + 1) * sizeof(WCHAR));
+    return ERROR_SUCCESS == res;
+}
+
+bool WriteRegExpandStr(HKEY keySub, const char *keyName, const char *valName, const char *value) {
+    AutoUtf8ToWstr keyNameW(keyName);
+    AutoUtf8ToWstr valNameW(valName);
+    AutoUtf8ToWstr valueW(value);
+    LSTATUS res = SHSetValueW(keySub, keyNameW, valNameW, REG_EXPAND_SZ, (const void *) valueW, (DWORD) (str::Len(valueW) + 1) * sizeof(WCHAR));
     return ERROR_SUCCESS == res;
 }
 
@@ -118,4 +166,10 @@ bool CreateRegKey(HKEY keySub, const char *keyName) {
     }
     RegCloseKey(hKey);
     return true;
+}
+
+void BroadcastEnvRegistryChanged() {
+    DWORD result;
+    UINT flags = SMTO_BLOCK | SMTO_ABORTIFHUNG | SMTO_NOTIMEOUTIFNOTHUNG;
+    SendMessageTimeoutW(HWND_BROADCAST, WM_SETTINGCHANGE, 0, (LPARAM)L"Environment", flags, 5000, &result);
 }

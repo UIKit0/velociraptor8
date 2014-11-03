@@ -198,7 +198,33 @@ static bool InstallCopyFiles() {
 static bool InstallSetRegistryKeys() { return true; }
 
 // adds our bin directory to %PATH%
-static bool AddSelfToPath() { return true; }
+// Maybe: also check HKLM_keyName = @"SYSTEM\CurrentControlSet\Control\Session Manager\Environment";
+// (although we don't write to it)
+bool AddSelfToPath() {
+    std::string path;
+    bool ok = ReadRegStr(HKEY_CURRENT_USER, "Environment", "Path", path);
+    if (!ok) {
+        return false;
+    }
+    std::string binDir(GetLocalAppDir(APP_DIR_NAME, BIN_DIR_NAME));
+    if (str::ContainsI(path, binDir)) {
+        return true;
+    }
+    char last = str::LastChar(path);
+    if (last != ';') {
+        path.append(1, ';');
+    }
+    path.append(binDir);
+    ok = WriteRegExpandStr(HKEY_CURRENT_USER, "Environment", "Path", path.c_str());
+    BroadcastEnvRegistryChanged();
+    return ok;
+}
+
+bool RemoveSelfFromPath() {
+    // TODO(kjk): write me
+    CrashIf(true);
+    return false;
+}
 
 bool CanInstall() {
     if (IsRunningInstalled()) {
