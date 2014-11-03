@@ -8,9 +8,10 @@ See License.txt for details about distribution and modification.
 */
 
 #include "Common.h"
-#include "ve8.h"
-
 #include "scintilla.h"
+
+#include "ve8.h"
+#include "Install.h"
 #include "helpers.h"
 #include "resource.h"
 
@@ -279,7 +280,11 @@ BOOL SetWindowTitle(HWND hwnd, UINT uIDAppName, BOOL bIsElevated, UINT uIDUntitl
 
     if (bIsElevated) {
         FormatString(szElevatedAppName, dimof(szElevatedAppName), IDS_APPTITLE_ELEVATED, szAppName);
-        StrCpyN(szAppName, szElevatedAppName, dimof(szAppName));
+        StrCpyNW(szAppName, szElevatedAppName, dimof(szAppName));
+    }
+
+    if (IsRunningPortable()) {
+        StrNCatW(szAppName, L" (portable)", dimof(szAppName));
     }
 
     if (bModified)
@@ -326,7 +331,7 @@ BOOL SetWindowTitle(HWND hwnd, UINT uIDAppName, BOOL bIsElevated, UINT uIDUntitl
     lstrcat(szTitle, pszSep);
     lstrcat(szTitle, szAppName);
 
-    return SetWindowText(hwnd, szTitle);
+    return SetWindowTextW(hwnd, szTitle);
 }
 
 void SetWindowTransparentMode(HWND hwnd, BOOL bTransparentMode) {

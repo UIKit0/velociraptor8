@@ -77,7 +77,7 @@ bool IsRunningInstalled() {
     return pos == 0;
 }
 
-bool IsRunnignPortable() { return !IsRunningInstalled(); }
+bool IsRunningPortable() { return !IsRunningInstalled(); }
 
 static bool InstallCopyFiles() {
     // TODO(kjk): kill processes that match the path we're writing to
