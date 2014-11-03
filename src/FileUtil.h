@@ -1,5 +1,7 @@
 namespace path {
 
+bool IsSep(char c);
+void Join(std::string& sInOut, const char *s, size_t sLen = 0);
 void Join(std::string& sInOut, const std::string& s2);
 std::string GetDir(const std::string&);
 void NormalizeInPlace(WCHAR *src, size_t srcCchSize);

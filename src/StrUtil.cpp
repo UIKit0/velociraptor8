@@ -8,12 +8,15 @@ size_t Len(const WCHAR *s) { return wcslen(s); }
 
 bool Eq(const char *s1, const char *s2) { return strcmp(s1, s2) == 0; }
 
-bool EndsWith(const std::string &s, char c) {
+char LastChar(const std::string& s) {
     if (s.empty()) {
-        return false;
+        return 0;
     }
-    char last = s.at(s.size() - 1);
-    return last == c;
+    return s.at(s.size() - 1);
+}
+
+bool EndsWith(const std::string &s, char c) {
+    return c == LastChar(s);
 }
 
 bool StartsWith(const std::string &s, char c) {

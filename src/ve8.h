@@ -5,6 +5,7 @@ Please send me your comments to this work.
 */
 
 #define SETTINGS_FILE_NAME L"ve8.ini"
+#define APP_NAME "Velociraptor8"
 // when installed our files are under %LOCALAPPDATA%\APP_DIR_NAME
 #define APP_DIR_NAME "ve8"
 #define BIN_DIR_NAME "bin"

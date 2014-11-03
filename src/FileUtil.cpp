@@ -3,6 +3,12 @@
 
 namespace path {
 
+bool IsSep(char c) {
+    // little known fact: on windows both / and \ are valid although
+    // \ is not as well supported
+    return '\\' == c || '/' == c;
+}
+
 // http://msdn.microsoft.com/en-us/library/windows/desktop/bb773569(v=vs.85).aspx
 // TODO: on win8 use PathCchCanonicalize or PathCchCanonicalizeEx
 void NormalizeInPlace(WCHAR *src, size_t srcCchSize) {
@@ -16,24 +22,23 @@ void NormalizeInPlace(WCHAR *src, size_t srcCchSize) {
     memcpy(src, buf, sizeof(buf));
 }
 
-void Join(std::string& sInOut, const std::string& s2) {
-    // TODO: support '/' as a separator
-    if (!str::EndsWith(sInOut, '\\')) {
+void Join(std::string& sInOut, const char *s, size_t sLen) {
+    char c = str::LastChar(sInOut);
+    if (!IsSep(c)) {
         sInOut.append(1, '\\');
     }
-    const char* s2c = s2.c_str();
-    size_t s2cLen = s2.size();
-    if (*s2c == '\\') {
-        s2c++;
-        s2cLen--;
+    if (sLen == 0) {
+        sLen = str::Len(s);
     }
-    sInOut.append(s2c, s2cLen);
+    if (IsSep(*s)) {
+        ++s;
+        --sLen;
+    }
+    sInOut.append(s, sLen);
 }
 
-static bool IsSep(char c) {
-    // little known fact: on windows both / and \ are valid although
-    // \ is not as well supported
-    return '\\' == c || '/' == c;
+void Join(std::string& sInOut, const std::string& s2) {
+    return Join(sInOut, s2.c_str(), s2.size());
 }
 
 // consider using PathRemoveFileSpec()

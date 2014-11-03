@@ -3,6 +3,7 @@
 #include "FileUtil.h"
 // Maybe: not ideal, decouple this via SetAppDirName() instead of APP_DIR_NAME
 #include "ve8.h"
+#include "WinUtil.h"
 
 // http://msdn.microsoft.com/en-us/library/windows/desktop/ms683197(v=vs.85).aspx
 static std::string GetExePath() {
@@ -45,6 +46,27 @@ static std::string GetLocalAppDir(const char *p1 = NULL, const char *p2 = NULL, 
     return path;
 }
 
+static std::string GetInstalledExePath() {
+    return GetLocalAppDir(APP_DIR_NAME, BIN_DIR_NAME, EXE_NAME);
+}
+
+static std::string GetShortcutPath(bool allUsers) {
+    // CSIDL_COMMON_PROGRAMS => installing for all users
+    std::string path(GetKnownFolderPathXp(allUsers ? CSIDL_COMMON_PROGRAMS : CSIDL_PROGRAMS));
+    if (!path.empty()) {
+        path::Join(path, APP_NAME ".lnk");
+    }
+    return path;
+}
+
+static bool CreateAppShortcut(bool allUsers) {
+    std::string shortcutPath(GetShortcutPath(allUsers));
+    if (shortcutPath.empty()) {
+        return false;
+    }
+    std::string exePath(GetInstalledExePath());
+    return CreateShortcut(shortcutPath, exePath);
+}
 // we consider the program installed if the exe is in the installation
 // directory
 bool IsRunningInstalled() {
@@ -57,10 +79,6 @@ bool IsRunningInstalled() {
 
 bool IsRunnignPortable() { return !IsRunningInstalled(); }
 
-static std::string GetInstalledExePath() {
-    return GetLocalAppDir(APP_DIR_NAME, BIN_DIR_NAME, EXE_NAME);
-}
-
 static bool InstallCopyFiles() {
     // TODO(kjk): kill processes that match the path we're writing to
     auto exePath = GetExePath();
@@ -68,6 +86,11 @@ static bool InstallCopyFiles() {
     if (!dir::CreateForFile(dstPath)) {
         return false;
     }
+    bool allUsers = false;
+    if (!CreateAppShortcut(allUsers)) {
+        return false;
+    }
+
     return file::Copy(dstPath, exePath);
 }
 
