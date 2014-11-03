@@ -5149,7 +5149,7 @@ void LoadSettings() {
     iPathNameFormat = IniSectionGetInt(pIniSection, L"PathNameFormat", 0);
     iPathNameFormat = max(min(iPathNameFormat, 2), 0);
 
-    fWordWrap = IniSectionGetInt(pIniSection, L"WordWrap", 0);
+    fWordWrap = IniSectionGetInt(pIniSection, L"WordWrap", 1);
     if (fWordWrap)
         fWordWrap = 1;
     fWordWrapG = fWordWrap;
