@@ -221,9 +221,29 @@ bool AddSelfToPath() {
 }
 
 bool RemoveSelfFromPath() {
-    // TODO(kjk): write me
-    CrashIf(true);
-    return false;
+    std::string path;
+    bool ok = ReadRegStr(HKEY_CURRENT_USER, "Environment", "Path", path);
+    if (!ok) {
+        return false;
+    }
+    std::string binDir(GetLocalAppDir(APP_DIR_NAME, BIN_DIR_NAME));
+    size_t pos = str::FindIPos(path.c_str(), binDir.c_str());
+    if (pos == std::string::npos) {
+        return true;
+    }
+    size_t end = pos + binDir.size();
+    bool removedSep = false;
+    if (pos > 0 && path.at(pos - 1) == ';') {
+        pos--;
+        removedSep = true;
+    }
+    if (!removedSep && end < path.size() - 1 && path.at(end) == ';') {
+        end++;
+    }
+    path.erase(pos, end - pos);
+    //ok = WriteRegExpandStr(HKEY_CURRENT_USER, "Environment", "Path", path.c_str());
+    BroadcastEnvRegistryChanged();
+    return ok;
 }
 
 bool CanInstall() {

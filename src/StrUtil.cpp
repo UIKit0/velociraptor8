@@ -54,15 +54,15 @@ bool EndsWith(const std::string &s, char c) {
 }
 
 /* return true if 'str' starts with 'txt', NOT case-sensitive */
-static bool StartsWithI(const char *str, const char *txt) {
-    if (str == txt)
+bool StartsWithI(const char *str, const char *prefix) {
+    if (str == prefix)
         return true;
-    if (!str || !txt)
+    if (!str || !prefix)
         return false;
-    return 0 == _strnicmp(str, txt, str::Len(txt));
+    return 0 == _strnicmp(str, prefix, str::Len(prefix));
 }
 
-static bool StartsWith(const std::string &s, char c) {
+bool StartsWith(const std::string &s, char c) {
     if (s.empty()) {
         return false;
     }
@@ -88,6 +88,14 @@ const char *FindI(const char *s, const char *toFind) {
         s++;
     }
     return nullptr;
+}
+
+size_t FindIPos(const char *s, const char *toFind) {
+    const char *pos = FindI(s, toFind);
+    if (pos == nullptr) {
+        return std::string::npos;
+    }
+    return pos - s;
 }
 
 bool ContainsI(const std::string& s, const std::string& toFind) {

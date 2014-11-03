@@ -489,7 +489,8 @@ static void AdHocTest() {
     //TestUiTask();
     //TestHttpGet();
     //TestGetDir();
-    AddSelfToPath();
+    //AddSelfToPath();
+    //RemoveSelfFromPath();
 }
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nCmdShow) {

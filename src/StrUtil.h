@@ -5,10 +5,13 @@ size_t Len(const char *s);
 size_t Len(const WCHAR *s);
 bool Eq(const char *s1, const char *s2);
 bool Eq(const WCHAR *s1, const WCHAR *s2);
+const char *FindI(const char *s, const char *toFind);
+size_t FindIPos(const char *s, const char *toFind);
 bool ContainsI(const std::string&, const std::string&);
 char LastChar(const std::string& s);
 bool EndsWith(const std::string &s, char c);
 bool StartsWith(const std::string &s, char c);
+bool StartsWithI(const char *str, const char *prefix);
 std::string FmtV(const char *fmt, va_list args);
 std::string Format(const char *fmt, ...);
 
