@@ -79,6 +79,75 @@ bool IsRunningInstalled() {
 
 bool IsRunningPortable() { return !IsRunningInstalled(); }
 
+// This is in HKLM. Note that on 64bit windows, if installing 32bit app
+// the installer has to be 32bit as well, so that it goes into proper
+// place in registry (under Software\Wow6432Node\Microsoft\Windows\...
+#define REG_PATH_UNINST     "Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\" APP_NAME
+// REG_SZ, a path to installed executable (or "$path,0" to force the first icon)
+#define DISPLAY_ICON "DisplayIcon"
+// REG_SZ, e.g "SumatraPDF" (APP_NAME_STR)
+#define DISPLAY_NAME "DisplayName"
+// REG_SZ, e.g. "1.2" (CURR_VERSION_STR)
+#define DISPLAY_VERSION "DisplayVersion"
+// REG_DWORD, get size of installed directory after copying files
+#define ESTIMATED_SIZE "EstimatedSize"
+// REG_SZ, the current date as YYYYMMDD
+#define INSTALL_DATE "InstallDate"
+// REG_DWORD, set to 1
+#define NO_MODIFY "NoModify"
+// REG_DWORD, set to 1
+#define NO_REPAIR "NoRepair"
+// REG_SZ, e.g. "Krzysztof Kowalczyk"
+#define PUBLISHER "Publisher"
+// REG_SZ, command line for uninstaller
+#define UNINSTALL_STRING "UninstallString"
+// REG_SZ, e.g. "http://blog.kowalczyk.info/software/sumatrapdf/"
+#define URL_INFO_ABOUT "URLInfoAbout"
+// REG_SZ, e.g. "http://blog.kowalczyk.info/software/sumatrapdf/news.html"
+#define URL_UPDATE_INFO "URLUpdateInfo"
+// REG_SZ, same as INSTALL_DIR below
+#define INSTALL_LOCATION "InstallLocation"
+
+std::string GetInstallDate() {
+    SYSTEMTIME st;
+    GetSystemTime(&st);
+    return str::Format("%04d%02d%02d", st.wYear, st.wMonth, st.wDay);
+}
+
+static bool InstallWriteRegistry(HKEY hkey) {
+    bool ok = true;
+
+    std::string exePath(GetInstalledExePath());
+    std::string installDate(GetInstallDate());
+    std::string installDir(path::GetDir(exePath));
+    std::string uninstallCmdLine("\"");
+    uninstallCmdLine.append(exePath);
+    uninstallCmdLine.append("\" /uninstall");
+
+    ok &= WriteRegStr(hkey, REG_PATH_UNINST, DISPLAY_ICON, exePath.c_str());
+    ok &= WriteRegStr(hkey, REG_PATH_UNINST, DISPLAY_NAME, APP_NAME);
+    //ok &= WriteRegStr(hkey, REG_PATH_UNINST, DISPLAY_VERSION, CURR_VERSION_STR);
+    // Windows XP doesn't allow to view the version number at a glance,
+    // so include it in the DisplayName
+#if 0
+    if (!IsVistaOrGreater()) {
+        ok &= WriteRegStr(hkey, REG_PATH_UNINST, DISPLAY_NAME, APP_NAME " " CURR_VERSION_STR);
+    }
+#endif
+    //DWORD size = GetDirSize(gGlobalData.installDir) / 1024;
+    //ok &= WriteRegDWORD(hkey, REG_PATH_UNINST, ESTIMATED_SIZE, size);
+    ok &= WriteRegStr(hkey, REG_PATH_UNINST, INSTALL_DATE, installDate.c_str());
+    ok &= WriteRegStr(hkey, REG_PATH_UNINST, INSTALL_LOCATION, installDir.c_str());
+    ok &= WriteRegDWORD(hkey, REG_PATH_UNINST, NO_MODIFY, 1);
+    ok &= WriteRegDWORD(hkey, REG_PATH_UNINST, NO_REPAIR, 1);
+    ok &= WriteRegStr(hkey, REG_PATH_UNINST, PUBLISHER, "Krzysztof Kowalczyk");
+    ok &= WriteRegStr(hkey, REG_PATH_UNINST, UNINSTALL_STRING, uninstallCmdLine.c_str());
+    ok &= WriteRegStr(hkey, REG_PATH_UNINST, URL_INFO_ABOUT, "http://blog.kowalczyk.info/software/velociraptor8/");
+    ok &= WriteRegStr(hkey, REG_PATH_UNINST, URL_UPDATE_INFO, "http://blog.kowalczyk.info/software/velociraptor8/news.html");
+
+    return ok;
+}
+
 static bool InstallCopyFiles() {
     // TODO(kjk): kill processes that match the path we're writing to
     auto exePath = GetExePath();
@@ -90,7 +159,7 @@ static bool InstallCopyFiles() {
     if (!CreateAppShortcut(allUsers)) {
         return false;
     }
-
+    // TODO(kjk): copy settings file as well
     return file::Copy(dstPath, exePath);
 }
 
@@ -117,10 +186,12 @@ void Install() {
         // TODO(kjk): show error message or crash
         return;
     }
-    if (!InstallSetRegistryKeys()) {
-        return;
+    // Maybe: also for HKEY_LOCAL_MACHINE ?
+    if (!InstallWriteRegistry(HKEY_CURRENT_USER)) {
         // TODO(kjk): show error message or crash
+        return;
     }
+
     if (!AddSelfToPath()) {
         return;
     }

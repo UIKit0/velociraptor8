@@ -7,6 +7,9 @@ bool Eq(const char *s1, const char *s2);
 char LastChar(const std::string& s);
 bool EndsWith(const std::string &s, char c);
 bool StartsWith(const std::string &s, char c);
+std::string FmtV(const char *fmt, va_list args);
+std::string Format(const char *fmt, ...);
+
 } // namespace str
 
 char *WstrToUtf8Buf(const WCHAR *s, char *buf, size_t bufCbLen);

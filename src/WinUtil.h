@@ -7,3 +7,8 @@ void EnableMenu(HMENU m, UINT id);
 void DisableMenu(HMENU m, UINT id);
 bool CreateShortcut(const std::string& shortcutPath, const std::string& exePath);
 
+bool CreateRegKey(HKEY keySub, const char *keyName);
+bool WriteRegDWORD(HKEY keySub, const char *keyName, const char *valName, DWORD value);
+bool ReadRegDWORD(HKEY keySub, const char *keyName, const char *valName, DWORD& value);
+bool WriteRegStr(HKEY keySub, const char *keyName, const char *valName, const char *value);
+

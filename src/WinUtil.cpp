@@ -86,3 +86,36 @@ bool CreateShortcut(const std::string& shortcutPath, const std::string& exePath)
     hr = file->Save(shortcutPathW, TRUE);
     return SUCCEEDED(hr);
 }
+
+bool WriteRegStr(HKEY keySub, const char *keyName, const char *valName, const char *value) {
+    AutoUtf8ToWstr keyNameW(keyName);
+    AutoUtf8ToWstr valNameW(valName);
+    AutoUtf8ToWstr valueW(value);
+    LSTATUS res = SHSetValueW(keySub, keyNameW, valNameW, REG_SZ, (const void *) valueW, (DWORD) (str::Len(valueW) + 1) * sizeof(WCHAR));
+    return ERROR_SUCCESS == res;
+}
+
+bool ReadRegDWORD(HKEY keySub, const char *keyName, const char *valName, DWORD& value) {
+    AutoUtf8ToWstr keyNameW(keyName);
+    AutoUtf8ToWstr valNameW(valName);
+    DWORD size = sizeof(DWORD);
+    LSTATUS res = SHGetValueW(keySub, keyNameW, valNameW, NULL, &value, &size);
+    return ERROR_SUCCESS == res && sizeof(DWORD) == size;
+}
+
+bool WriteRegDWORD(HKEY keySub, const char *keyName, const char *valName, DWORD value) {
+    AutoUtf8ToWstr keyNameW(keyName);
+    AutoUtf8ToWstr valNameW(valName);
+    LSTATUS res = SHSetValueW(keySub, keyNameW, valNameW, REG_DWORD, (const VOID *) &value, sizeof(DWORD));
+    return ERROR_SUCCESS == res;
+}
+
+bool CreateRegKey(HKEY keySub, const char *keyName) {
+    HKEY hKey;
+    AutoUtf8ToWstr keyNameW(keyName);
+    if (RegCreateKeyExW(keySub, keyNameW, 0, NULL, 0, KEY_WRITE, NULL, &hKey, NULL) != ERROR_SUCCESS) {
+        return false;
+    }
+    RegCloseKey(hKey);
+    return true;
+}
