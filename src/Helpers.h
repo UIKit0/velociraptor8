@@ -33,16 +33,8 @@ inline BOOL IniSectionSetInt(WCHAR *lpCachedIniSection, const WCHAR *lpName, int
     return IniSectionSetString(lpCachedIniSection, lpName, tch);
 }
 
-inline void BeginWaitCursor() {
-    SendMessage(gDoc->hwndScintilla, SCI_SETCURSOR, (WPARAM)SC_CURSORWAIT, 0);
-}
-
-inline void EndWaitCursor() {
-    POINT pt;
-    SendMessage(gDoc->hwndScintilla, SCI_SETCURSOR, (WPARAM)SC_CURSORNORMAL, 0);
-    GetCursorPos(&pt);
-    SetCursorPos(pt.x, pt.y);
-}
+void BeginWaitCursor();
+void EndWaitCursor();
 
 #define Is2k() (g_uWinVer >= 0x0500)
 #define IsXP() (g_uWinVer >= 0x0501)

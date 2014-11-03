@@ -15,6 +15,17 @@ See License.txt for details about distribution and modification.
 #include "helpers.h"
 #include "resource.h"
 
+void BeginWaitCursor() {
+    SendMessage(gDoc->hwndScintilla, SCI_SETCURSOR, (WPARAM) SC_CURSORWAIT, 0);
+}
+
+void EndWaitCursor() {
+    POINT pt;
+    SendMessage(gDoc->hwndScintilla, SCI_SETCURSOR, (WPARAM) SC_CURSORNORMAL, 0);
+    GetCursorPos(&pt);
+    SetCursorPos(pt.x, pt.y);
+}
+
 //  Manipulation of (cached) ini file sections
 int IniSectionGetString(const WCHAR *lpCachedIniSection, const WCHAR *lpName,
                         const WCHAR *lpDefault, WCHAR *lpReturnedString, int cchReturnedString) {

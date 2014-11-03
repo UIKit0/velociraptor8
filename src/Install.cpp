@@ -4,6 +4,8 @@
 // Maybe: not ideal, decouple this via SetAppDirName() instead of APP_DIR_NAME
 #include "ve8.h"
 #include "WinUtil.h"
+#include "Version.h"
+#include "Helpers.h"
 
 // http://msdn.microsoft.com/en-us/library/windows/desktop/ms683197(v=vs.85).aspx
 static std::string GetExePath() {
@@ -79,6 +81,37 @@ bool IsRunningInstalled() {
 
 bool IsRunningPortable() { return !IsRunningInstalled(); }
 
+static int64_t GetFullSize(WIN32_FIND_DATA& d) {
+    uint64_t tmp = d.nFileSizeHigh;
+    tmp = tmp >> 32;
+    return (int64_t) tmp + (int64_t) d.nFileSizeLow;
+}
+
+static int64_t GetDirSizeRecur(const std::string& dir) {
+    std::string dirPatternA(dir);
+    path::Join(dirPatternA, "*", 1);
+    AutoUtf8ToWstr dirPattern(dirPatternA);
+    WIN32_FIND_DATA findData;
+
+    HANDLE h = FindFirstFile(dirPattern, &findData);
+    if (h == INVALID_HANDLE_VALUE)
+        return 0;
+
+    int64_t totalSize = 0;
+    do {
+        if (!(findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
+            totalSize += GetFullSize(findData);
+        } else if (!str::Eq(findData.cFileName, L".") && !str::Eq(findData.cFileName, L"..")) {
+            AutoWstrToUtf8 fileName(findData.cFileName);
+            std::string subDir(dir);
+            path::Join(subDir, fileName.Get());
+            totalSize += GetDirSizeRecur(subDir);
+        }
+    } while (FindNextFile(h, &findData) != 0);
+    FindClose(h);
+    return totalSize;
+}
+
 // This is in HKLM. Note that on 64bit windows, if installing 32bit app
 // the installer has to be 32bit as well, so that it goes into proper
 // place in registry (under Software\Wow6432Node\Microsoft\Windows\...
@@ -119,23 +152,22 @@ static bool InstallWriteRegistry(HKEY hkey) {
 
     std::string exePath(GetInstalledExePath());
     std::string installDate(GetInstallDate());
-    std::string installDir(path::GetDir(exePath));
+    std::string installDir(GetLocalAppDir(APP_DIR_NAME));
     std::string uninstallCmdLine("\"");
     uninstallCmdLine.append(exePath);
     uninstallCmdLine.append("\" /uninstall");
 
+    int64_t size = GetDirSizeRecur(installDir) / 1024;
+
     ok &= WriteRegStr(hkey, REG_PATH_UNINST, DISPLAY_ICON, exePath.c_str());
     ok &= WriteRegStr(hkey, REG_PATH_UNINST, DISPLAY_NAME, APP_NAME);
-    //ok &= WriteRegStr(hkey, REG_PATH_UNINST, DISPLAY_VERSION, CURR_VERSION_STR);
+    ok &= WriteRegStr(hkey, REG_PATH_UNINST, DISPLAY_VERSION, CURR_VERSION_STRA);
     // Windows XP doesn't allow to view the version number at a glance,
     // so include it in the DisplayName
-#if 0
-    if (!IsVistaOrGreater()) {
-        ok &= WriteRegStr(hkey, REG_PATH_UNINST, DISPLAY_NAME, APP_NAME " " CURR_VERSION_STR);
+    if (!IsVista()) {
+        ok &= WriteRegStr(hkey, REG_PATH_UNINST, DISPLAY_NAME, APP_NAME " " CURR_VERSION_STRA);
     }
-#endif
-    //DWORD size = GetDirSize(gGlobalData.installDir) / 1024;
-    //ok &= WriteRegDWORD(hkey, REG_PATH_UNINST, ESTIMATED_SIZE, size);
+    ok &= WriteRegDWORD(hkey, REG_PATH_UNINST, ESTIMATED_SIZE, (DWORD)size);
     ok &= WriteRegStr(hkey, REG_PATH_UNINST, INSTALL_DATE, installDate.c_str());
     ok &= WriteRegStr(hkey, REG_PATH_UNINST, INSTALL_LOCATION, installDir.c_str());
     ok &= WriteRegDWORD(hkey, REG_PATH_UNINST, NO_MODIFY, 1);

@@ -4,6 +4,7 @@ namespace str {
 size_t Len(const char *s);
 size_t Len(const WCHAR *s);
 bool Eq(const char *s1, const char *s2);
+bool Eq(const WCHAR *s1, const WCHAR *s2);
 char LastChar(const std::string& s);
 bool EndsWith(const std::string &s, char c);
 bool StartsWith(const std::string &s, char c);
