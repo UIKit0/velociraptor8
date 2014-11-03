@@ -69,6 +69,16 @@ static bool CreateAppShortcut(bool allUsers) {
     std::string exePath(GetInstalledExePath());
     return CreateShortcut(shortcutPath, exePath);
 }
+
+static bool RemoveAppShortcut(bool allUsers) {
+    std::string shortcutPath(GetShortcutPath(allUsers));
+    if (shortcutPath.empty()) {
+        return false;
+    }
+    bool ok = file::Delete(shortcutPath);
+    return ok;
+}
+
 // we consider the program installed if the exe is in the installation
 // directory
 bool IsRunningInstalled() {
@@ -180,6 +190,12 @@ static bool InstallWriteRegistry(HKEY hkey) {
     return ok;
 }
 
+static bool UninstallRemoveRegistry(HKEY hkey) {
+    // TODO(kjK): write me
+    CrashIf(true);
+    return false;
+}
+
 static bool InstallCopyFiles() {
     // TODO(kjk): kill processes that match the path we're writing to
     auto exePath = GetExePath();
@@ -193,6 +209,18 @@ static bool InstallCopyFiles() {
     }
     // TODO(kjk): copy settings file as well
     return file::Copy(dstPath, exePath);
+}
+
+static bool UninstallRemoveFiles() {
+    auto exePath = GetExePath();
+    if (!file::Delete(exePath)) {
+        return false;
+    }
+    bool allUsers = false;
+    if (!RemoveAppShortcut(allUsers)) {
+        return false;
+    }
+    return true;
 }
 
 static bool InstallSetRegistryKeys() { return true; }
@@ -283,5 +311,16 @@ void Install() {
 
 // called when /uninstall cmd-line arg is given
 void Uninstall() {
-
+    if (!UninstallRemoveFiles()) {
+        // TODO(kjk): show error message or crash
+        return;
+    }
+    if (UninstallRemoveRegistry(HKEY_CURRENT_USER)) {
+        // TODO(kjk): show error message or crash
+        return;
+    }
+    if (!RemoveSelfFromPath()) {
+        // TODO(kjk): show error message or crash
+        return;
+    }
 }

@@ -12,6 +12,7 @@ namespace file {
 
 bool Exists(const std::string&);
 bool Copy(const std::string& dst, const std::string& src);
+bool Delete(const std::string&);
 
 } // namespace file
 
