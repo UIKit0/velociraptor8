@@ -31,7 +31,8 @@ static std::string GetKnownFolderPathXp(int nFolder) {
     return WstrToUtf8Str(buf);
 }
 
-static std::string GetLocalAppDir(const char *p1 = NULL, const char *p2 = NULL, const char *p3 = NULL, const char *p4 = NULL) {
+static std::string GetLocalAppDir(const char *p1 = NULL, const char *p2 = NULL,
+                                  const char *p3 = NULL, const char *p4 = NULL) {
     std::string path(GetKnownFolderPathXp(CSIDL_LOCAL_APPDATA));
     if (p1 != NULL) {
         path::Join(path, p1);
@@ -91,13 +92,13 @@ bool IsRunningInstalled() {
 
 bool IsRunningPortable() { return !IsRunningInstalled(); }
 
-static int64_t GetFullSize(WIN32_FIND_DATA& d) {
+static int64_t GetFullSize(WIN32_FIND_DATA &d) {
     uint64_t tmp = d.nFileSizeHigh;
     tmp = tmp >> 32;
-    return (int64_t) tmp + (int64_t) d.nFileSizeLow;
+    return (int64_t)tmp + (int64_t)d.nFileSizeLow;
 }
 
-static int64_t GetDirSizeRecur(const std::string& dir) {
+static int64_t GetDirSizeRecur(const std::string &dir) {
     std::string dirPatternA(dir);
     path::Join(dirPatternA, "*", 1);
     AutoUtf8ToWstr dirPattern(dirPatternA);
@@ -125,7 +126,7 @@ static int64_t GetDirSizeRecur(const std::string& dir) {
 // This is in HKLM. Note that on 64bit windows, if installing 32bit app
 // the installer has to be 32bit as well, so that it goes into proper
 // place in registry (under Software\Wow6432Node\Microsoft\Windows\...
-#define REG_PATH_UNINST     "Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\" APP_NAME
+#define REG_PATH_UNINST "Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\" APP_NAME
 // REG_SZ, a path to installed executable (or "$path,0" to force the first icon)
 #define DISPLAY_ICON "DisplayIcon"
 // REG_SZ, e.g "SumatraPDF" (APP_NAME_STR)
@@ -184,8 +185,10 @@ static bool InstallWriteRegistry(HKEY hkey) {
     ok &= WriteRegDWORD(hkey, REG_PATH_UNINST, NO_REPAIR, 1);
     ok &= WriteRegStr(hkey, REG_PATH_UNINST, PUBLISHER, "Krzysztof Kowalczyk");
     ok &= WriteRegStr(hkey, REG_PATH_UNINST, UNINSTALL_STRING, uninstallCmdLine.c_str());
-    ok &= WriteRegStr(hkey, REG_PATH_UNINST, URL_INFO_ABOUT, "http://blog.kowalczyk.info/software/velociraptor8/");
-    ok &= WriteRegStr(hkey, REG_PATH_UNINST, URL_UPDATE_INFO, "http://blog.kowalczyk.info/software/velociraptor8/news.html");
+    ok &= WriteRegStr(hkey, REG_PATH_UNINST, URL_INFO_ABOUT,
+                      "http://blog.kowalczyk.info/software/velociraptor8/");
+    ok &= WriteRegStr(hkey, REG_PATH_UNINST, URL_UPDATE_INFO,
+                      "http://blog.kowalczyk.info/software/velociraptor8/news.html");
 
     return ok;
 }
@@ -269,7 +272,7 @@ bool RemoveSelfFromPath() {
         end++;
     }
     path.erase(pos, end - pos);
-    //ok = WriteRegExpandStr(HKEY_CURRENT_USER, "Environment", "Path", path.c_str());
+    // ok = WriteRegExpandStr(HKEY_CURRENT_USER, "Environment", "Path", path.c_str());
     BroadcastEnvRegistryChanged();
     return ok;
 }

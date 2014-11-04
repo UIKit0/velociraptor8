@@ -11,7 +11,7 @@ bool IsSep(char c) {
 
 // http://msdn.microsoft.com/en-us/library/windows/desktop/bb773569(v=vs.85).aspx
 // TODO: on win8 use PathCchCanonicalize or PathCchCanonicalizeEx
-void NormalizeInPlace(WCHAR *src, size_t srcCchSize) {
+void NormalizeInPlace(WCHAR* src, size_t srcCchSize) {
     // TODO: make it work even if srcCchSize is < MAX_PATH
     CrashIf(srcCchSize < MAX_PATH);
     WCHAR buf[MAX_PATH];
@@ -22,7 +22,7 @@ void NormalizeInPlace(WCHAR *src, size_t srcCchSize) {
     memcpy(src, buf, sizeof(buf));
 }
 
-void Join(std::string& sInOut, const char *s, size_t sLen) {
+void Join(std::string& sInOut, const char* s, size_t sLen) {
     char c = str::LastChar(sInOut);
     if (!IsSep(c)) {
         sInOut.append(1, '\\');
@@ -48,8 +48,8 @@ std::string GetDir(const std::string& path) {
     if (path.empty()) {
         return res;
     }
-    const char *start = res.c_str();
-    const char *end = start + res.size() - 1;
+    const char* start = res.c_str();
+    const char* end = start + res.size() - 1;
     while (end >= start) {
         char c = *end;
         if (IsSep(c)) {
@@ -145,4 +145,3 @@ bool CreateForFile(const std::string& path) {
 }
 
 } // namespace dir
-

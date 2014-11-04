@@ -16,12 +16,12 @@ See License.txt for details about distribution and modification.
 #include "resource.h"
 
 void BeginWaitCursor() {
-    SendMessage(gDoc->hwndScintilla, SCI_SETCURSOR, (WPARAM) SC_CURSORWAIT, 0);
+    SendMessage(gDoc->hwndScintilla, SCI_SETCURSOR, (WPARAM)SC_CURSORWAIT, 0);
 }
 
 void EndWaitCursor() {
     POINT pt;
-    SendMessage(gDoc->hwndScintilla, SCI_SETCURSOR, (WPARAM) SC_CURSORNORMAL, 0);
+    SendMessage(gDoc->hwndScintilla, SCI_SETCURSOR, (WPARAM)SC_CURSORNORMAL, 0);
     GetCursorPos(&pt);
     SetCursorPos(pt.x, pt.y);
 }

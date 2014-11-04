@@ -5,12 +5,12 @@
 #include "WinUtil.h"
 #include "FileUtil.h"
 
-static WCHAR* knownCursorIds[] = { IDC_ARROW,  IDC_IBEAM,  IDC_HAND, IDC_SIZEALL,
+static WCHAR *knownCursorIds[] = { IDC_ARROW,  IDC_IBEAM,  IDC_HAND, IDC_SIZEALL,
                                    IDC_SIZEWE, IDC_SIZENS, IDC_NO,   IDC_CROSS };
 
 static HCURSOR cachedCursors[dimof(knownCursorIds)] = {};
 
-HCURSOR GetCursor(WCHAR* id) {
+HCURSOR GetCursor(WCHAR *id) {
     int cursorIdx = -1;
     for (int i = 0; i < dimof(knownCursorIds); i++) {
         if (id == knownCursorIds[i]) {
@@ -26,9 +26,9 @@ HCURSOR GetCursor(WCHAR* id) {
     return cachedCursors[cursorIdx];
 }
 
-void SetCursor(WCHAR* id) { SetCursor(GetCursor(id)); }
+void SetCursor(WCHAR *id) { SetCursor(GetCursor(id)); }
 
-void FillWndClassEx(WNDCLASSEX& wcex, const WCHAR* clsName, WNDPROC wndproc) {
+void FillWndClassEx(WNDCLASSEX &wcex, const WCHAR *clsName, WNDPROC wndproc) {
     ZeroMemory(&wcex, sizeof(WNDCLASSEX));
     wcex.cbSize = sizeof(WNDCLASSEX);
     wcex.style = CS_HREDRAW | CS_VREDRAW;
@@ -48,7 +48,7 @@ void DisableMenu(HMENU m, UINT id) {
     CrashIf(ret == -1);
 }
 
-bool CreateShortcut(const std::string& shortcutPath, const std::string& exePath) {
+bool CreateShortcut(const std::string &shortcutPath, const std::string &exePath) {
     // TODO(kjk): expose args, description, iconIndex
     const WCHAR *args = NULL;
     const WCHAR *description = NULL;
@@ -87,7 +87,8 @@ bool CreateShortcut(const std::string& shortcutPath, const std::string& exePath)
     return SUCCEEDED(hr);
 }
 
-bool ReadRegStr(HKEY keySub, const std::string& keyName, const std::string& valName, std::string& valOut) {
+bool ReadRegStr(HKEY keySub, const std::string &keyName, const std::string &valName,
+                std::string &valOut) {
     AutoUtf8ToWstr keyNameW(keyName);
     AutoUtf8ToWstr valNameW(valName);
 
@@ -101,7 +102,7 @@ TryAgainWOW64:
         res = RegQueryValueExW(hKey, valNameW.Get(), NULL, NULL, NULL, &valLen);
         if (ERROR_SUCCESS == res) {
             val = AllocMustN<WCHAR>(valLen / sizeof(WCHAR) + 1);
-            res = RegQueryValueExW(hKey, valNameW.Get(), NULL, NULL, (LPBYTE) val, &valLen);
+            res = RegQueryValueExW(hKey, valNameW.Get(), NULL, NULL, (LPBYTE)val, &valLen);
             if (ERROR_SUCCESS != res) {
                 free(val);
                 val = NULL;
@@ -110,8 +111,8 @@ TryAgainWOW64:
         RegCloseKey(hKey);
     }
     if (ERROR_FILE_NOT_FOUND == res && HKEY_LOCAL_MACHINE == keySub && KEY_READ == access) {
-        // try the (non-)64-bit key as well, as HKLM\Software is not shared between 32-bit and
-        // 64-bit applications per http://msdn.microsoft.com/en-us/library/aa384253(v=vs.85).aspx
+// try the (non-)64-bit key as well, as HKLM\Software is not shared between 32-bit and
+// 64-bit applications per http://msdn.microsoft.com/en-us/library/aa384253(v=vs.85).aspx
 #ifdef _WIN64
         access = KEY_READ | KEY_WOW64_32KEY;
 #else
@@ -131,7 +132,8 @@ bool WriteRegStr(HKEY keySub, const char *keyName, const char *valName, const ch
     AutoUtf8ToWstr keyNameW(keyName);
     AutoUtf8ToWstr valNameW(valName);
     AutoUtf8ToWstr valueW(value);
-    LSTATUS res = SHSetValueW(keySub, keyNameW, valNameW, REG_SZ, (const void *) valueW, (DWORD) (str::Len(valueW) + 1) * sizeof(WCHAR));
+    LSTATUS res = SHSetValueW(keySub, keyNameW, valNameW, REG_SZ, (const void *)valueW,
+                              (DWORD)(str::Len(valueW) + 1) * sizeof(WCHAR));
     return ERROR_SUCCESS == res;
 }
 
@@ -139,11 +141,12 @@ bool WriteRegExpandStr(HKEY keySub, const char *keyName, const char *valName, co
     AutoUtf8ToWstr keyNameW(keyName);
     AutoUtf8ToWstr valNameW(valName);
     AutoUtf8ToWstr valueW(value);
-    LSTATUS res = SHSetValueW(keySub, keyNameW, valNameW, REG_EXPAND_SZ, (const void *) valueW, (DWORD) (str::Len(valueW) + 1) * sizeof(WCHAR));
+    LSTATUS res = SHSetValueW(keySub, keyNameW, valNameW, REG_EXPAND_SZ, (const void *)valueW,
+                              (DWORD)(str::Len(valueW) + 1) * sizeof(WCHAR));
     return ERROR_SUCCESS == res;
 }
 
-bool ReadRegDWORD(HKEY keySub, const char *keyName, const char *valName, DWORD& value) {
+bool ReadRegDWORD(HKEY keySub, const char *keyName, const char *valName, DWORD &value) {
     AutoUtf8ToWstr keyNameW(keyName);
     AutoUtf8ToWstr valNameW(valName);
     DWORD size = sizeof(DWORD);
@@ -154,14 +157,16 @@ bool ReadRegDWORD(HKEY keySub, const char *keyName, const char *valName, DWORD& 
 bool WriteRegDWORD(HKEY keySub, const char *keyName, const char *valName, DWORD value) {
     AutoUtf8ToWstr keyNameW(keyName);
     AutoUtf8ToWstr valNameW(valName);
-    LSTATUS res = SHSetValueW(keySub, keyNameW, valNameW, REG_DWORD, (const VOID *) &value, sizeof(DWORD));
+    LSTATUS res =
+        SHSetValueW(keySub, keyNameW, valNameW, REG_DWORD, (const VOID *)&value, sizeof(DWORD));
     return ERROR_SUCCESS == res;
 }
 
 bool CreateRegKey(HKEY keySub, const char *keyName) {
     HKEY hKey;
     AutoUtf8ToWstr keyNameW(keyName);
-    if (RegCreateKeyExW(keySub, keyNameW, 0, NULL, 0, KEY_WRITE, NULL, &hKey, NULL) != ERROR_SUCCESS) {
+    if (RegCreateKeyExW(keySub, keyNameW, 0, NULL, 0, KEY_WRITE, NULL, &hKey, NULL) !=
+        ERROR_SUCCESS) {
         return false;
     }
     RegCloseKey(hKey);
@@ -172,5 +177,6 @@ bool CreateRegKey(HKEY keySub, const char *keyName) {
 void BroadcastEnvRegistryChanged() {
     DWORD result;
     UINT flags = SMTO_BLOCK | SMTO_ABORTIFHUNG | SMTO_NOTIMEOUTIFNOTHUNG;
-    SendMessageTimeoutW(HWND_BROADCAST, WM_SETTINGCHANGE, 0, (LPARAM)L"Environment", flags, 5000, &result);
+    SendMessageTimeoutW(HWND_BROADCAST, WM_SETTINGCHANGE, 0, (LPARAM)L"Environment", flags, 5000,
+                        &result);
 }

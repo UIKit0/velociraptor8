@@ -13,4 +13,4 @@ set -o pipefail
 
 cd src
 clang-format -style="{BasedOnStyle: Mozilla, IndentWidth: 4, ColumnLimit: 100}" -i *.cpp *.h
-dos2unix -s -v *.cpp *.h
+#dos2unix -s -v *.cpp *.h

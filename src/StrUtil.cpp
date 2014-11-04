@@ -4,23 +4,23 @@
 // returns either bufOut or newly allocated
 char *WstrToUtf8Buf(const WCHAR *s, char *bufOut, size_t cbBufOutSize) {
     CrashIf(!bufOut || (0 == cbBufOutSize));
-    size_t cbNeeds = (size_t) WideCharToMultiByte(CP_UTF8, 0, s, -1, NULL, 0, NULL, NULL);
+    size_t cbNeeds = (size_t)WideCharToMultiByte(CP_UTF8, 0, s, -1, NULL, 0, NULL, NULL);
     if (cbNeeds >= cbBufOutSize) {
         bufOut = AllocMustN<char>(cbNeeds + 1);
     }
-    size_t res = (size_t) WideCharToMultiByte(CP_UTF8, 0, s, (int) str::Len(s), bufOut, (int) cbNeeds,
-        NULL, NULL);
+    size_t res = (size_t)WideCharToMultiByte(CP_UTF8, 0, s, (int)str::Len(s), bufOut, (int)cbNeeds,
+                                             NULL, NULL);
     CrashIf(res > cbNeeds);
     bufOut[res] = '\0';
     return bufOut;
 }
 
 WCHAR *Utf8ToWstrBuf(const char *s, WCHAR *bufOut, size_t cchBufOutSize) {
-    size_t cchNeeds = (size_t) MultiByteToWideChar(CP_UTF8, 0, s, -1, NULL, 0);
+    size_t cchNeeds = (size_t)MultiByteToWideChar(CP_UTF8, 0, s, -1, NULL, 0);
     if (cchNeeds >= cchBufOutSize) {
         bufOut = AllocMustN<WCHAR>(cchNeeds + 1);
     }
-    size_t res = (size_t) MultiByteToWideChar(CP_UTF8, 0, s, -1, bufOut, cchNeeds);
+    size_t res = (size_t)MultiByteToWideChar(CP_UTF8, 0, s, -1, bufOut, cchNeeds);
     CrashIf(res > cchNeeds);
     bufOut[res] = 0;
     return bufOut;
@@ -42,16 +42,14 @@ size_t Len(const WCHAR *s) { return wcslen(s); }
 bool Eq(const char *s1, const char *s2) { return strcmp(s1, s2) == 0; }
 bool Eq(const WCHAR *s1, const WCHAR *s2) { return wcscmp(s1, s2) == 0; }
 
-char LastChar(const std::string& s) {
+char LastChar(const std::string &s) {
     if (s.empty()) {
         return 0;
     }
     return s.at(s.size() - 1);
 }
 
-bool EndsWith(const std::string &s, char c) {
-    return c == LastChar(s);
-}
+bool EndsWith(const std::string &s, char c) { return c == LastChar(s); }
 
 /* return true if 'str' starts with 'txt', NOT case-sensitive */
 bool StartsWithI(const char *str, const char *prefix) {
@@ -75,11 +73,11 @@ const char *FindI(const char *s, const char *toFind) {
         return nullptr;
     }
 
-    char first = (char) tolower(*toFind);
+    char first = (char)tolower(*toFind);
     if (!first)
         return s;
     while (*s) {
-        char c = (char) tolower(*s);
+        char c = (char)tolower(*s);
         if (c == first) {
             if (str::StartsWithI(s, toFind)) {
                 return s;
@@ -98,18 +96,18 @@ size_t FindIPos(const char *s, const char *toFind) {
     return pos - s;
 }
 
-bool ContainsI(const std::string& s, const std::string& toFind) {
+bool ContainsI(const std::string &s, const std::string &toFind) {
     const char *found = FindI(s.c_str(), toFind.c_str());
     return found != nullptr;
 }
 
 std::string FmtV(const char *fmt, va_list args) {
-    char    message[256];
-    size_t  bufCchSize = dimof(message);
-    char  * buf = message;
+    char message[256];
+    size_t bufCchSize = dimof(message);
+    char *buf = message;
     for (;;) {
         int count = _vsnprintf_s(buf, bufCchSize, _TRUNCATE, fmt, args);
-        if ((count >= 0) && ((size_t) count < bufCchSize)) {
+        if ((count >= 0) && ((size_t)count < bufCchSize)) {
             break;
         }
         /* we have to make the buffer bigger. The algorithm used to calculate
@@ -143,4 +141,3 @@ std::string Format(const char *fmt, ...) {
 }
 
 } // namespace str
-

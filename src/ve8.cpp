@@ -474,23 +474,19 @@ static void TestGetDir() {
 
 static void TestUiTask() {
     // example of using uitask::Post()
-    uitask::Post([] {
-        OutputDebugStringA("hello2");
-    });
+    uitask::Post([] { OutputDebugStringA("hello2"); });
 }
 
 static void TestHttpGet() {
-    HttpGetAsync(AUTO_UPDATE_URL, [](HttpRsp* r) {
-        OutputDebugStringA("got data\n");
-    });
+    HttpGetAsync(AUTO_UPDATE_URL, [](HttpRsp *r) { OutputDebugStringA("got data\n"); });
 }
 
 static void AdHocTest() {
-    //TestUiTask();
-    //TestHttpGet();
-    //TestGetDir();
-    //AddSelfToPath();
-    //RemoveSelfFromPath();
+    // TestUiTask();
+    // TestHttpGet();
+    // TestGetDir();
+    // AddSelfToPath();
+    // RemoveSelfFromPath();
 }
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nCmdShow) {

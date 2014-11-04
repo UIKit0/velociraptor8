@@ -7,8 +7,8 @@ bool Eq(const char *s1, const char *s2);
 bool Eq(const WCHAR *s1, const WCHAR *s2);
 const char *FindI(const char *s, const char *toFind);
 size_t FindIPos(const char *s, const char *toFind);
-bool ContainsI(const std::string&, const std::string&);
-char LastChar(const std::string& s);
+bool ContainsI(const std::string &, const std::string &);
+char LastChar(const std::string &s);
 bool EndsWith(const std::string &s, char c);
 bool StartsWith(const std::string &s, char c);
 bool StartsWithI(const char *str, const char *prefix);
@@ -45,7 +45,7 @@ class AutoUtf8ToWstr {
   public:
     AutoUtf8ToWstr(const char *s) { res = Utf8ToWstrBuf(s, buf, dimof(buf)); }
     // Maybe: optimize-out strlen
-    AutoUtf8ToWstr(const std::string& s) { res = Utf8ToWstrBuf(s.c_str(), buf, dimof(buf)); }
+    AutoUtf8ToWstr(const std::string &s) { res = Utf8ToWstrBuf(s.c_str(), buf, dimof(buf)); }
     ~AutoUtf8ToWstr() {
         if (res != buf)
             free(res);
