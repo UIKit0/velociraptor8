@@ -5676,12 +5676,12 @@ void ParseCommandLine() {
                 else
                     flagUseSystemMRU = 1;
             } else
-                switch (*CharUpper(lp1)) {
+                switch (*CharUpperW(lp1)) {
 
                     case L'N':
                         flagReuseWindow = 0;
                         flagNoReuseWindow = 1;
-                        if (*CharUpper(lp1 + 1) == L'S')
+                        if (*CharUpperW(lp1 + 1) == L'S')
                             flagSingleFileInstance = 1;
                         else
                             flagSingleFileInstance = 0;
@@ -5690,19 +5690,19 @@ void ParseCommandLine() {
                     case L'R':
                         flagReuseWindow = 1;
                         flagNoReuseWindow = 0;
-                        if (*CharUpper(lp1 + 1) == L'S')
+                        if (*CharUpperW(lp1 + 1) == L'S')
                             flagSingleFileInstance = 1;
                         else
                             flagSingleFileInstance = 0;
                         break;
 
                     case L'F':
-                        if (*(lp1 + 1) == L'0' || *CharUpper(lp1 + 1) == L'O')
+                        if (*(lp1 + 1) == L'0' || *CharUpperW(lp1 + 1) == L'O')
                             lstrcpy(szIniFile, L"*?");
                         else if (ExtractFirstArgument(lp2, lp1, lp2)) {
-                            StrCpyN(szIniFile, lp1, dimof(szIniFile));
+                            StrCpyNW(szIniFile, lp1, dimof(szIniFile));
                             TrimString(szIniFile);
-                            PathUnquoteSpaces(szIniFile);
+                            PathUnquoteSpacesW(szIniFile);
                         }
                         break;
 
@@ -5711,7 +5711,7 @@ void ParseCommandLine() {
                         break;
 
                     case L'O':
-                        if (*(lp1 + 1) == L'0' || *(lp1 + 1) == L'-' || *CharUpper(lp1 + 1) == L'O')
+                        if (*(lp1 + 1) == L'0' || *(lp1 + 1) == L'-' || *CharUpperW(lp1 + 1) == L'O')
                             flagAlwaysOnTop = 1;
                         else
                             flagAlwaysOnTop = 2;
@@ -5721,7 +5721,7 @@ void ParseCommandLine() {
                         WCHAR *lp = lp1;
                         if (StrCmpNI(lp1, L"POS:", CSTRLEN(L"POS:")) == 0)
                             lp += CSTRLEN(L"POS:") - 1;
-                        else if (StrCmpNI(lp1, L"POS", CSTRLEN(L"POS")) == 0)
+                        else if (StrCmpNIW(lp1, L"POS", CSTRLEN(L"POS")) == 0)
                             lp += CSTRLEN(L"POS") - 1;
                         else if (*(lp1 + 1) == L':')
                             lp += 1;
@@ -5730,18 +5730,18 @@ void ParseCommandLine() {
                                 ExtractFirstArgument(lp2, lp1, lp2);
                             break;
                         }
-                        if (*(lp + 1) == L'0' || *CharUpper(lp + 1) == L'O') {
+                        if (*(lp + 1) == L'0' || *CharUpperW(lp + 1) == L'O') {
                             flagPosParam = 1;
                             flagDefaultPos = 1;
-                        } else if (*CharUpper(lp + 1) == L'D' || *CharUpper(lp + 1) == L'S') {
+                        } else if (*CharUpperW(lp + 1) == L'D' || *CharUpperW(lp + 1) == L'S') {
                             flagPosParam = 1;
-                            flagDefaultPos = (StrChrI((lp + 1), L'L')) ? 3 : 2;
-                        } else if (StrChrI(L"FLTRBM", *(lp + 1))) {
+                            flagDefaultPos = (StrChrIW((lp + 1), L'L')) ? 3 : 2;
+                        } else if (StrChrIW(L"FLTRBM", *(lp + 1))) {
                             WCHAR *p = (lp + 1);
                             flagPosParam = 1;
                             flagDefaultPos = 0;
                             while (*p) {
-                                switch (*CharUpper(p)) {
+                                switch (*CharUpperW(p)) {
                                     case L'F':
                                         flagDefaultPos &= ~(4 | 8 | 16 | 32);
                                         flagDefaultPos |= 64;
@@ -5790,7 +5790,7 @@ void ParseCommandLine() {
 
                     case L'T':
                         if (ExtractFirstArgument(lp2, lp1, lp2)) {
-                            StrCpyN(szTitleExcerpt, lp1, dimof(szTitleExcerpt));
+                            StrCpyNW(szTitleExcerpt, lp1, dimof(szTitleExcerpt));
                             fKeepTitleExcerpt = 1;
                         }
                         break;
@@ -5807,7 +5807,7 @@ void ParseCommandLine() {
                         if (ExtractFirstArgument(lp2, lp1, lp2)) {
                             if (lpEncodingArg)
                                 LocalFree(lpEncodingArg);
-                            lpEncodingArg = StrDup(lp1);
+                            lpEncodingArg = StrDupW(lp1);
                         }
                         break;
 
@@ -5825,17 +5825,17 @@ void ParseCommandLine() {
                         BOOL bRegex = FALSE;
                         BOOL bTransBS = FALSE;
 
-                        if (StrChr(lp1, L'-'))
+                        if (StrChrW(lp1, L'-'))
                             bFindUp = TRUE;
-                        if (StrChr(lp1, L'R'))
+                        if (StrChrW(lp1, L'R'))
                             bRegex = TRUE;
-                        if (StrChr(lp1, L'B'))
+                        if (StrChrW(lp1, L'B'))
                             bTransBS = TRUE;
 
                         if (ExtractFirstArgument(lp2, lp1, lp2)) {
                             if (lpMatchArg)
                                 GlobalFree(lpMatchArg);
-                            lpMatchArg = StrDup(lp1);
+                            lpMatchArg = StrDupW(lp1);
                             flagMatchText = 1;
 
                             if (bFindUp)
@@ -5854,7 +5854,7 @@ void ParseCommandLine() {
                     } break;
 
                     case L'L':
-                        if (*(lp1 + 1) == L'0' || *(lp1 + 1) == L'-' || *CharUpper(lp1 + 1) == L'O')
+                        if (*(lp1 + 1) == L'0' || *(lp1 + 1) == L'-' || *CharUpperW(lp1 + 1) == L'O')
                             flagChangeNotify = 1;
                         else
                             flagChangeNotify = 2;
@@ -5868,7 +5868,7 @@ void ParseCommandLine() {
                         if (ExtractFirstArgument(lp2, lp1, lp2)) {
                             if (lpSchemeArg)
                                 LocalFree(lpSchemeArg);
-                            lpSchemeArg = StrDup(lp1);
+                            lpSchemeArg = StrDupW(lp1);
                             flagLexerSpecified = 1;
                         }
                         break;
@@ -5922,9 +5922,9 @@ void ParseCommandLine() {
 
         // pathname
         else {
-            WCHAR *lpFileBuf = (WCHAR *)LocalAlloc(LPTR, sizeof(WCHAR) * (lstrlen(lpCmdLine) + 1));
+            WCHAR *lpFileBuf = (WCHAR *)LocalAlloc(LPTR, sizeof(WCHAR) * (str::Len(lpCmdLine) + 1));
 
-            cchiFileList = lstrlen(lpCmdLine) - lstrlen(lp3);
+            cchiFileList = str::Len(lpCmdLine) - str::Len(lp3);
 
             if (lpFileArg)
                 GlobalFree(lpFileArg);
@@ -5932,7 +5932,7 @@ void ParseCommandLine() {
             lpFileArg = (WCHAR *)GlobalAlloc(GPTR, sizeof(WCHAR) * (MAX_PATH + 2)); // changed for
             // ActivatePrevInst()
             // needs
-            StrCpyN(lpFileArg, lp3, MAX_PATH);
+            StrCpyNW(lpFileArg, lp3, MAX_PATH);
 
             PathFixBackslashes(lpFileArg);
 
@@ -5941,17 +5941,17 @@ void ParseCommandLine() {
                     -1 /*&& PathGetDriveNumber(g_wchWorkingDirectory) != -1*/) {
 
                 WCHAR wchPath[MAX_PATH];
-                lstrcpy(wchPath, g_workingDirectory);
+                lstrcpyW(wchPath, g_workingDirectory);
                 PathStripToRoot(wchPath);
                 PathAppend(wchPath, lpFileArg);
-                lstrcpy(lpFileArg, wchPath);
+                lstrcpyW(lpFileArg, wchPath);
             }
 
-            StrTrim(lpFileArg, L" \"");
+            StrTrimW(lpFileArg, L" \"");
 
             while (cFileList < 32 && ExtractFirstArgument(lp3, lpFileBuf, lp3)) {
-                PathQuoteSpaces(lpFileBuf);
-                fileList[cFileList++] = StrDup(lpFileBuf);
+                PathQuoteSpacesW(lpFileBuf);
+                fileList[cFileList++] = StrDupW(lpFileBuf);
             }
 
             bContinue = FALSE;
@@ -5960,7 +5960,7 @@ void ParseCommandLine() {
 
         // Continue with next argument
         if (bContinue)
-            lstrcpy(lp3, lp2);
+            lstrcpyW(lp3, lp2);
     }
 
     LocalFree(lp1);
