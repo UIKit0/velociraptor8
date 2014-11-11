@@ -701,9 +701,9 @@ HWND InitInstance(HINSTANCE hInstance, LPSTR pszCmdLine, int nCmdShow) {
         }
     }
 
-    HWND hwndMain =
-        CreateWindowExW(0, fullWndClass, L"Velociraptor8", WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN,
-                        wi.x, wi.y, wi.cx, wi.cy, NULL, NULL, hInstance, NULL);
+    DWORD style = WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN;
+    HWND hwndMain = CreateWindowExW(0, fullWndClass, L"Velociraptor8", style, wi.x, wi.y, wi.cx,
+                                    wi.cy, NULL, NULL, hInstance, NULL);
     gDoc->hwndTopLevel = hwndMain;
     auto mainMenu = BuildMainMenu();
     SetMenu(hwndMain, mainMenu);
@@ -1469,37 +1469,29 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wp, LPARAM lp) {
                 (bViewWhiteSpace) ? SCWS_VISIBLEALWAYS : SCWS_INVISIBLE, 0);
     SendMessage(gDoc->hwndScintilla, SCI_SETVIEWEOL, bViewEOLs, 0);
 
-    gDoc->hwndEditFrame =
-        CreateWindowEx(WS_EX_CLIENTEDGE, WC_LISTVIEW, NULL,
-                       WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0, 0, 100, 100,
-                       hwnd, (HMENU)IDC_EDITFRAME, hInstance, NULL);
+    DWORD style = WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
+    gDoc->hwndEditFrame = CreateWindowExW(WS_EX_CLIENTEDGE, WC_LISTVIEW, NULL, style, 0, 0, 100,
+                                          100, hwnd, (HMENU)IDC_EDITFRAME, hInstance, NULL);
+
+    cxEditFrame = 0;
+    cyEditFrame = 0;
+    bIsAppThemed = FALSE;
 
     if (PrivateIsAppThemed()) {
-
         RECT rc, rc2;
-
         bIsAppThemed = TRUE;
+        SetWindowLongPtrW(gDoc->hwndScintilla, GWL_EXSTYLE,
+                          GetWindowLongPtrW(gDoc->hwndScintilla, GWL_EXSTYLE) & ~WS_EX_CLIENTEDGE);
+        UINT flags = SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED;
+        SetWindowPos(gDoc->hwndScintilla, NULL, 0, 0, 0, 0, flags);
 
-        SetWindowLongPtr(gDoc->hwndScintilla, GWL_EXSTYLE,
-                         GetWindowLongPtr(gDoc->hwndScintilla, GWL_EXSTYLE) & ~WS_EX_CLIENTEDGE);
-        SetWindowPos(gDoc->hwndScintilla, NULL, 0, 0, 0, 0,
-                     SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
-
-        if (IsVista()) {
-            cxEditFrame = 0;
-            cyEditFrame = 0;
-        } else {
+        if (!IsVista()) {
             GetClientRect(gDoc->hwndEditFrame, &rc);
             GetWindowRect(gDoc->hwndEditFrame, &rc2);
 
-            cxEditFrame = ((rc2.right - rc2.left) - (rc.right - rc.left)) / 2;
-            cyEditFrame = ((rc2.bottom - rc2.top) - (rc.bottom - rc.top)) / 2;
+            cxEditFrame = (RectDx(rc2) - RectDx(rc)) / 2;
+            cyEditFrame = (RectDy(rc2) - RectDy(rc)) / 2;
         }
-    } else {
-        bIsAppThemed = FALSE;
-
-        cxEditFrame = 0;
-        cyEditFrame = 0;
     }
 
     // Create Toolbar and Statusbar
@@ -1724,20 +1716,18 @@ void MsgThemeChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
     // reinitialize edit frame
 
+    cxEditFrame = 0;
+    cyEditFrame = 0;
+    UINT flags = SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED;
     if (PrivateIsAppThemed()) {
         bIsAppThemed = TRUE;
 
         SetWindowLongPtr(gDoc->hwndScintilla, GWL_EXSTYLE,
                          GetWindowLongPtr(gDoc->hwndScintilla, GWL_EXSTYLE) & ~WS_EX_CLIENTEDGE);
-        SetWindowPos(gDoc->hwndScintilla, NULL, 0, 0, 0, 0,
-                     SWP_NOZORDER | SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE);
+        SetWindowPos(gDoc->hwndScintilla, NULL, 0, 0, 0, 0, flags);
 
-        if (IsVista()) {
-            cxEditFrame = 0;
-            cyEditFrame = 0;
-        } else {
-            SetWindowPos(gDoc->hwndEditFrame, NULL, 0, 0, 0, 0,
-                         SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
+        if (!IsVista()) {
+            SetWindowPos(gDoc->hwndEditFrame, NULL, 0, 0, 0, 0, flags);
             GetClientRect(gDoc->hwndEditFrame, &rc);
             GetWindowRect(gDoc->hwndEditFrame, &rc2);
 
@@ -1749,11 +1739,7 @@ void MsgThemeChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
         SetWindowLongPtr(gDoc->hwndScintilla, GWL_EXSTYLE,
                          WS_EX_CLIENTEDGE | GetWindowLongPtr(gDoc->hwndScintilla, GWL_EXSTYLE));
-        SetWindowPos(gDoc->hwndScintilla, NULL, 0, 0, 0, 0,
-                     SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
-
-        cxEditFrame = 0;
-        cyEditFrame = 0;
+        SetWindowPos(gDoc->hwndScintilla, NULL, 0, 0, 0, 0, flags);
     }
 
     // recreate toolbar and statusbar
@@ -1774,20 +1760,15 @@ void MsgThemeChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 // WM_SIZE
 void MsgSize(HWND hwnd, WPARAM wParam, LPARAM lParam) {
     RECT rc;
-    int x, y, cx, cy;
-    HDWP hdwp;
-
-    // Statusbar
-    int aWidth[6];
 
     if (wParam == SIZE_MINIMIZED)
         return;
 
-    x = 0;
-    y = 0;
+    int x = 0;
+    int y = 0;
 
-    cx = LOWORD(lParam);
-    cy = HIWORD(lParam);
+    int cx = LOWORD(lParam);
+    int cy = HIWORD(lParam);
 
     if (bShowToolbar) {
         /*  SendMessage(hwndToolbar,WM_SIZE,0,0);
@@ -1810,19 +1791,18 @@ void MsgSize(HWND hwnd, WPARAM wParam, LPARAM lParam) {
     if (bShowStatusbar) {
         SendMessage(gDoc->hwndStatus, WM_SIZE, 0, 0);
         GetWindowRect(gDoc->hwndStatus, &rc);
-        cy -= (rc.bottom - rc.top);
+        cy -= RectDy(rc);
     }
 
-    hdwp = BeginDeferWindowPos(2);
-
-    DeferWindowPos(hdwp, gDoc->hwndEditFrame, NULL, x, y, cx, cy, SWP_NOZORDER | SWP_NOACTIVATE);
-
+    HDWP hdwp = BeginDeferWindowPos(2);
+    UINT flags = SWP_NOZORDER | SWP_NOACTIVATE;
+    DeferWindowPos(hdwp, gDoc->hwndEditFrame, NULL, x, y, cx, cy, flags);
     DeferWindowPos(hdwp, gDoc->hwndScintilla, NULL, x + cxEditFrame, y + cyEditFrame,
-                   cx - 2 * cxEditFrame, cy - 2 * cyEditFrame, SWP_NOZORDER | SWP_NOACTIVATE);
-
+                   cx - 2 * cxEditFrame, cy - 2 * cyEditFrame, flags);
     EndDeferWindowPos(hdwp);
 
-    // Statusbar width
+    // Statusbar
+    int aWidth[6];
     aWidth[0] = max(120, min(cx / 3, StatusCalcPaneWidth(gDoc->hwndStatus,
                                                          L"Ln 9'999'999 : 9'999'999   Col "
                                                          L"9'999'999 : 999   Sel 9'999'999")));
@@ -1831,7 +1811,6 @@ void MsgSize(HWND hwnd, WPARAM wParam, LPARAM lParam) {
     aWidth[3] = aWidth[2] + StatusCalcPaneWidth(gDoc->hwndStatus, L"CR+LF");
     aWidth[4] = aWidth[3] + StatusCalcPaneWidth(gDoc->hwndStatus, L"OVR");
     aWidth[5] = -1;
-
     SendMessage(gDoc->hwndStatus, SB_SETPARTS, dimof(aWidth), (LPARAM)aWidth);
 
     // UpdateStatusbar();
@@ -5711,7 +5690,8 @@ void ParseCommandLine() {
                         break;
 
                     case L'O':
-                        if (*(lp1 + 1) == L'0' || *(lp1 + 1) == L'-' || *CharUpperW(lp1 + 1) == L'O')
+                        if (*(lp1 + 1) == L'0' || *(lp1 + 1) == L'-' ||
+                            *CharUpperW(lp1 + 1) == L'O')
                             flagAlwaysOnTop = 1;
                         else
                             flagAlwaysOnTop = 2;
@@ -5854,7 +5834,8 @@ void ParseCommandLine() {
                     } break;
 
                     case L'L':
-                        if (*(lp1 + 1) == L'0' || *(lp1 + 1) == L'-' || *CharUpperW(lp1 + 1) == L'O')
+                        if (*(lp1 + 1) == L'0' || *(lp1 + 1) == L'-' ||
+                            *CharUpperW(lp1 + 1) == L'O')
                             flagChangeNotify = 1;
                         else
                             flagChangeNotify = 2;

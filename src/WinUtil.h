@@ -15,3 +15,6 @@ bool ReadRegStr(HKEY keySub, const std::string &keyName, const std::string &valN
 bool WriteRegExpandStr(HKEY keySub, const char *keyName, const char *valName, const char *value);
 bool WriteRegStr(HKEY keySub, const char *keyName, const char *valName, const char *value);
 void BroadcastEnvRegistryChanged();
+
+inline int RectDx(const RECT &r) { return r.right - r.left; }
+inline int RectDy(const RECT &r) { return r.bottom - r.top; }
