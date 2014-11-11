@@ -4,6 +4,4 @@
 @cd src
 
 @rem for /f "delims=|" %%f in ('dir /b *.cpp *.h') do @echo %%f
-
-for /f "delims=|" %%f in ('dir /b *.cpp *.h') do clang-format -style="{BasedOnStyle: Mozilla, IndentWidth: 4, ColumnLimit: 100}" -i %%f
-@rem clang-format -style="{BasedOnStyle: Mozilla, IndentWidth: 4, ColumnLimit: 100}" -i *.cpp *.h
+for /f %%f in ('dir /b *.cpp *.h') do clang-format -style="{BasedOnStyle: Mozilla, IndentWidth: 4, ColumnLimit: 100}" -i %%f
