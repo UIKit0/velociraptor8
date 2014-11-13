@@ -10,6 +10,8 @@ size_t Len(const char *s);
 size_t Len(const WCHAR *s);
 int Len(Slice &);
 
+char *DupN(const char *s, int n);
+
 bool Eq(const char *s1, const char *s2);
 bool Eq(const WCHAR *s1, const WCHAR *s2);
 const char *FindI(const char *s, const char *toFind);

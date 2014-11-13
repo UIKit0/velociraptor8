@@ -119,7 +119,6 @@ BOOL OpenFileDlg(HWND, WCHAR *, int, const WCHAR *);
 BOOL SaveFileDlg(HWND, WCHAR *, int, const WCHAR *);
 
 LRESULT CALLBACK MainWndProc(HWND, UINT, WPARAM, LPARAM);
-LRESULT MsgCreate(HWND, WPARAM, LPARAM);
 void CreateBars(HWND, HINSTANCE);
 void MsgInitMenu(HWND, WPARAM, LPARAM);
 LRESULT MsgCommand(HWND, WPARAM, LPARAM);

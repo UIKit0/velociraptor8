@@ -14,7 +14,7 @@ struct TextRun {
 
 struct TextStyle {
     std::string fontName;
-    int fontSize;
+    float fontSizePt;
     COLORREF col;
 };
 

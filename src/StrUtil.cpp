@@ -46,6 +46,12 @@ int Len(Slice &s) {
     return s.len;
 }
 
+char *DupN(const char *s, int n) {
+    char *res = (char *)calloc(n + 1, 1);
+    memcpy(res, s, (size_t)n);
+    return res;
+}
+
 bool Eq(const char *s1, const char *s2) { return strcmp(s1, s2) == 0; }
 bool Eq(const WCHAR *s1, const WCHAR *s2) { return wcscmp(s1, s2) == 0; }
 

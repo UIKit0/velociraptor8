@@ -107,3 +107,24 @@ void FormatText(FormattedText& f, Slice& s, HDC hdc, int dx, const TextStyle& in
     LayoutTextRuns(f, hdc, dx);
 }
 
+static void DebugDump(FormattedText& f) {
+    std::string s;
+    for (auto& r : f.runs) {
+        char* copy = str::DupN(r.s.s, r.s.len);
+        s = str::Format("%d: %s\n", r.s.len, copy);
+        OutputDebugStringA(s.c_str());
+        free(copy);
+    }
+}
+
+void TestFormatText() {
+    const char* s = "This is a test\nof a {b bold} text.\r\n {i ita{b li}c}";
+    Slice slice = { s, 0 };
+    FormattedText f;
+    TextStyle style;
+    style.col = RGB(0xff, 00, 00);
+    style.fontName = "Tahoma";
+    style.fontSizePt = 12.f;
+    FormatText(f, slice, NULL, 1024, style);
+    DebugDump(f);
+}

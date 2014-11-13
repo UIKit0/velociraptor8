@@ -26,6 +26,7 @@ See License.txt for details about distribution and modification.
 
 static void WmThemeChanged(HWND, WPARAM, LPARAM);
 static void WmSize(HWND, WPARAM, LPARAM);
+static LRESULT WmCreate(HWND, WPARAM, LPARAM);
 
 // Local and global Variables for Notepad2.c
 HWND hwndNextCBChain;
@@ -904,7 +905,9 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
             return DefWindowProc(hwnd, msg, wp, lp);
 
         case WM_CREATE:
-            return MsgCreate(hwnd, wp, lp);
+            extern void TestFormatText();
+            TestFormatText();
+            return WmCreate(hwnd, wp, lp);
 
         case WM_DESTROY:
         case WM_ENDSESSION:
@@ -1358,7 +1361,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
 }
 
 // WM_CREATE
-LRESULT MsgCreate(HWND hwnd, WPARAM wp, LPARAM lp) {
+static LRESULT WmCreate(HWND hwnd, WPARAM wp, LPARAM lp) {
     CREATESTRUCTW *cs = (CREATESTRUCTW *)lp;
     HINSTANCE hInstance = cs->hInstance;
 
