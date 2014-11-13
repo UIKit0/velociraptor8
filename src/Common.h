@@ -18,6 +18,9 @@
 
 #include <memory>
 #include <functional>
+#include <vector>
+
+typedef uint16_t u16;
 
 #define dimof(X) (sizeof(X) / sizeof((X)[0]))
 #define CSTRLEN(s) (dimof(s) - 1)

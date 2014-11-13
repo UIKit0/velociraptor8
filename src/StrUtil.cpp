@@ -39,6 +39,13 @@ namespace str {
 size_t Len(const char *s) { return strlen(s); }
 size_t Len(const WCHAR *s) { return wcslen(s); }
 
+int Len(Slice &s) {
+    if (s.len <= 0) {
+        s.len = (int)str::Len(s.s);
+    }
+    return s.len;
+}
+
 bool Eq(const char *s1, const char *s2) { return strcmp(s1, s2) == 0; }
 bool Eq(const WCHAR *s1, const WCHAR *s2) { return wcscmp(s1, s2) == 0; }
 

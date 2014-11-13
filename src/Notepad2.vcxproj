@@ -379,6 +379,8 @@
     <ClCompile Include="Install.cpp" />
     <ClCompile Include="Menu.cpp" />
     <ClCompile Include="FileUtil.cpp" />
+    <ClCompile Include="TableLayout.cpp" />
+    <ClCompile Include="TextFormat.cpp" />
     <ClCompile Include="Translations.cpp" />
     <ClCompile Include="ve8.cpp" />
     <ClCompile Include="Print.cpp" />
@@ -401,6 +403,8 @@
     <ClInclude Include="StrUtil.h" />
     <ClInclude Include="Styles.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="TableLayout.h" />
+    <ClInclude Include="TextFormat.h" />
     <ClInclude Include="Translations.h" />
     <ClInclude Include="UITask.h" />
     <ClInclude Include="ve8.h" />
