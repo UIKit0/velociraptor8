@@ -24,6 +24,9 @@ See License.txt for details about distribution and modification.
 #include "WinUtil.h"
 #include "FileUtil.h"
 
+static void WmThemeChanged(HWND, WPARAM, LPARAM);
+static void WmSize(HWND, WPARAM, LPARAM);
+
 // Local and global Variables for Notepad2.c
 HWND hwndNextCBChain;
 HWND hDlgFindReplace;
@@ -156,7 +159,7 @@ struct WinInfo {
 WinInfo wi;
 BOOL bStickyWinPos;
 
-BOOL bIsAppThemed;
+BOOL gIsAppThemed;
 int cyReBar;
 int cyReBarFrame;
 int cxEditFrame;
@@ -982,7 +985,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
 
         // Reinitialize theme-dependent values and resize windows
         case WM_THEMECHANGED:
-            MsgThemeChanged(hwnd, wp, lp);
+            WmThemeChanged(hwnd, wp, lp);
             break;
 
         // update Scintilla colors
@@ -996,7 +999,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
         //  break;
 
         case WM_SIZE:
-            MsgSize(hwnd, wp, lp);
+            WmSize(hwnd, wp, lp);
             break;
 
         case WM_SETFOCUS:
@@ -1475,11 +1478,11 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wp, LPARAM lp) {
 
     cxEditFrame = 0;
     cyEditFrame = 0;
-    bIsAppThemed = FALSE;
+    gIsAppThemed = FALSE;
 
     if (PrivateIsAppThemed()) {
         RECT rc, rc2;
-        bIsAppThemed = TRUE;
+        gIsAppThemed = TRUE;
         SetWindowLongPtrW(gDoc->hwndScintilla, GWL_EXSTYLE,
                           GetWindowLongPtrW(gDoc->hwndScintilla, GWL_EXSTYLE) & ~WS_EX_CLIENTEDGE);
         UINT flags = SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED;
@@ -1549,7 +1552,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
     DWORD dwStatusbarStyle = WS_CHILD | WS_CLIPSIBLINGS;
     DWORD dwReBarStyle = WS_REBAR;
 
-    BOOL bIsAppThemed = PrivateIsAppThemed();
+    BOOL isAppThemed = PrivateIsAppThemed();
 
     int i, n;
     WCHAR tchDesc[256];
@@ -1692,7 +1695,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
         RBBIM_STYLE | RBBIM_CHILD | RBBIM_CHILDSIZE /*| RBBIM_SIZE*/;
     rbBand.fStyle =
         /*RBBS_CHILDEDGE |*/ /* RBBS_BREAK |*/ RBBS_FIXEDSIZE /*| RBBS_GRIPPERALWAYS*/;
-    if (bIsAppThemed)
+    if (isAppThemed)
         rbBand.fStyle |= RBBS_CHILDEDGE;
     rbBand.hbmBack = NULL;
     rbBand.lpText = L"Toolbar";
@@ -1706,11 +1709,10 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
     GetWindowRect(gDoc->hwndReBar, &rc);
     cyReBar = rc.bottom - rc.top;
 
-    cyReBarFrame = bIsAppThemed ? 0 : 2;
+    cyReBarFrame = isAppThemed ? 0 : 2;
 }
 
-// WM_THEMECHANGED
-void MsgThemeChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
+static void WmThemeChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
     RECT rc, rc2;
     HINSTANCE hInstance = (HINSTANCE)(INT_PTR) GetWindowLongPtr(hwnd, GWLP_HINSTANCE);
 
@@ -1720,7 +1722,7 @@ void MsgThemeChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
     cyEditFrame = 0;
     UINT flags = SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED;
     if (PrivateIsAppThemed()) {
-        bIsAppThemed = TRUE;
+        gIsAppThemed = TRUE;
 
         SetWindowLongPtr(gDoc->hwndScintilla, GWL_EXSTYLE,
                          GetWindowLongPtr(gDoc->hwndScintilla, GWL_EXSTYLE) & ~WS_EX_CLIENTEDGE);
@@ -1735,7 +1737,7 @@ void MsgThemeChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
             cyEditFrame = ((rc2.bottom - rc2.top) - (rc.bottom - rc.top)) / 2;
         }
     } else {
-        bIsAppThemed = FALSE;
+        gIsAppThemed = FALSE;
 
         SetWindowLongPtr(gDoc->hwndScintilla, GWL_EXSTYLE,
                          WS_EX_CLIENTEDGE | GetWindowLongPtr(gDoc->hwndScintilla, GWL_EXSTYLE));
@@ -1757,53 +1759,50 @@ void MsgThemeChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
     UpdateStatusbar();
 }
 
-// WM_SIZE
-void MsgSize(HWND hwnd, WPARAM wParam, LPARAM lParam) {
-    RECT rc;
-
+static void WmSize(HWND hwnd, WPARAM wParam, LPARAM lParam) {
     if (wParam == SIZE_MINIMIZED)
         return;
 
-    int x = 0;
-    int y = 0;
-
-    int cx = LOWORD(lParam);
-    int cy = HIWORD(lParam);
+    int dx = LOWORD(lParam);
+    int dy = HIWORD(lParam);
+    RECT r = { 0, 0, dx, dy };
+    RECT rTop;
 
     if (bShowToolbar) {
+        RectSplitY(r, cyReBar, rTop, r);
+
         /*  SendMessage(hwndToolbar,WM_SIZE,0,0);
             GetWindowRect(hwndToolbar,&rc);
             y = (rc.bottom - rc.top);
             cy -= (rc.bottom - rc.top);*/
 
         // SendMessage(gDoc->hwndToolbar,TB_GETITEMRECT,0,(LPARAM)&rc);
-        SetWindowPos(gDoc->hwndReBar, NULL, 0, 0, LOWORD(lParam), cyReBar, SWP_NOZORDER);
+        SetWindowPos(gDoc->hwndReBar, rTop, SWP_NOZORDER);
         // the ReBar automatically sets the correct height
         // calling SetWindowPos() with the height of one toolbar button
         // causes the control not to temporarily use the whole client area
         // and prevents flickering
 
         // GetWindowRect(hwndReBar,&rc);
-        y = cyReBar + cyReBarFrame;   // define
-        cy -= cyReBar + cyReBarFrame; // border
+        r.top += cyReBarFrame;
     }
 
     if (bShowStatusbar) {
         SendMessage(gDoc->hwndStatus, WM_SIZE, 0, 0);
-        GetWindowRect(gDoc->hwndStatus, &rc);
-        cy -= RectDy(rc);
+        GetWindowRect(gDoc->hwndStatus, &rTop);
+        r.bottom -= RectDy(rTop);
     }
 
     HDWP hdwp = BeginDeferWindowPos(2);
     UINT flags = SWP_NOZORDER | SWP_NOACTIVATE;
-    DeferWindowPos(hdwp, gDoc->hwndEditFrame, NULL, x, y, cx, cy, flags);
-    DeferWindowPos(hdwp, gDoc->hwndScintilla, NULL, x + cxEditFrame, y + cyEditFrame,
-                   cx - 2 * cxEditFrame, cy - 2 * cyEditFrame, flags);
+    DeferWindowPos(hdwp, gDoc->hwndEditFrame, r, flags);
+    RectInflate(r, -cxEditFrame, -cyEditFrame);
+    DeferWindowPos(hdwp, gDoc->hwndScintilla, r, flags);
     EndDeferWindowPos(hdwp);
 
     // Statusbar
     int aWidth[6];
-    aWidth[0] = max(120, min(cx / 3, StatusCalcPaneWidth(gDoc->hwndStatus,
+    aWidth[0] = max(120, min(dx / 3, StatusCalcPaneWidth(gDoc->hwndStatus,
                                                          L"Ln 9'999'999 : 9'999'999   Col "
                                                          L"9'999'999 : 999   Sel 9'999'999")));
     aWidth[1] = aWidth[0] + StatusCalcPaneWidth(gDoc->hwndStatus, L"9'999'999 Bytes");

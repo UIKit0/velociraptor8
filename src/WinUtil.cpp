@@ -180,3 +180,35 @@ void BroadcastEnvRegistryChanged() {
     SendMessageTimeoutW(HWND_BROADCAST, WM_SETTINGCHANGE, 0, (LPARAM)L"Environment", flags, 5000,
                         &result);
 }
+
+BOOL SetWindowPos(HWND hwnd, const RECT &r, UINT flags) {
+    return SetWindowPos(hwnd, NULL, r.left, r.top, RectDx(r), RectDy(r), flags);
+}
+
+HDWP DeferWindowPos(HDWP hdwp, HWND hwnd, const RECT &r, UINT flags) {
+    return DeferWindowPos(hdwp, hwnd, NULL, r.left, r.top, RectDx(r), RectDy(r), flags);
+}
+
+int RectDx(const RECT &r) { return r.right - r.left; }
+int RectDy(const RECT &r) { return r.bottom - r.top; }
+void SetDy(RECT &r, int dy) { r.bottom = r.top = dy; }
+void SetDx(RECT &r, int dx) { r.bottom = r.top + dx; }
+
+void RectInflate(RECT &r, int dx, int dy) {
+    r.left -= dx;
+    r.right += dx * 2;
+    r.top -= dy;
+    r.bottom += dy * 2;
+}
+
+void RectSplitX(const RECT &r, int dx, RECT &rLeft, RECT &rRight) {
+    rLeft = rRight = r;
+    rLeft.right = rLeft.left + dx;
+    rRight.left += dx;
+}
+
+void RectSplitY(const RECT &r, int dy, RECT &rTop, RECT &rBottom) {
+    rTop = rBottom = r;
+    rTop.bottom = rTop.top + dy;
+    rBottom.top += dy;
+}

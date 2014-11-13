@@ -6707,7 +6707,7 @@ int FileVars_GetEncoding(LPFILEVARS lpfv) {
 // FARPROC pfnIsThemeBackgroundPartiallyTransparent = NULL;
 //
 // BOOL bThemesPresent = FALSE;
-// extern BOOL bIsAppThemed;
+// extern BOOL gIsAppThemed;
 // extern HMODULE hModUxTheme;
 //
 // void SciInitThemes(HWND hwnd)
@@ -6743,7 +6743,7 @@ int FileVars_GetEncoding(LPFILEVARS lpfv) {
 // CallWindowProcW(pfnSciWndProc,hwnd,WM_NCCALCSIZE,wParam,lParam);
 //      NCCALCSIZE_PARAMS *csp = (NCCALCSIZE_PARAMS*)lParam;
 //
-//      if (bThemesPresent && bIsAppThemed) {
+//      if (bThemesPresent && gIsAppThemed) {
 //        HANDLE hTheme = (HANDLE)pfnOpenThemeData(hwnd,L"edit");
 //        if(hTheme) {
 //          BOOL bSuccess = FALSE;
@@ -6775,7 +6775,7 @@ int FileVars_GetEncoding(LPFILEVARS lpfv) {
 //  else if (umsg == WM_NCPAINT) {
 //    LRESULT lresult =
 // CallWindowProcW(pfnSciWndProc,hwnd,WM_NCPAINT,wParam,lParam);
-//    if(bThemesPresent && bIsAppThemed) {
+//    if(bThemesPresent && gIsAppThemed) {
 //
 //      HANDLE hTheme = (HANDLE)pfnOpenThemeData(hwnd,L"edit");
 //      if(hTheme) {

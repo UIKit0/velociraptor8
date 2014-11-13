@@ -16,5 +16,16 @@ bool WriteRegExpandStr(HKEY keySub, const char *keyName, const char *valName, co
 bool WriteRegStr(HKEY keySub, const char *keyName, const char *valName, const char *value);
 void BroadcastEnvRegistryChanged();
 
-inline int RectDx(const RECT &r) { return r.right - r.left; }
-inline int RectDy(const RECT &r) { return r.bottom - r.top; }
+BOOL SetWindowPos(HWND hwnd, const RECT &r, UINT flags);
+HDWP DeferWindowPos(HDWP hdwp, HWND hwnd, const RECT &r, UINT flags);
+
+int RectDx(const RECT &r);
+int RectDy(const RECT &r);
+
+void SetDy(RECT &r, int dy);
+void SetDx(RECT &r, int dx);
+
+void RectInflate(RECT &r, int dx, int dy);
+
+void RectSplitX(const RECT &r, int dx, RECT &rLeft, RECT &rRight);
+void RectSplitY(const RECT &r, int dy, RECT &rTop, RECT &rBottom);

@@ -94,15 +94,15 @@ BOOL IniSectionSetString(WCHAR *lpCachedIniSection, const WCHAR *lpName, const W
 extern HMODULE hModUxTheme;
 BOOL PrivateIsAppThemed() {
     FARPROC pfnIsAppThemed;
-    BOOL bIsAppThemed = FALSE;
+    BOOL isAppThemed = FALSE;
 
     if (hModUxTheme) {
         pfnIsAppThemed = GetProcAddress(hModUxTheme, "IsAppThemed");
 
         if (pfnIsAppThemed)
-            bIsAppThemed = (BOOL)pfnIsAppThemed();
+            isAppThemed = (BOOL)pfnIsAppThemed();
     }
-    return bIsAppThemed;
+    return isAppThemed;
 }
 
 typedef HRESULT(WINAPI *SetCurrentProcessExplicitAppUserModelIDProc)(PCWSTR AppID);
