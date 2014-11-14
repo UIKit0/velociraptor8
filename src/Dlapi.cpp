@@ -20,7 +20,6 @@ struct DLDATA {
     HANDLE hTerminatedThread; // Flag is set when Icon Thread has terminated
 };
 
-//==== Property Name ==========================================================
 static const WCHAR* pDirListProp = L"DirListData";
 
 //  Initializes the DLDATA structure and sets up the listview control
