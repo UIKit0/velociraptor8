@@ -55,7 +55,6 @@ void Destroy() {
 
 void Post(const std::function<void()> &f) {
     auto task = new UITask(f);
-    // task->f = f;
     PostMessage(gTaskDispatchHwnd, WM_EXECUTE_TASK, 0, (LPARAM)task);
 }
 }
