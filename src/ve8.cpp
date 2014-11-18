@@ -15,7 +15,7 @@ See License.txt for details about distribution and modification.
 #include "SciCall.h"
 #include "resource.h"
 #include "Version.h"
-#include "UITask2.h"
+#include "UITask.h"
 #include "Http.h"
 #include "Install.h"
 #include "Menu.h"
