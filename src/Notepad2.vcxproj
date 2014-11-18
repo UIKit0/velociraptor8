@@ -179,13 +179,13 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>..\scintilla\include;..\scintilla\lexlib;..\scintilla\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\scintilla\include;..\scintilla\lexlib;..\scintilla\src;utils;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <MinimalRebuild>false</MinimalRebuild>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;STATIC_BUILD;SCI_LEXER;BOOKMARK_EDITION;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;STATIC_BUILD;SCI_LEXER;BOOKMARK_EDITION;NO_LIBMUPDF;NO_LIBWEBP;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <EnablePREfast>false</EnablePREfast>
@@ -195,7 +195,7 @@
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>comctl32.lib;imm32.lib;shlwapi.lib;Wininet.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>comctl32.lib;imm32.lib;shlwapi.lib;Wininet.lib;gdiplus.lib;urlmon.lib;Version.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
@@ -241,11 +241,11 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>..\scintilla\include;..\scintilla\lexlib;..\scintilla\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\scintilla\include;..\scintilla\lexlib;..\scintilla\src;utils;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <EnableEnhancedInstructionSet>NoExtensions</EnableEnhancedInstructionSet>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <Optimization>MinSpace</Optimization>
-      <PreprocessorDefinitions>WIN32;STATIC_BUILD;SCI_LEXER;BOOKMARK_EDITION;NDEBUG;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;STATIC_BUILD;SCI_LEXER;BOOKMARK_EDITION;NO_LIBMUPDF;NO_LIBWEBP;NDEBUG;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DisableSpecificWarnings>4800</DisableSpecificWarnings>
@@ -256,7 +256,7 @@
       <FavorSizeOrSpeed>Size</FavorSizeOrSpeed>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>comctl32.lib;imm32.lib;shlwapi.lib;Wininet.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>comctl32.lib;imm32.lib;shlwapi.lib;Wininet.lib;gdiplus.lib;urlmon.lib;Version.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <MergeSections>.rdata=.text</MergeSections>
@@ -275,11 +275,11 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release Analyze|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>..\scintilla\include;..\scintilla\lexlib;..\scintilla\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\scintilla\include;..\scintilla\lexlib;..\scintilla\src;utils;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <EnableEnhancedInstructionSet>NoExtensions</EnableEnhancedInstructionSet>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <Optimization>MaxSpeed</Optimization>
-      <PreprocessorDefinitions>WIN32;STATIC_BUILD;SCI_LEXER;BOOKMARK_EDITION;NDEBUG;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;STATIC_BUILD;SCI_LEXER;BOOKMARK_EDITION;NO_LIBMUPDF;NO_LIBWEBP;NDEBUG;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <EnablePREfast>true</EnablePREfast>
@@ -289,7 +289,7 @@
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>comctl32.lib;imm32.lib;shlwapi.lib;Wininet.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>comctl32.lib;imm32.lib;shlwapi.lib;Wininet.lib;gdiplus.lib;urlmon.lib;Version.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <MergeSections>.rdata=.text</MergeSections>
@@ -374,42 +374,101 @@
     <ClCompile Include="Dialogs.cpp" />
     <ClCompile Include="Dlapi.cpp" />
     <ClCompile Include="Edit.cpp" />
+    <ClCompile Include="FileUtil2.cpp" />
     <ClCompile Include="Helpers.cpp" />
     <ClCompile Include="Http.cpp" />
     <ClCompile Include="Install.cpp" />
     <ClCompile Include="Menu.cpp" />
-    <ClCompile Include="FileUtil.cpp" />
+    <ClCompile Include="StrUtil2.cpp" />
     <ClCompile Include="TableLayout.cpp" />
     <ClCompile Include="TextFormat.cpp" />
     <ClCompile Include="Translations.cpp" />
+    <ClCompile Include="utils\BaseUtil.cpp" />
+    <ClCompile Include="utils\CmdLineParser.cpp" />
+    <ClCompile Include="utils\DbgHelpDyn.cpp" />
+    <ClCompile Include="utils\DebugLog.cpp" />
+    <ClCompile Include="utils\Dpi.cpp" />
+    <ClCompile Include="utils\FileUtil.cpp" />
+    <ClCompile Include="utils\FileWatcher.cpp" />
+    <ClCompile Include="utils\FrameRateWnd.cpp" />
+    <ClCompile Include="utils\FzImgReader.cpp" />
+    <ClCompile Include="utils\GdiPlusUtil.cpp" />
+    <ClCompile Include="utils\HtmlWindow.cpp" />
+    <ClCompile Include="utils\HttpUtil.cpp" />
+    <ClCompile Include="utils\LabelWithCloseWnd.cpp" />
+    <ClCompile Include="utils\SplitterWnd.cpp" />
+    <ClCompile Include="utils\StrFormat.cpp" />
+    <ClCompile Include="utils\StrSlice.cpp" />
+    <ClCompile Include="utils\StrUtil.cpp" />
+    <ClCompile Include="utils\TgaReader.cpp" />
+    <ClCompile Include="utils\ThreadUtil.cpp" />
+    <ClCompile Include="utils\Touch.cpp" />
+    <ClCompile Include="utils\UITask.cpp" />
+    <ClCompile Include="utils\UtAssert.cpp" />
+    <ClCompile Include="utils\WebpReader.cpp" />
+    <ClCompile Include="utils\WinCursors.cpp" />
+    <ClCompile Include="utils\WinUtil.cpp" />
     <ClCompile Include="ve8.cpp" />
     <ClCompile Include="Print.cpp" />
-    <ClCompile Include="StrUtil.cpp" />
     <ClCompile Include="Styles.cpp" />
-    <ClCompile Include="UITask.cpp" />
-    <ClCompile Include="WinUtil.cpp" />
+    <ClCompile Include="WinUtil2.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common.h" />
     <ClInclude Include="Dialogs.h" />
     <ClInclude Include="Dlapi.h" />
     <ClInclude Include="Edit.h" />
+    <ClInclude Include="FileUtil2.h" />
     <ClInclude Include="Helpers.h" />
     <ClInclude Include="Http.h" />
     <ClInclude Include="Install.h" />
     <ClInclude Include="Menu.h" />
-    <ClInclude Include="FileUtil.h" />
     <ClInclude Include="SciCall.h" />
-    <ClInclude Include="StrUtil.h" />
+    <ClInclude Include="StrUtil2.h" />
     <ClInclude Include="Styles.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="TableLayout.h" />
     <ClInclude Include="TextFormat.h" />
     <ClInclude Include="Translations.h" />
-    <ClInclude Include="UITask.h" />
+    <ClInclude Include="utils\Allocator.h" />
+    <ClInclude Include="utils\BaseUtil.h" />
+    <ClInclude Include="utils\BitManip.h" />
+    <ClInclude Include="utils\ByteReader.h" />
+    <ClInclude Include="utils\CmdLineParser.h" />
+    <ClInclude Include="utils\DbgHelpDyn.h" />
+    <ClInclude Include="utils\DebugLog.h" />
+    <ClInclude Include="utils\Dpi.h" />
+    <ClInclude Include="utils\FileUtil.h" />
+    <ClInclude Include="utils\FileWatcher.h" />
+    <ClInclude Include="utils\FrameRateWnd.h" />
+    <ClInclude Include="utils\FrameTimeoutCalculator.h" />
+    <ClInclude Include="utils\FzImgReader.h" />
+    <ClInclude Include="utils\GdiPlusUtil.h" />
+    <ClInclude Include="utils\GeomUtil.h" />
+    <ClInclude Include="utils\HtmlWindow.h" />
+    <ClInclude Include="utils\HttpUtil.h" />
+    <ClInclude Include="utils\LabelWithCloseWnd.h" />
+    <ClInclude Include="utils\RefCounted.h" />
+    <ClInclude Include="utils\Scoped.h" />
+    <ClInclude Include="utils\SplitterWnd.h" />
+    <ClInclude Include="utils\StrFormat.h" />
+    <ClInclude Include="utils\StrHash.h" />
+    <ClInclude Include="utils\StrSlice.h" />
+    <ClInclude Include="utils\StrUtil.h" />
+    <ClInclude Include="utils\TgaReader.h" />
+    <ClInclude Include="utils\ThreadUtil.h" />
+    <ClInclude Include="utils\Timer.h" />
+    <ClInclude Include="utils\Touch.h" />
+    <ClInclude Include="utils\UITask.h" />
+    <ClInclude Include="utils\UtAssert.h" />
+    <ClInclude Include="utils\Vec.h" />
+    <ClInclude Include="utils\VecSegmented.h" />
+    <ClInclude Include="utils\WebpReader.h" />
+    <ClInclude Include="utils\WinCursors.h" />
+    <ClInclude Include="utils\WinUtil.h" />
     <ClInclude Include="ve8.h" />
     <ClInclude Include="Version.h" />
-    <ClInclude Include="WinUtil.h" />
+    <ClInclude Include="WinUtil2.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\res\Copy.cur" />

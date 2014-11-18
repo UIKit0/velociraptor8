@@ -1,50 +1,30 @@
+#include "BaseUtil.h"
 
-#if !defined(_WIN32_WINNT)
-#define _WIN32_WINNT 0x501
+#ifndef max
+#define max(a,b)            (((a) > (b)) ? (a) : (b))
 #endif
 
-#include <windows.h>
-#include <commctrl.h>
+#ifndef min
+#define min(a,b)            (((a) < (b)) ? (a) : (b))
+#endif
+
+#undef GetRValue
+#define GetRValue GetRValueSafe
+#undef GetGValue
+#define GetGValue GetGValueSafe
+#undef GetBValue
+#define GetBValue GetBValueSafe
+
 #include <commdlg.h>
 #include <shellapi.h>
-#include <shlobj.h>
-#include <shlwapi.h>
 #include <uxtheme.h>
 
-#include <limits.h>
-#include <stdio.h>
-#include <string.h>
-#include <time.h>
-
 #include <memory>
-#include <functional>
 #include <vector>
 
 typedef uint16_t u16;
 
-#define dimof(X) (sizeof(X) / sizeof((X)[0]))
 #define CSTRLEN(s) (dimof(s) - 1)
-
-#pragma warning(push)
-#pragma warning(disable : 6011) // silence /analyze: de-referencing a NULL pointer
-inline void CrashMe() {
-    char *s = nullptr;
-    *s = 0;
-};
-#pragma warning(pop)
-
-#define CrashAlwaysIf(cond)                                                                        \
-    do {                                                                                           \
-        if (cond)                                                                                  \
-            CrashMe();                                                                             \
-        __analysis_assume(!(cond));                                                                \
-    } while (0)
-
-#if defined(DEBUG) || defined(PRE_RELEASE)
-#define CrashIf(cond) CrashAlwaysIf(cond)
-#else
-#define CrashIf(cond) __analysis_assume(!(cond))
-#endif
 
 inline void CrashIfLastError() {
     DWORD err = GetLastError();
@@ -93,4 +73,4 @@ template <typename T> class AutoStruct {
     operator T *() const { return val; }
 };
 
-#include "StrUtil.h"
+#include "StrUtil2.h"

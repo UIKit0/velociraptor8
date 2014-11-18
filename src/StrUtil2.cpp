@@ -36,9 +36,6 @@ std::string WstrToUtf8Str(const WCHAR *s) {
 
 namespace str {
 
-size_t Len(const char *s) { return strlen(s); }
-size_t Len(const WCHAR *s) { return wcslen(s); }
-
 int Len(Slice &s) {
     if (s.len <= 0) {
         s.len = (int)str::Len(s.s);
@@ -52,9 +49,6 @@ char *DupN(const char *s, int n) {
     return res;
 }
 
-bool Eq(const char *s1, const char *s2) { return strcmp(s1, s2) == 0; }
-bool Eq(const WCHAR *s1, const WCHAR *s2) { return wcscmp(s1, s2) == 0; }
-
 char LastChar(const std::string &s) {
     if (s.empty()) {
         return 0;
@@ -64,41 +58,12 @@ char LastChar(const std::string &s) {
 
 bool EndsWith(const std::string &s, char c) { return c == LastChar(s); }
 
-/* return true if 'str' starts with 'txt', NOT case-sensitive */
-bool StartsWithI(const char *str, const char *prefix) {
-    if (str == prefix)
-        return true;
-    if (!str || !prefix)
-        return false;
-    return 0 == _strnicmp(str, prefix, str::Len(prefix));
-}
-
 bool StartsWith(const std::string &s, char c) {
     if (s.empty()) {
         return false;
     }
     char first = s.at(0);
     return first == c;
-}
-
-const char *FindI(const char *s, const char *toFind) {
-    if (!s || !toFind) {
-        return nullptr;
-    }
-
-    char first = (char)tolower(*toFind);
-    if (!first)
-        return s;
-    while (*s) {
-        char c = (char)tolower(*s);
-        if (c == first) {
-            if (str::StartsWithI(s, toFind)) {
-                return s;
-            }
-        }
-        s++;
-    }
-    return nullptr;
 }
 
 size_t FindIPos(const char *s, const char *toFind) {
@@ -114,7 +79,7 @@ bool ContainsI(const std::string &s, const std::string &toFind) {
     return found != nullptr;
 }
 
-std::string FmtV(const char *fmt, va_list args) {
+std::string StrFmtV(const char *fmt, va_list args) {
     char message[256];
     size_t bufCchSize = dimof(message);
     char *buf = message;
@@ -145,7 +110,7 @@ std::string FmtV(const char *fmt, va_list args) {
     return res;
 }
 
-std::string Format(const char *fmt, ...) {
+std::string StrFormat(const char *fmt, ...) {
     va_list args;
     va_start(args, fmt);
     auto res(FmtV(fmt, args));

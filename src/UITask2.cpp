@@ -1,7 +1,7 @@
 
 #include "Common.h"
-#include "UITask.h"
-#include "WinUtil.h"
+#include "UITask2.h"
+#include "WinUtil2.h"
 
 // TODO(kjk): can I avoid this struct wrapper?
 struct UITask {

@@ -5,7 +5,6 @@ See License.txt for details about distribution and modification.
 */
 
 #include "Common.h"
-
 #include "scintilla.h"
 #include "scilexer.h"
 #include "ve8.h"

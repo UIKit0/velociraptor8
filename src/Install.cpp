@@ -1,9 +1,9 @@
 #include "Common.h"
 #include "Install.h"
-#include "FileUtil.h"
+#include "FileUtil2.h"
 // Maybe: not ideal, decouple this via SetAppDirName() instead of APP_DIR_NAME
 #include "ve8.h"
-#include "WinUtil.h"
+#include "WinUtil2.h"
 #include "Version.h"
 #include "Helpers.h"
 

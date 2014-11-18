@@ -1,42 +1,9 @@
 
 #include "Common.h"
 #include <atlcomcli.h>
-
 #include "WinUtil.h"
-#include "FileUtil.h"
-
-static WCHAR *knownCursorIds[] = { IDC_ARROW,  IDC_IBEAM,  IDC_HAND, IDC_SIZEALL,
-                                   IDC_SIZEWE, IDC_SIZENS, IDC_NO,   IDC_CROSS };
-
-static HCURSOR cachedCursors[dimof(knownCursorIds)] = {};
-
-HCURSOR GetCursor(WCHAR *id) {
-    int cursorIdx = -1;
-    for (int i = 0; i < dimof(knownCursorIds); i++) {
-        if (id == knownCursorIds[i]) {
-            cursorIdx = i;
-            break;
-        }
-    }
-    CrashIf(cursorIdx == -1);
-    if (NULL == cachedCursors[cursorIdx]) {
-        cachedCursors[cursorIdx] = LoadCursor(NULL, id);
-        CrashIf(cachedCursors[cursorIdx] == NULL);
-    }
-    return cachedCursors[cursorIdx];
-}
-
-void SetCursor(WCHAR *id) { SetCursor(GetCursor(id)); }
-
-void FillWndClassEx(WNDCLASSEX &wcex, const WCHAR *clsName, WNDPROC wndproc) {
-    ZeroMemory(&wcex, sizeof(WNDCLASSEX));
-    wcex.cbSize = sizeof(WNDCLASSEX);
-    wcex.style = CS_HREDRAW | CS_VREDRAW;
-    wcex.hInstance = GetModuleHandleW(NULL);
-    wcex.hCursor = GetCursor(IDC_ARROW);
-    wcex.lpszClassName = clsName;
-    wcex.lpfnWndProc = wndproc;
-}
+#include "WinUtil2.h"
+#include "FileUtil2.h"
 
 void EnableMenu(HMENU m, UINT id) {
     BOOL ret = EnableMenuItem(m, id, MF_BYCOMMAND | MF_ENABLED);
@@ -189,8 +156,6 @@ HDWP DeferWindowPos(HDWP hdwp, HWND hwnd, const RECT &r, UINT flags) {
     return DeferWindowPos(hdwp, hwnd, NULL, r.left, r.top, RectDx(r), RectDy(r), flags);
 }
 
-int RectDx(const RECT &r) { return r.right - r.left; }
-int RectDy(const RECT &r) { return r.bottom - r.top; }
 void SetDy(RECT &r, int dy) { r.bottom = r.top = dy; }
 void SetDx(RECT &r, int dx) { r.bottom = r.top + dx; }
 

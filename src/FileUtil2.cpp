@@ -1,13 +1,8 @@
 #include "Common.h"
+#include "FileUtil2.h"
 #include "FileUtil.h"
 
 namespace path {
-
-bool IsSep(char c) {
-    // little known fact: on windows both / and \ are valid although
-    // \ is not as well supported
-    return '\\' == c || '/' == c;
-}
 
 // http://msdn.microsoft.com/en-us/library/windows/desktop/bb773569(v=vs.85).aspx
 // TODO: on win8 use PathCchCanonicalize or PathCchCanonicalizeEx

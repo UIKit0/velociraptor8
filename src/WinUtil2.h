@@ -1,8 +1,4 @@
 
-HCURSOR GetCursor(WCHAR *);
-void SetCursor(WCHAR *);
-void FillWndClassEx(WNDCLASSEX &wcex, const WCHAR *clsName, WNDPROC wndproc);
-
 void EnableMenu(HMENU m, UINT id);
 void DisableMenu(HMENU m, UINT id);
 bool CreateShortcut(const std::string &shortcutPath, const std::string &exePath);
@@ -18,9 +14,6 @@ void BroadcastEnvRegistryChanged();
 
 BOOL SetWindowPos(HWND hwnd, const RECT &r, UINT flags);
 HDWP DeferWindowPos(HDWP hdwp, HWND hwnd, const RECT &r, UINT flags);
-
-int RectDx(const RECT &r);
-int RectDy(const RECT &r);
 
 void SetDy(RECT &r, int dy);
 void SetDx(RECT &r, int dx);

@@ -5,7 +5,6 @@ See License.txt for details about distribution and modification.
 */
 
 #include "Common.h"
-
 #include "scintilla.h"
 #include "scilexer.h"
 #include "ve8.h"
@@ -16,13 +15,13 @@ See License.txt for details about distribution and modification.
 #include "SciCall.h"
 #include "resource.h"
 #include "Version.h"
-#include "UITask.h"
+#include "UITask2.h"
 #include "Http.h"
 #include "Install.h"
 #include "Menu.h"
-#include "Install.h"
 #include "WinUtil.h"
-#include "FileUtil.h"
+#include "WinUtil2.h"
+#include "FileUtil2.h"
 
 static void WmThemeChanged(HWND, WPARAM, LPARAM);
 static void WmSize(HWND, WPARAM, LPARAM);

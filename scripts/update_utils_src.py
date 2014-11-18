@@ -14,7 +14,7 @@ subprocess.call(["svn", "update"])
 
 files = os.listdir(g_src_dir)
 
-blacklist = ["ArchUtil", "BitReader", "ByteOrderDecoder", "ByteWriter", "CryptoUtil", "CssParser", "DialogSizer", "Dict", "DirIter", "FileTransactions", "FzImageReader", "GdiPlusUtil", "HtmlParserLookup", "HtmlPrettyPrint", "HtmlPullParser", "JsonParser", "LzmaSimpleArchive", "mingw_compat", "NoFreeAllocator", "PalmDbReader", "SerializeTxt", "SettingsUtil", "SimpleLog", "SquareTreeParser", "TgaReader", "TrivailHtmlParser", "TxtParser", "VarintGob", "WebpReader", "ZipUtil"]
+blacklist = ["ArchUtil", "BitReader", "ByteOrderDecoder", "ByteWriter", "CryptoUtil", "CssParser", "DialogSizer", "Dict", "DirIter", "FileTransactions", "HtmlParserLookup", "HtmlPrettyPrint", "HtmlPullParser", "JsonParser", "LzmaSimpleArchive", "NoFreeAllocator", "PalmDbReader", "SerializeTxt", "SettingsUtil", "SimpleLog", "SquareTreeParser", "TrivialHtmlParser", "TxtParser", "VarintGob", "ZipUtil"]
 
 def should_copy(f):
 	if not (f.endswith(".h") or f.endswith(".cpp")):

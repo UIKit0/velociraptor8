@@ -9,6 +9,9 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
+    <Filter Include="src\utils">
+      <UniqueIdentifier>{ce49f44a-28a6-4050-92a2-45b70bdabc92}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Print.cpp">
@@ -29,15 +32,6 @@
     <ClCompile Include="Styles.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="StrUtil.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="UITask.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="WinUtil.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="Http.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -53,14 +47,95 @@
     <ClCompile Include="Translations.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="FileUtil.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="TableLayout.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="TextFormat.cpp">
       <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\BaseUtil.cpp">
+      <Filter>src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\CmdLineParser.cpp">
+      <Filter>src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\DbgHelpDyn.cpp">
+      <Filter>src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\DebugLog.cpp">
+      <Filter>src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\Dpi.cpp">
+      <Filter>src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\FileUtil.cpp">
+      <Filter>src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\FileWatcher.cpp">
+      <Filter>src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\FrameRateWnd.cpp">
+      <Filter>src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\HtmlWindow.cpp">
+      <Filter>src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\HttpUtil.cpp">
+      <Filter>src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\LabelWithCloseWnd.cpp">
+      <Filter>src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\SplitterWnd.cpp">
+      <Filter>src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\StrFormat.cpp">
+      <Filter>src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\StrSlice.cpp">
+      <Filter>src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\StrUtil.cpp">
+      <Filter>src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\ThreadUtil.cpp">
+      <Filter>src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\Touch.cpp">
+      <Filter>src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\UITask.cpp">
+      <Filter>src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\UtAssert.cpp">
+      <Filter>src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\WinCursors.cpp">
+      <Filter>src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\WinUtil.cpp">
+      <Filter>src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="WinUtil2.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="FileUtil2.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="StrUtil2.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\GdiPlusUtil.cpp">
+      <Filter>src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\FzImgReader.cpp">
+      <Filter>src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\TgaReader.cpp">
+      <Filter>src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\WebpReader.cpp">
+      <Filter>src\utils</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -77,9 +152,6 @@
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="Edit.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="FileUtil.h">
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="Helpers.h">
@@ -100,9 +172,6 @@
     <ClInclude Include="SciCall.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="StrUtil.h">
-      <Filter>src</Filter>
-    </ClInclude>
     <ClInclude Include="Styles.h">
       <Filter>src</Filter>
     </ClInclude>
@@ -112,17 +181,128 @@
     <ClInclude Include="Translations.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="UITask.h">
-      <Filter>src</Filter>
-    </ClInclude>
     <ClInclude Include="ve8.h">
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="Version.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="WinUtil.h">
+    <ClInclude Include="utils\Allocator.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\BaseUtil.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\BitManip.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\ByteReader.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\CmdLineParser.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\DbgHelpDyn.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\DebugLog.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\Dpi.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\FileUtil.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\FileWatcher.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\FrameRateWnd.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\FrameTimeoutCalculator.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\GeomUtil.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\HtmlWindow.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\HttpUtil.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\LabelWithCloseWnd.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\RefCounted.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\Scoped.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\SplitterWnd.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\StrFormat.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\StrHash.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\StrSlice.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\StrUtil.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\ThreadUtil.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\Timer.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\Touch.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\UITask.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\UtAssert.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\Vec.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\VecSegmented.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\WinCursors.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\WinUtil.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="WinUtil2.h">
       <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="FileUtil2.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="StrUtil2.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\GdiPlusUtil.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\FzImgReader.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\TgaReader.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\WebpReader.h">
+      <Filter>src\utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
