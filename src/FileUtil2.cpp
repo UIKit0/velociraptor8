@@ -61,8 +61,8 @@ std::string GetDir(const std::string& path) {
 
 namespace file {
 
-bool Exists(const std::string& path) {
-    if (path.empty()) {
+bool Exists(const char* path) {
+    if (str::IsEmpty(path)) {
         return false;
     }
     AutoUtf8ToWstr pathW(path);
@@ -79,14 +79,7 @@ bool Exists(const std::string& path) {
     return true;
 }
 
-// Return true if the file wasn't there or was successfully deleted
-bool Delete(const std::string& path) {
-    AutoUtf8ToWstr pathW(path);
-    BOOL ok = DeleteFile(pathW.Get());
-    return ok || GetLastError() == ERROR_FILE_NOT_FOUND;
-}
-
-bool Copy(const std::string& dst, const std::string& src) {
+bool Copy(const char *dst, const char *src) {
     AutoUtf8ToWstr dstW(dst);
     AutoUtf8ToWstr srcW(src);
     BOOL failIfExists = TRUE;
@@ -94,12 +87,19 @@ bool Copy(const std::string& dst, const std::string& src) {
     return res != 0;
 }
 
+// Return true if the file wasn't there or was successfully deleted
+bool Delete(const char *path) {
+    AutoUtf8ToWstr pathW(path);
+    BOOL ok = DeleteFile(pathW.Get());
+    return ok || GetLastError() == ERROR_FILE_NOT_FOUND;
+}
+
 } // namespace file
 
 namespace dir {
 
-bool Exists(const std::string& dir) {
-    if (dir.empty()) {
+bool Exists(const char* dir) {
+    if (str::IsEmpty(dir)) {
         return false;
     }
     AutoUtf8ToWstr dirW(dir);
@@ -128,7 +128,7 @@ bool Create(const std::string& dir) {
 // creates a directory and all its parent directories that don't exist yet
 bool CreateAll(const std::string& dir) {
     std::string parent(path::GetDir(dir));
-    if (parent != dir && !Exists(parent)) {
+    if (parent != dir && !Exists(parent.c_str())) {
         CreateAll(parent);
     }
     return Create(dir);

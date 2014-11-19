@@ -9,15 +9,15 @@ void NormalizeInPlace(WCHAR* src, size_t srcCchSize);
 
 namespace file {
 
-bool Exists(const std::string&);
-bool Copy(const std::string& dst, const std::string& src);
-bool Delete(const std::string&);
+bool Exists(const char*);
+bool Copy(const char* dst, const char *src);
+bool Delete(const char *);
 
 } // namespace file
 
 namespace dir {
 
-bool Exists(const std::string&);
+bool Exists(const char*);
 bool Create(const std::string&);
 bool CreateAll(const std::string&);
 bool CreateForFile(const std::string&);

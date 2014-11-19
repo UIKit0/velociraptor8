@@ -76,7 +76,7 @@ static bool RemoveAppShortcut(bool allUsers) {
     if (shortcutPath.empty()) {
         return false;
     }
-    bool ok = file::Delete(shortcutPath);
+    bool ok = file::Delete(shortcutPath.c_str());
     return ok;
 }
 
@@ -211,12 +211,12 @@ static bool InstallCopyFiles() {
         return false;
     }
     // TODO(kjk): copy settings file as well
-    return file::Copy(dstPath, exePath);
+    return file::Copy(dstPath.c_str(), exePath.c_str());
 }
 
 static bool UninstallRemoveFiles() {
     auto exePath = GetExePath();
-    if (!file::Delete(exePath)) {
+    if (!file::Delete(exePath.c_str())) {
         return false;
     }
     bool allUsers = false;
@@ -287,7 +287,7 @@ bool CanInstall() {
         return false;
     }
     auto path(GetInstalledExePath());
-    if (file::Exists(path)) {
+    if (file::Exists(path.c_str())) {
         // TODO(kjk): allow installation if my version > installed version
         return false;
     }
