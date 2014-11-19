@@ -39,7 +39,7 @@ bool CreateShortcut(const std::string &shortcutPath, const std::string &exePath)
     if (FAILED(hr))
         return false;
 
-    auto dir(path::GetDir(exePath));
+    char *dir = path::GetDir(exePath.c_str());
     AutoUtf8ToWstr dirW(dir);
     lnk->SetWorkingDirectory(dirW.Get());
     // lnk->SetShowCmd(SW_SHOWNORMAL);

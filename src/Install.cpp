@@ -6,6 +6,7 @@
 #include "WinUtil2.h"
 #include "Version.h"
 #include "Helpers.h"
+#include "FileUtil.h"
 
 // http://msdn.microsoft.com/en-us/library/windows/desktop/ms683197(v=vs.85).aspx
 static std::string GetExePath() {
@@ -23,28 +24,34 @@ static std::string GetExePath() {
 }
 
 // http://msdn.microsoft.com/en-us/library/windows/desktop/bb762181(v=vs.85).aspx
-static std::string GetKnownFolderPathXp(int nFolder) {
+// caller has to free()
+static char *GetKnownFolderPathXp(int nFolder) {
     WCHAR buf[MAX_PATH];
     // TODO: on Vista+ use SHGetSpecialFolderPath, SHGetFolderPath is deprecated
     HRESULT hr = SHGetFolderPath(NULL, nFolder, NULL, SHGFP_TYPE_DEFAULT, buf);
     CrashIf(hr != S_OK);
-    return WstrToUtf8Str(buf);
+    return WstrToUtf8(buf);
 }
 
-static std::string GetLocalAppDir(const char *p1 = NULL, const char *p2 = NULL,
+// caller has to free()
+static char *GetLocalAppDir(const char *p1 = NULL, const char *p2 = NULL,
                                   const char *p3 = NULL, const char *p4 = NULL) {
-    std::string path(GetKnownFolderPathXp(CSIDL_LOCAL_APPDATA));
+    char *path = GetKnownFolderPathXp(CSIDL_LOCAL_APPDATA);
     if (p1 != NULL) {
-        path::Join(path, p1);
+        char *tmp = path::JoinUtf(path, p1, NULL);
+        str::ReplacePtr(&path, tmp);
     }
     if (p2 != NULL) {
-        path::Join(path, p2);
+        char *tmp = path::JoinUtf(path, p2, NULL);
+        str::ReplacePtr(&path, tmp);
     }
     if (p3 != NULL) {
-        path::Join(path, p3);
+        char *tmp = path::JoinUtf(path, p3, NULL);
+        str::ReplacePtr(&path, tmp);
     }
     if (p4 != NULL) {
-        path::Join(path, p4);
+        char *tmp = path::JoinUtf(path, p4, NULL);
+        str::ReplacePtr(&path, tmp);
     }
     return path;
 }
@@ -53,11 +60,12 @@ static std::string GetInstalledExePath() {
     return GetLocalAppDir(APP_DIR_NAME, BIN_DIR_NAME, EXE_NAME);
 }
 
-static std::string GetShortcutPath(bool allUsers) {
+static char *GetShortcutPath(bool allUsers) {
     // CSIDL_COMMON_PROGRAMS => installing for all users
-    std::string path(GetKnownFolderPathXp(allUsers ? CSIDL_COMMON_PROGRAMS : CSIDL_PROGRAMS));
-    if (!path.empty()) {
-        path::Join(path, APP_NAME ".lnk");
+    char *path = GetKnownFolderPathXp(allUsers ? CSIDL_COMMON_PROGRAMS : CSIDL_PROGRAMS);
+    if (!str::IsEmpty(path)) {
+        char *tmp = path::JoinUtf(path, APP_NAME ".lnk", NULL);
+        str::ReplacePtr(&path, tmp);
     }
     return path;
 }
@@ -98,13 +106,12 @@ static int64_t GetFullSize(WIN32_FIND_DATA &d) {
     return (int64_t)tmp + (int64_t)d.nFileSizeLow;
 }
 
-static int64_t GetDirSizeRecur(const std::string &dir) {
-    std::string dirPatternA(dir);
-    path::Join(dirPatternA, "*", 1);
-    AutoUtf8ToWstr dirPattern(dirPatternA);
+static int64_t GetDirSizeRecur(const char *dir) {
+    ScopedMem<char> dirPattern(path::JoinUtf(dir, "*", NULL));
+    AutoUtf8ToWstr dirPatternW(dirPattern);
     WIN32_FIND_DATA findData;
 
-    HANDLE h = FindFirstFile(dirPattern, &findData);
+    HANDLE h = FindFirstFile(dirPatternW, &findData);
     if (h == INVALID_HANDLE_VALUE)
         return 0;
 
@@ -114,8 +121,7 @@ static int64_t GetDirSizeRecur(const std::string &dir) {
             totalSize += GetFullSize(findData);
         } else if (!str::Eq(findData.cFileName, L".") && !str::Eq(findData.cFileName, L"..")) {
             AutoWstrToUtf8 fileName(findData.cFileName);
-            std::string subDir(dir);
-            path::Join(subDir, fileName.Get());
+            ScopedMem<char> subDir(path::JoinUtf(dir, fileName.Get(), NULL));
             totalSize += GetDirSizeRecur(subDir);
         }
     } while (FindNextFile(h, &findData) != 0);
@@ -168,7 +174,7 @@ static bool InstallWriteRegistry(HKEY hkey) {
     uninstallCmdLine.append(exePath);
     uninstallCmdLine.append("\" /uninstall");
 
-    int64_t size = GetDirSizeRecur(installDir) / 1024;
+    int64_t size = GetDirSizeRecur(installDir.c_str()) / 1024;
 
     ok &= WriteRegStr(hkey, REG_PATH_UNINST, DISPLAY_ICON, exePath.c_str());
     ok &= WriteRegStr(hkey, REG_PATH_UNINST, DISPLAY_NAME, APP_NAME);
@@ -203,7 +209,7 @@ static bool InstallCopyFiles() {
     // TODO(kjk): kill processes that match the path we're writing to
     auto exePath = GetExePath();
     auto dstPath = GetInstalledExePath();
-    if (!dir::CreateForFile(dstPath)) {
+    if (!dir::CreateForFile(dstPath.c_str())) {
         return false;
     }
     bool allUsers = false;

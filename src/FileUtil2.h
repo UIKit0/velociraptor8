@@ -1,8 +1,6 @@
 namespace path {
 
-void Join(std::string& sInOut, const char* s, size_t sLen = 0);
-void Join(std::string& sInOut, const std::string& s2);
-std::string GetDir(const std::string&);
+char* GetDir(const char*);
 void NormalizeInPlace(WCHAR* src, size_t srcCchSize);
 
 } // namespace path
@@ -18,9 +16,9 @@ bool Delete(const char *);
 namespace dir {
 
 bool Exists(const char*);
-bool Create(const std::string&);
-bool CreateAll(const std::string&);
-bool CreateForFile(const std::string&);
-bool Delete(const std::string&);
+bool Create(const char*);
+bool CreateAll(const char*);
+bool CreateForFile(const char*);
+bool Delete(const char*);
 
 } // namespace dir

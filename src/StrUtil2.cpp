@@ -28,6 +28,11 @@ WCHAR *Utf8ToWstrBuf(const char *s, WCHAR *bufOut, size_t cchBufOutSize) {
 
 WCHAR *Utf8ToWstr(const char *s) { return Utf8ToWstrBuf(s, NULL, 0); }
 
+char *WstrToUtf8(const WCHAR *s) {
+    AutoWstrToUtf8 sA(s);
+    return str::Dup(sA.Get());
+}
+
 std::string WstrToUtf8Str(const WCHAR *s) {
     AutoWstrToUtf8 sA(s);
     char *cstr = sA.Get();

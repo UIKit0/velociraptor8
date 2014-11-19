@@ -38,23 +38,19 @@ void Join(std::string& sInOut, const std::string& s2) {
 
 // consider using PathRemoveFileSpec()
 // http://msdn.microsoft.com/en-us/library/windows/desktop/bb773748(v=vs.85).aspx
-std::string GetDir(const std::string& path) {
-    std::string res(path);
-    if (path.empty()) {
-        return res;
-    }
-    const char* start = res.c_str();
-    const char* end = start + res.size() - 1;
-    while (end >= start) {
-        char c = *end;
-        if (IsSep(c)) {
-            size_t idx = end - start;
-            res.erase(idx, res.size());
-            return res;
-        }
-        --end;
-    }
-    return res;
+// Caller has to free()
+char *GetDir(const char*path) {
+    const char *baseName = GetBaseName(path);
+    if (baseName == path) // relative directory
+        return str::Dup(".");
+    if (baseName == path + 1) // relative root
+        return str::DupN(path, 1);
+    if (baseName == path + 3 && path[1] == ':') // local drive root
+        return str::DupN(path, 3);
+    if (baseName == path + 2 && str::StartsWith(path, "\\\\")) // server root
+        return str::Dup(path);
+    // any subdirectory
+    return str::DupN(path, baseName - path - 1);
 }
 
 } // namespace path
@@ -117,25 +113,25 @@ bool Exists(const char* dir) {
 }
 
 // Return true if a directory already exists or has been successfully created
-bool Create(const std::string& dir) {
+bool Create(const char *dir) {
     AutoUtf8ToWstr dirW(dir);
-    BOOL ok = CreateDirectory(dirW.Get(), NULL);
+    BOOL ok = CreateDirectoryW(dirW.Get(), NULL);
     if (ok)
         return true;
     return ERROR_ALREADY_EXISTS == GetLastError();
 }
 
 // creates a directory and all its parent directories that don't exist yet
-bool CreateAll(const std::string& dir) {
-    std::string parent(path::GetDir(dir));
-    if (parent != dir && !Exists(parent.c_str())) {
+bool CreateAll(const char *dir) {
+    ScopedMem<char> parent(path::GetDir(dir));
+    if (parent != dir && !Exists(parent)) {
         CreateAll(parent);
     }
     return Create(dir);
 }
 
-bool CreateForFile(const std::string& path) {
-    auto dir(path::GetDir(path));
+bool CreateForFile(const char *path) {
+    ScopedMem<char> dir(path::GetDir(path));
     return dir::CreateAll(dir);
 }
 

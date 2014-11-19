@@ -24,7 +24,7 @@ char *WstrToUtf8Buf(const WCHAR *s, char *buf, size_t bufCbLen);
 WCHAR *Utf8ToWstrBuf(const char *s, WCHAR *buf, size_t bufCchLen);
 WCHAR *Utf8ToWstr(const char *s);
 
-// TODO: allow optimizing by specifying size of s
+char *WstrToUtf8(const WCHAR *s);
 std::string WstrToUtf8Str(const WCHAR *s);
 
 class AutoWstrToUtf8 {

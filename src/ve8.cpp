@@ -465,14 +465,14 @@ static bool CheckWinVer() {
 }
 
 static void TestGetDir() {
-    std::string s("c:\\foo\\bar\\and.txt");
-    OutputDebugStringA(path::GetDir(s).c_str());
-    s = "";
-    OutputDebugStringA(path::GetDir(s).c_str());
-    s = "foo/bar.txt";
-    OutputDebugStringA(path::GetDir(s).c_str());
-    s = "foo";
-    OutputDebugStringA(path::GetDir(s).c_str());
+    ScopedMem<char> s(path::GetDir("c:\\foo\\bar\\and.txt"));
+    OutputDebugStringA(s.Get());
+    s.Set(path::GetDir(""));
+    OutputDebugStringA(s.Get());
+    s.Set(path::GetDir("foo/bar.txt"));
+    OutputDebugStringA(s.Get());
+    s.Set(path::GetDir("foo"));
+    OutputDebugStringA(s.Get());
 }
 
 static void TestUiTask() {
