@@ -570,8 +570,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, in
 
     LoadSettings();
 
-    if (!InitApplication(hInstance))
+    BOOL ok = InitApplication(hInstance);
+    if (!ok) {
         return FALSE;
+    }
 
     if (!(hwnd = InitInstance(hInstance, lpCmdLine, nCmdShow)))
         return FALSE;
@@ -620,7 +622,8 @@ BOOL InitApplication(HINSTANCE hInstance) {
     // wc.lpszMenuName = MAKEINTRESOURCE(IDR_MAINWND);
     wc.lpszClassName = fullWndClass;
 
-    return RegisterClass(&wc);
+    ATOM a = RegisterClassW(&wc);
+    return a != 0;
 }
 
 HWND InitInstance(HINSTANCE hInstance, LPSTR pszCmdLine, int nCmdShow) {
@@ -902,6 +905,11 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
         case WM_WINDOWPOSCHANGING:
         case WM_WINDOWPOSCHANGED:
             return DefWindowProc(hwnd, msg, wp, lp);
+
+        case WM_NCCREATE: {
+            LRESULT lres = DefWindowProc(hwnd, msg, wp, lp);
+            return lres;
+        }
 
         case WM_CREATE:
             extern void TestFormatText();
