@@ -53,69 +53,6 @@
     <ClCompile Include="TextFormat.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="utils\BaseUtil.cpp">
-      <Filter>src\utils</Filter>
-    </ClCompile>
-    <ClCompile Include="utils\CmdLineParser.cpp">
-      <Filter>src\utils</Filter>
-    </ClCompile>
-    <ClCompile Include="utils\DbgHelpDyn.cpp">
-      <Filter>src\utils</Filter>
-    </ClCompile>
-    <ClCompile Include="utils\DebugLog.cpp">
-      <Filter>src\utils</Filter>
-    </ClCompile>
-    <ClCompile Include="utils\Dpi.cpp">
-      <Filter>src\utils</Filter>
-    </ClCompile>
-    <ClCompile Include="utils\FileUtil.cpp">
-      <Filter>src\utils</Filter>
-    </ClCompile>
-    <ClCompile Include="utils\FileWatcher.cpp">
-      <Filter>src\utils</Filter>
-    </ClCompile>
-    <ClCompile Include="utils\FrameRateWnd.cpp">
-      <Filter>src\utils</Filter>
-    </ClCompile>
-    <ClCompile Include="utils\HtmlWindow.cpp">
-      <Filter>src\utils</Filter>
-    </ClCompile>
-    <ClCompile Include="utils\HttpUtil.cpp">
-      <Filter>src\utils</Filter>
-    </ClCompile>
-    <ClCompile Include="utils\LabelWithCloseWnd.cpp">
-      <Filter>src\utils</Filter>
-    </ClCompile>
-    <ClCompile Include="utils\SplitterWnd.cpp">
-      <Filter>src\utils</Filter>
-    </ClCompile>
-    <ClCompile Include="utils\StrFormat.cpp">
-      <Filter>src\utils</Filter>
-    </ClCompile>
-    <ClCompile Include="utils\StrSlice.cpp">
-      <Filter>src\utils</Filter>
-    </ClCompile>
-    <ClCompile Include="utils\StrUtil.cpp">
-      <Filter>src\utils</Filter>
-    </ClCompile>
-    <ClCompile Include="utils\ThreadUtil.cpp">
-      <Filter>src\utils</Filter>
-    </ClCompile>
-    <ClCompile Include="utils\Touch.cpp">
-      <Filter>src\utils</Filter>
-    </ClCompile>
-    <ClCompile Include="utils\UITask.cpp">
-      <Filter>src\utils</Filter>
-    </ClCompile>
-    <ClCompile Include="utils\UtAssert.cpp">
-      <Filter>src\utils</Filter>
-    </ClCompile>
-    <ClCompile Include="utils\WinCursors.cpp">
-      <Filter>src\utils</Filter>
-    </ClCompile>
-    <ClCompile Include="utils\WinUtil.cpp">
-      <Filter>src\utils</Filter>
-    </ClCompile>
     <ClCompile Include="WinUtil2.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -125,16 +62,115 @@
     <ClCompile Include="StrUtil2.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="utils\GdiPlusUtil.cpp">
+    <ClCompile Include="..\..\sumatrapdf\src\utils\BaseUtil.cpp">
       <Filter>src\utils</Filter>
     </ClCompile>
-    <ClCompile Include="utils\FzImgReader.cpp">
+    <ClCompile Include="..\..\sumatrapdf\src\utils\BitReader.cpp">
       <Filter>src\utils</Filter>
     </ClCompile>
-    <ClCompile Include="utils\TgaReader.cpp">
+    <ClCompile Include="..\..\sumatrapdf\src\utils\ByteOrderDecoder.cpp">
       <Filter>src\utils</Filter>
     </ClCompile>
-    <ClCompile Include="utils\WebpReader.cpp">
+    <ClCompile Include="..\..\sumatrapdf\src\utils\CmdLineParser.cpp">
+      <Filter>src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sumatrapdf\src\utils\CssParser.cpp">
+      <Filter>src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sumatrapdf\src\utils\DbgHelpDyn.cpp">
+      <Filter>src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sumatrapdf\src\utils\DebugLog.cpp">
+      <Filter>src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sumatrapdf\src\utils\DialogSizer.cpp">
+      <Filter>src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sumatrapdf\src\utils\Dict.cpp">
+      <Filter>src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sumatrapdf\src\utils\DirIter.cpp">
+      <Filter>src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sumatrapdf\src\utils\Dpi.cpp">
+      <Filter>src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sumatrapdf\src\utils\FileTransactions.cpp">
+      <Filter>src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sumatrapdf\src\utils\FileUtil.cpp">
+      <Filter>src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sumatrapdf\src\utils\FileWatcher.cpp">
+      <Filter>src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sumatrapdf\src\utils\FrameRateWnd.cpp">
+      <Filter>src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sumatrapdf\src\utils\FzImgReader.cpp">
+      <Filter>src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sumatrapdf\src\utils\GdiPlusUtil.cpp">
+      <Filter>src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sumatrapdf\src\utils\HtmlParserLookup.cpp">
+      <Filter>src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sumatrapdf\src\utils\HtmlPrettyPrint.cpp">
+      <Filter>src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sumatrapdf\src\utils\HtmlPullParser.cpp">
+      <Filter>src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sumatrapdf\src\utils\HtmlWindow.cpp">
+      <Filter>src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sumatrapdf\src\utils\HttpUtil.cpp">
+      <Filter>src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sumatrapdf\src\utils\JsonParser.cpp">
+      <Filter>src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sumatrapdf\src\utils\LabelWithCloseWnd.cpp">
+      <Filter>src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sumatrapdf\src\utils\SplitterWnd.cpp">
+      <Filter>src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sumatrapdf\src\utils\StrFormat.cpp">
+      <Filter>src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sumatrapdf\src\utils\StrSlice.cpp">
+      <Filter>src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sumatrapdf\src\utils\StrUtil.cpp">
+      <Filter>src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sumatrapdf\src\utils\TgaReader.cpp">
+      <Filter>src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sumatrapdf\src\utils\ThreadUtil.cpp">
+      <Filter>src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sumatrapdf\src\utils\Touch.cpp">
+      <Filter>src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sumatrapdf\src\utils\TrivialHtmlParser.cpp">
+      <Filter>src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sumatrapdf\src\utils\UITask.cpp">
+      <Filter>src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sumatrapdf\src\utils\UtAssert.cpp">
+      <Filter>src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sumatrapdf\src\utils\WebpReader.cpp">
+      <Filter>src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sumatrapdf\src\utils\WinCursors.cpp">
+      <Filter>src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sumatrapdf\src\utils\WinUtil.cpp">
       <Filter>src\utils</Filter>
     </ClCompile>
   </ItemGroup>
@@ -187,102 +223,6 @@
     <ClInclude Include="Version.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="utils\Allocator.h">
-      <Filter>src\utils</Filter>
-    </ClInclude>
-    <ClInclude Include="utils\BaseUtil.h">
-      <Filter>src\utils</Filter>
-    </ClInclude>
-    <ClInclude Include="utils\BitManip.h">
-      <Filter>src\utils</Filter>
-    </ClInclude>
-    <ClInclude Include="utils\ByteReader.h">
-      <Filter>src\utils</Filter>
-    </ClInclude>
-    <ClInclude Include="utils\CmdLineParser.h">
-      <Filter>src\utils</Filter>
-    </ClInclude>
-    <ClInclude Include="utils\DbgHelpDyn.h">
-      <Filter>src\utils</Filter>
-    </ClInclude>
-    <ClInclude Include="utils\DebugLog.h">
-      <Filter>src\utils</Filter>
-    </ClInclude>
-    <ClInclude Include="utils\Dpi.h">
-      <Filter>src\utils</Filter>
-    </ClInclude>
-    <ClInclude Include="utils\FileUtil.h">
-      <Filter>src\utils</Filter>
-    </ClInclude>
-    <ClInclude Include="utils\FileWatcher.h">
-      <Filter>src\utils</Filter>
-    </ClInclude>
-    <ClInclude Include="utils\FrameRateWnd.h">
-      <Filter>src\utils</Filter>
-    </ClInclude>
-    <ClInclude Include="utils\FrameTimeoutCalculator.h">
-      <Filter>src\utils</Filter>
-    </ClInclude>
-    <ClInclude Include="utils\GeomUtil.h">
-      <Filter>src\utils</Filter>
-    </ClInclude>
-    <ClInclude Include="utils\HtmlWindow.h">
-      <Filter>src\utils</Filter>
-    </ClInclude>
-    <ClInclude Include="utils\HttpUtil.h">
-      <Filter>src\utils</Filter>
-    </ClInclude>
-    <ClInclude Include="utils\LabelWithCloseWnd.h">
-      <Filter>src\utils</Filter>
-    </ClInclude>
-    <ClInclude Include="utils\RefCounted.h">
-      <Filter>src\utils</Filter>
-    </ClInclude>
-    <ClInclude Include="utils\Scoped.h">
-      <Filter>src\utils</Filter>
-    </ClInclude>
-    <ClInclude Include="utils\SplitterWnd.h">
-      <Filter>src\utils</Filter>
-    </ClInclude>
-    <ClInclude Include="utils\StrFormat.h">
-      <Filter>src\utils</Filter>
-    </ClInclude>
-    <ClInclude Include="utils\StrHash.h">
-      <Filter>src\utils</Filter>
-    </ClInclude>
-    <ClInclude Include="utils\StrSlice.h">
-      <Filter>src\utils</Filter>
-    </ClInclude>
-    <ClInclude Include="utils\StrUtil.h">
-      <Filter>src\utils</Filter>
-    </ClInclude>
-    <ClInclude Include="utils\ThreadUtil.h">
-      <Filter>src\utils</Filter>
-    </ClInclude>
-    <ClInclude Include="utils\Timer.h">
-      <Filter>src\utils</Filter>
-    </ClInclude>
-    <ClInclude Include="utils\Touch.h">
-      <Filter>src\utils</Filter>
-    </ClInclude>
-    <ClInclude Include="utils\UITask.h">
-      <Filter>src\utils</Filter>
-    </ClInclude>
-    <ClInclude Include="utils\UtAssert.h">
-      <Filter>src\utils</Filter>
-    </ClInclude>
-    <ClInclude Include="utils\Vec.h">
-      <Filter>src\utils</Filter>
-    </ClInclude>
-    <ClInclude Include="utils\VecSegmented.h">
-      <Filter>src\utils</Filter>
-    </ClInclude>
-    <ClInclude Include="utils\WinCursors.h">
-      <Filter>src\utils</Filter>
-    </ClInclude>
-    <ClInclude Include="utils\WinUtil.h">
-      <Filter>src\utils</Filter>
-    </ClInclude>
     <ClInclude Include="WinUtil2.h">
       <Filter>src</Filter>
     </ClInclude>
@@ -292,16 +232,157 @@
     <ClInclude Include="StrUtil2.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="utils\GdiPlusUtil.h">
+    <ClInclude Include="..\..\sumatrapdf\src\utils\Allocator.h">
       <Filter>src\utils</Filter>
     </ClInclude>
-    <ClInclude Include="utils\FzImgReader.h">
+    <ClInclude Include="..\..\sumatrapdf\src\utils\BaseUtil.h">
       <Filter>src\utils</Filter>
     </ClInclude>
-    <ClInclude Include="utils\TgaReader.h">
+    <ClInclude Include="..\..\sumatrapdf\src\utils\BitManip.h">
       <Filter>src\utils</Filter>
     </ClInclude>
-    <ClInclude Include="utils\WebpReader.h">
+    <ClInclude Include="..\..\sumatrapdf\src\utils\BitReader.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sumatrapdf\src\utils\ByteOrderDecoder.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sumatrapdf\src\utils\ByteReader.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sumatrapdf\src\utils\ByteWriter.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sumatrapdf\src\utils\CmdLineParser.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sumatrapdf\src\utils\CssParser.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sumatrapdf\src\utils\DbgHelpDyn.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sumatrapdf\src\utils\DebugLog.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sumatrapdf\src\utils\DialogSizer.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sumatrapdf\src\utils\Dict.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sumatrapdf\src\utils\DirIter.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sumatrapdf\src\utils\Dpi.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sumatrapdf\src\utils\FileTransactions.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sumatrapdf\src\utils\FileUtil.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sumatrapdf\src\utils\FileWatcher.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sumatrapdf\src\utils\FrameRateWnd.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sumatrapdf\src\utils\FrameTimeoutCalculator.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sumatrapdf\src\utils\FzImgReader.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sumatrapdf\src\utils\GdiPlusUtil.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sumatrapdf\src\utils\GeomUtil.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sumatrapdf\src\utils\HtmlParserLookup.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sumatrapdf\src\utils\HtmlPrettyPrint.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sumatrapdf\src\utils\HtmlPullParser.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sumatrapdf\src\utils\HtmlWindow.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sumatrapdf\src\utils\HttpUtil.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sumatrapdf\src\utils\JsonParser.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sumatrapdf\src\utils\LabelWithCloseWnd.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sumatrapdf\src\utils\mingw_compat.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sumatrapdf\src\utils\RefCounted.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sumatrapdf\src\utils\Scoped.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sumatrapdf\src\utils\SimpleLog.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sumatrapdf\src\utils\SplitterWnd.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sumatrapdf\src\utils\StrFormat.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sumatrapdf\src\utils\StrHash.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sumatrapdf\src\utils\StrSlice.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sumatrapdf\src\utils\StrUtil.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sumatrapdf\src\utils\TgaReader.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sumatrapdf\src\utils\ThreadUtil.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sumatrapdf\src\utils\Timer.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sumatrapdf\src\utils\Touch.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sumatrapdf\src\utils\TrivialHtmlParser.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sumatrapdf\src\utils\UITask.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sumatrapdf\src\utils\UtAssert.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sumatrapdf\src\utils\Vec.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sumatrapdf\src\utils\VecSegmented.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sumatrapdf\src\utils\WebpReader.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sumatrapdf\src\utils\WinCursors.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sumatrapdf\src\utils\WinUtil.h">
       <Filter>src\utils</Filter>
     </ClInclude>
   </ItemGroup>
