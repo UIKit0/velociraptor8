@@ -1365,9 +1365,9 @@ static LRESULT WmCreate(HWND hwnd, WPARAM wp, LPARAM lp) {
     HINSTANCE hInstance = cs->hInstance;
 
     //(void)IsRunningInstalled();
-
     CrashIf(gDoc);
     gDoc = AllocMust<Document>();
+
     gDoc->hwndScintilla = EditCreate(hwnd);
     InitScintillaHandle(gDoc->hwndScintilla);
 
