@@ -52,7 +52,7 @@ static const u16 STYLE_BITS = 16 - TYPE_BITS;
 static const u16 STYLE_MASK = ~(3 << STYLE_BITS);
 
 u16 MakeStyleAndType(u16 style, u16 type) {
-    CrashIf(type <= TextRun::TypeMax);
+    CrashIf(type > TextRun::TypeMax);
     type = type << STYLE_BITS;
     return style | type;
 }

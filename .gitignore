@@ -14,4 +14,8 @@
 /build/temp_zip*
 /distrib/Notepad2-mod.*.exe
 /signinfo_notepad2-mod.txt
-
+gyp/Debug/
+gyp/Release/
+gyp/*.sln
+gyp/*.vcxproj
+gyp/*.filters

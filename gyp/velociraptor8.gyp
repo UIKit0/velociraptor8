@@ -6,7 +6,7 @@
 			'msvs_disabled_warnings': [4244],
 			'dependencies': [
 				'scintilla.gyp:Scintilla',
-				'../../sumatrapdf/gyp/utils.gyp:utils'
+				'utils.gyp:utils'
 			],
 			'defines': [
 				'NO_LIBMUPDF',

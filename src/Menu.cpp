@@ -311,7 +311,7 @@ static HMENU AppendToMenu(HMENU m, MenuDef *menuDef) {
         }
         AutoUtf8ToWstr tmp(md.title);
         if (md.sub == nullptr) {
-            CrashIf(md.id != 0);
+            CrashIf(md.id == 0);
             AppendMenu(m, MF_STRING, (UINT_PTR)md.id, tmp.Get());
         } else {
             auto subMenu = AppendToMenu(CreateMenu(), md.sub);
